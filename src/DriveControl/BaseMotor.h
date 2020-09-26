@@ -24,19 +24,20 @@ double bRB = 1;
 double bLB = 1;
 
 //Function Definitions
-void setDPS(double velocity){
+void setDPS(double targetVel){
   //Sets velocity of motors; directon depends on current axis; Units in degrees per second
 
   int d = 1;
-  if(velocity<0){
+  if(targetVel<0){
     d = -1;
-    velocity=velocity*d;
+    targetVel=targetVel*d;
   }
 
   //If vel is < than min vel to move or is 0 then it will stop
-  if((velocity == 0) || ((velocity<minDPSSpeed) && (velocity>0)) ) { 
+  if((targetVel == 0) || ((targetVel<minDPSSpeed) && (targetVel>0)) ) { 
     //TODO! Remove minDPSLimit when calculating min DPS
     //Stop
+    std::cout << "STOP" << std::endl;
     fRB = 1;
     fLB = 1;
     bRB = 1;
@@ -47,11 +48,11 @@ void setDPS(double velocity){
     backRight.stop();
   }
 
-  velocity = velocity*d;
-  frontLeft.setVelocity(velocity*fLB, velocityUnits::dps);
-  frontRight.setVelocity(velocity*fRB, velocityUnits::dps);
-  backLeft.setVelocity(velocity*bLB, velocityUnits::dps);
-  backRight.setVelocity(velocity*bRB, velocityUnits::dps);
+  targetVel = targetVel*d;
+  frontLeft.setVelocity(targetVel*fLB, velocityUnits::dps);
+  frontRight.setVelocity(targetVel*fRB, velocityUnits::dps);
+  backLeft.setVelocity(targetVel*bLB, velocityUnits::dps);
+  backRight.setVelocity(targetVel*bRB, velocityUnits::dps);
 }
 
 

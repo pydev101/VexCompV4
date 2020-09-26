@@ -11,8 +11,8 @@
 #include "math.h"
 
 //Adj Constants
-const double timeUnit = 250; //msec; Delay time between updates of PID function
-const double gain = 10;
+const double timeUnit = 200; //msec; Delay time between updates of PID function
+const double gain = 0.9;
 const double widthOfBaseMeters = 0; //In Meters
 const double heightOfBaseMeters = 0; //In Meters
 const double diameterOfWheelMeters = 0; //In Meters
@@ -50,16 +50,26 @@ results PID(double encTarget, double encCurr, double lastError=0, double reset=0
 }
 
 
-void axisPID(int axis, double degrees){
-  resetEncoders();
-  setAxis(axis);
+void axisPID(int axis, double degrees, bool isInit=true){
+  if(isInit){
+    resetEncoders();
+    setAxis(axis);
+  }
+
   results r = PID(degrees, getRightVertEnc());
 
-  while(r.speed > 0){
+  if(abs(r.lastError) <= minDegreesPerTimeUnit){
+    setDPS(0);
+    return;
+  }
+
+  while(abs(r.lastError) > minDegreesPerTimeUnit){
     std::cout << "Encoder: " << getRightVertEnc() << " Speed: " << r.speed << " Error: " << r.lastError << std::endl;
 
     setDPS(r.speed);
     wait(timeUnit, timeUnits::msec);
     r = PID(degrees, getRightVertEnc(), r.lastError, r.reset);
   }
+
+  axisPID(axis, degrees, false);
 }
