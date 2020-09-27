@@ -26,35 +26,22 @@ double bLB = 1;
 //Function Definitions
 void setDPS(double targetVel){
   //Sets velocity of motors; directon depends on current axis; Units in degrees per second
-
-  int d = 1;
-  if(targetVel<0){
-    d = -1;
-    targetVel=targetVel*d;
-  }
-
-  //If vel is < than min vel to move or is 0 then it will stop
-  if((targetVel == 0) || ((targetVel<minDPSSpeed) && (targetVel>0)) ) { 
-    //TODO! Remove minDPSLimit when calculating min DPS
-    //Stop
-    std::cout << "STOP" << std::endl;
-    fRB = 1;
-    fLB = 1;
-    bRB = 1;
-    bLB = 1;
-    frontLeft.stop();
-    frontRight.stop();
-    backLeft.stop();
-    backRight.stop();
-  }
-
-  targetVel = targetVel*d;
   frontLeft.setVelocity(targetVel*fLB, velocityUnits::dps);
   frontRight.setVelocity(targetVel*fRB, velocityUnits::dps);
   backLeft.setVelocity(targetVel*bLB, velocityUnits::dps);
   backRight.setVelocity(targetVel*bRB, velocityUnits::dps);
 }
 
+void stopMotors(){
+  fRB = 1;
+  fLB = 1;
+  bRB = 1;
+  bLB = 1;
+  frontLeft.stop();
+  frontRight.stop();
+  backLeft.stop();
+  backRight.stop();
+}
 
 //Non Rotation Movement
 
@@ -150,4 +137,32 @@ double getHorEnc(){
 
 double getHeading(){
   return ISensor.heading();
+}
+
+double getAxisEncoder(int axis){
+  if(axis == 0){
+    //Vertical - Positive is fwd
+    return getRightVertEnc();
+  }else if(axis == 1){
+    //Horizontal - Positive is right
+    return getHorEnc();
+  }else{
+    double ver = getRightVertEnc();
+    double hor = getRightVertEnc();
+    if(axis == 2){
+      //Diagnal - Positive is fwd-right
+      if((hor>0) && (ver>0)){
+        return sqrt((ver*ver)+(hor*hor));
+      }else if((hor<0) && (ver<0)){
+        return -sqrt((ver*ver)+(hor*hor));
+      }
+    }else if(axis == 3){
+      //Diagnal - Positive is fwd-left
+      if((hor<0) && (ver>0)){
+        return sqrt((ver*ver)+(hor*hor));
+      }else if((hor>0) && (ver<0)){
+        return -sqrt((ver*ver)+(hor*hor));
+      }
+    }
+  }
 }

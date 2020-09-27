@@ -36,44 +36,33 @@ struct results{double speed; double lastError; double reset;};
 results PID(double encTarget, double encCurr, double lastError=0, double reset=0){
   //EncTarget is in degrees
   double error = encTarget - encCurr;
-
-  if(abs(error) < minDegreesPerTimeUnit){
-    //Robot unable to move distance in one time unit using minVelocity
-    //return results{0,0,0};
-  }
   
   reset = reset + (tau * error);
   double p = gain * error;
   double d = tau * (error - lastError);
 
-  results r = results{p+reset+d, error, reset};
-  std::cout << "Encoder: " << getRightVertEnc() << " Speed: " << r.speed << " Error: " << r.lastError << std::endl;
-  return r;
+  return results{p+reset+d, error, reset};
 }
 
 
 void axisPID(int axis, double degrees, bool isInit=true){
-  std::cout << minDegreesPerTimeUnit << std::endl;
   if(isInit){
     resetEncoders();
   }
-  results r = PID(degrees, getRightVertEnc());
 
-  if(abs(r.lastError) > minDegreesPerTimeUnit){
-    setAxis(axis);
-  }else{
-    setDPS(0);
+  results r = PID(degrees, getAxisEncoder(axis));
+  
+  if(abs(r.lastError) < minDegreesPerTimeUnit){
+    stopMotors();
     return;
   }
-
-  while(abs(r.lastError) > minDegreesPerTimeUnit){
+  setAxis(axis);
+  
+  while((abs(r.lastError) < minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
+    r = PID(degrees, getAxisEncoder(axis), r.lastError, r.reset);
     setDPS(r.speed);
     wait(timeUnit, msec);
-    r = PID(degrees, getRightVertEnc(), r.lastError, r.reset);
-    if((isSpining()) && ((degrees - getRightVertEnc()) == r.lastError)){
-      break;
-    }
   }
 
-  axisPID(axis, degrees, isInit=false);
+  stopMotors();
 }
