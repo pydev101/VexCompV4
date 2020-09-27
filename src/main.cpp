@@ -20,7 +20,7 @@
 // ISensor              inertial      15              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 #include "AutoPrograms.h"
-//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();

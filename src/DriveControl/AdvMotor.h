@@ -12,7 +12,7 @@
 
 //Adj Constants
 const double timeUnit = 200; //msec; Delay time between updates of PID function
-const double gain = 0.9;
+const double gain = 0.85;
 const double widthOfBaseMeters = 0; //In Meters
 const double heightOfBaseMeters = 0; //In Meters
 const double diameterOfTravelWheel = 0; //In Meters
@@ -58,10 +58,13 @@ void axisPID(int axis, double degrees, bool isInit=true){
   }
   setAxis(axis);
   
-  while((abs(r.lastError) < minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
+  int currTimeUnit = 0;
+  while((abs(r.lastError) > minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
     r = PID(degrees, getAxisEncoder(axis), r.lastError, r.reset);
     setDPS(r.speed);
+    std::cout << currTimeUnit << ", " << getAxisEncoder(axis) << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
+    currTimeUnit++;
   }
 
   stopMotors();

@@ -165,4 +165,6 @@ double getAxisEncoder(int axis){
       }
     }
   }
+  std::cout << "ERROR" << std::endl;
+  return 0;
 }
