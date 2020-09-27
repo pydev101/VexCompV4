@@ -15,7 +15,8 @@ const double timeUnit = 200; //msec; Delay time between updates of PID function
 const double gain = 0.9;
 const double widthOfBaseMeters = 0; //In Meters
 const double heightOfBaseMeters = 0; //In Meters
-const double diameterOfWheelMeters = 0; //In Meters
+const double diameterOfTravelWheel = 0; //In Meters
+const double diameterOfMeasureWheel = 0; //In Meters
 
 //Known constants
 const double timeUnitsPerSecond = 1000/timeUnit; //How many time units per second (t/s)
@@ -38,38 +39,41 @@ results PID(double encTarget, double encCurr, double lastError=0, double reset=0
 
   if(abs(error) < minDegreesPerTimeUnit){
     //Robot unable to move distance in one time unit using minVelocity
-    //setDPS(0);
-    return results{0,0,0};
+    //return results{0,0,0};
   }
   
   reset = reset + (tau * error);
   double p = gain * error;
   double d = tau * (error - lastError);
 
-  return results{p+reset+d, error, reset};
+  results r = results{p+reset+d, error, reset};
+  std::cout << "Encoder: " << getRightVertEnc() << " Speed: " << r.speed << " Error: " << r.lastError << std::endl;
+  return r;
 }
 
 
 void axisPID(int axis, double degrees, bool isInit=true){
+  std::cout << minDegreesPerTimeUnit << std::endl;
   if(isInit){
     resetEncoders();
-    setAxis(axis);
   }
-
   results r = PID(degrees, getRightVertEnc());
 
-  if(abs(r.lastError) <= minDegreesPerTimeUnit){
+  if(abs(r.lastError) > minDegreesPerTimeUnit){
+    setAxis(axis);
+  }else{
     setDPS(0);
     return;
   }
 
   while(abs(r.lastError) > minDegreesPerTimeUnit){
-    std::cout << "Encoder: " << getRightVertEnc() << " Speed: " << r.speed << " Error: " << r.lastError << std::endl;
-
     setDPS(r.speed);
-    wait(timeUnit, timeUnits::msec);
+    wait(timeUnit, msec);
     r = PID(degrees, getRightVertEnc(), r.lastError, r.reset);
+    if((isSpining()) && ((degrees - getRightVertEnc()) == r.lastError)){
+      break;
+    }
   }
 
-  axisPID(axis, degrees, false);
+  axisPID(axis, degrees, isInit=false);
 }

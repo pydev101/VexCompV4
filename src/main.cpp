@@ -20,7 +20,7 @@
 // ISensor              inertial      15              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 #include "AutoPrograms.h"
-//AAAAAAAAAAAAAAAAAAA
+//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
@@ -35,6 +35,5 @@ int main() {
 
   axisPID(0, 1000);
 
-  while(abs(ISensor.acceleration(axisType::yaxis)) > 0){wait(500, msec);}
   std::cout << "END " << getRightVertEnc() << std::endl;
 }

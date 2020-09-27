@@ -117,6 +117,14 @@ void rotate(){
   backLeft.spin(directionType::fwd);
 }
 
+bool isSpining(){
+  if(frontLeft.isSpinning() || frontRight.isSpinning() || backLeft.isSpinning() || backRight.isSpinning()){
+    return true;
+  }else{
+    return false;
+  }
+}
+
 //Encoder
 void resetEncoders(){
   horEncoder.resetRotation();
