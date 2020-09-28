@@ -33,7 +33,7 @@ int main() {
   backRight.setBrake(brakeType::hold);
   setDPS(0);
 
-  axisPID(0, 3000);
-
+  axisPID(3, 1000);
+  axisPID(3, -1000);
   std::cout << "END " << getRightVertEnc() << std::endl;
 }

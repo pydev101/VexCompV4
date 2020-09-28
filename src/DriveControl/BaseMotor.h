@@ -133,7 +133,7 @@ double getLeftVertEnc(){
 }
 
 double getHorEnc(){
-  return horEncoder.position(rotationUnits::deg);
+  return -1*horEncoder.position(rotationUnits::deg);
 }
 
 double getHeading(){

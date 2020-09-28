@@ -12,17 +12,15 @@
 
 //Adj Constants
 const double timeUnit = 10; //msec; Delay time between updates of PID function
-const double gain = 1.25;
-const double widthOfBaseMeters = 0; //In Meters
-const double heightOfBaseMeters = 0; //In Meters
-const double diameterOfTravelWheel = 0; //In Meters
-const double diameterOfMeasureWheel = 0; //In Meters
+const double widthOfBaseMeters = 13; //In Inches
+const double heightOfBaseMeters = 11; //In Inches
+const double diameterOfTravelWheel = 4; //In Inches
+const double diameterOfMeasureWheel = 3; //In Inches
 
 //Known constants
 const double timeUnitsPerSecond = 1000/timeUnit; //How many time units per second (t/s)
 const double minDegreesPerTimeUnit = minDPSSpeed/timeUnitsPerSecond; //The least ammount of degrees travelable in one time unit
-const double tau = gain/timeUnitsPerSecond; //Seconds per repeat * gain
-const double turnDiameter = sqrt((widthOfBaseMeters*widthOfBaseMeters) + (heightOfBaseMeters*heightOfBaseMeters)); //Multiple meters*convserionConstant if wanted radians in motor degrees
+const double turnDiameter = sqrt((widthOfBaseMeters*widthOfBaseMeters) + (heightOfBaseMeters*heightOfBaseMeters)); //Diagboal length across wheels in inches
 
 //Helper
 double abs(double x){
@@ -31,26 +29,24 @@ double abs(double x){
 }
 
 //Main Functions
-struct results{double speed; double lastError; double reset;};
+struct results{double speed; double lastError;};
 
-results PID(double encTarget, double encCurr, double lastError=0, double reset=0){
+results PID(double encTarget, double encCurr, double gain, results r={0,0}){
   //EncTarget is in degrees
   double error = encTarget - encCurr;
   
-  //reset = reset + (0 * error);
+  //reset = r.reset + (0 * error);
+  //double d = 0 * (error - r.lastError);
   double p = gain * error;
-  //double d = 0 * (error - lastError);
 
-  return results{p, error, reset};
+  return results{p, error};
 }
 
 
-void axisPID(int axis, double degrees, bool isInit=true){
-  if(isInit){
-    resetEncoders();
-  }
+void axisPID(int axis, double degrees, int stopDelay=500, double gain=1.25){
+  resetEncoders();
 
-  results r = PID(degrees, getAxisEncoder(axis));
+  results r = PID(degrees, getAxisEncoder(axis), gain);
   
   if(abs(r.lastError) < minDegreesPerTimeUnit){
     stopMotors();
@@ -60,11 +56,17 @@ void axisPID(int axis, double degrees, bool isInit=true){
   
   int currTimeUnit = 0;
   while((abs(r.lastError) > minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
-    r = PID(degrees, getAxisEncoder(axis));
+    r = PID(degrees, getAxisEncoder(axis), gain);
     setDPS(r.speed);
     std::cout << currTimeUnit << ", " << getAxisEncoder(axis) << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
     currTimeUnit++;
   }
   stopMotors();
+  wait(stopDelay, timeUnits::msec);
+}
+
+void rotatePID(double degreesTarget, bool CCW=true, int stopDelay=500, double gain=1.25){
+  resetHeading();
+  results r = PID(degreesTarget, getHeading(), gain);
 }
