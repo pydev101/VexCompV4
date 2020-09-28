@@ -33,6 +33,7 @@ void setDPS(double targetVel){
 }
 
 void stopMotors(){
+  setDPS(0);
   fRB = 1;
   fLB = 1;
   bRB = 1;

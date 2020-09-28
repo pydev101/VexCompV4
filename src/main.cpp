@@ -20,12 +20,12 @@
 // ISensor              inertial      15              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 #include "AutoPrograms.h"
-//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-  //ISensor.startCalibration();
-  //while(ISensor.isCalibrating()){wait(5, msec);}
+  ISensor.startCalibration();
+  while(ISensor.isCalibrating()){wait(5, msec);}
 
   frontLeft.setBrake(brakeType::hold);
   frontRight.setBrake(brakeType::hold);
@@ -33,7 +33,7 @@ int main() {
   backRight.setBrake(brakeType::hold);
   setDPS(0);
 
-  axisPID(0, 1000);
+  axisPID(0, 3000);
 
   std::cout << "END " << getRightVertEnc() << std::endl;
 }
