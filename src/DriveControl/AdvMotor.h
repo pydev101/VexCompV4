@@ -1,6 +1,6 @@
 /*----------------------------------------------------------------------------
 //                                                                            
-//    Module:       BaseMotor.h                                               
+//    Module:       AdvMotor.h                                               
 //    Author:       Carson E                                
 //    Created:      Thu Sep 10 2020                                           
 //    Description:  Header file that contains functions that provide a layer of logic ontop of basic drive functions in order to more accuratly move                                            
@@ -8,19 +8,13 @@
 //--------------------------------------------------------------------------*/
 
 #include "BaseMotor.h"
-#include "math.h"
-
-//Adj Constants
-const double timeUnit = 10; //msec; Delay time between updates of PID function
-const double widthOfBaseMeters = 13; //In Inches
-const double heightOfBaseMeters = 11; //In Inches
-const double diameterOfTravelWheel = 4; //In Inches
-const double diameterOfMeasureWheel = 3; //In Inches
 
 //Known constants
 const double timeUnitsPerSecond = 1000/timeUnit; //How many time units per second (t/s)
 const double minDegreesPerTimeUnit = minDPSSpeed/timeUnitsPerSecond; //The least ammount of degrees travelable in one time unit
-const double turnDiameter = sqrt((widthOfBaseMeters*widthOfBaseMeters) + (heightOfBaseMeters*heightOfBaseMeters)); //Diagboal length across wheels in inches
+const double turnCircumfranceMajor = (3.1415*sqrt((widthOfBaseMeters*widthOfBaseMeters) + (heightOfBaseMeters*heightOfBaseMeters))); //Diagboal length across wheels in inches times pi
+const double turnCircumfranceMinor = (2*centerToMeasureWheelRadius*3.1415);
+const double measureWheelC = (3.1415)*diameterOfMeasureWheel;
 
 //Helper
 double abs(double x){
@@ -29,21 +23,21 @@ double abs(double x){
 }
 
 //Main Functions
-struct results{double speed; double lastError;};
+struct results{double speed; double lastError; double reset;};
 
-results PID(double encTarget, double encCurr, double gain, results r={0,0}){
+results PID(double encTarget, double encCurr, double gain, results r={0,0,0}, double rGain=0, double dGain=0){
   //EncTarget is in degrees
   double error = encTarget - encCurr;
   
-  //reset = r.reset + (0 * error);
-  //double d = 0 * (error - r.lastError);
+  double reset = r.reset + (rGain * error);
+  double d = dGain * (error - r.lastError);
   double p = gain * error;
 
-  return results{p, error};
+  return results{p+reset+d, error, reset};
 }
 
 
-void axisPID(int axis, double degrees, int stopDelay=500, double gain=1.25){
+void axisPID(int axis, double degrees, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
   resetEncoders();
 
   results r = PID(degrees, getAxisEncoder(axis), gain);
@@ -56,7 +50,7 @@ void axisPID(int axis, double degrees, int stopDelay=500, double gain=1.25){
   
   int currTimeUnit = 0;
   while((abs(r.lastError) > minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
-    r = PID(degrees, getAxisEncoder(axis), gain);
+    r = PID(degrees, getAxisEncoder(axis), gain, r);
     setDPS(r.speed);
     std::cout << currTimeUnit << ", " << getAxisEncoder(axis) << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
@@ -66,7 +60,26 @@ void axisPID(int axis, double degrees, int stopDelay=500, double gain=1.25){
   wait(stopDelay, timeUnits::msec);
 }
 
-void rotatePID(double degreesTarget, bool CCW=true, int stopDelay=500, double gain=1.25){
-  resetHeading();
-  results r = PID(degreesTarget, getHeading(), gain);
+void rotatePID(double degreesTarget, int CCW=1, int stopDelay=defaultStopDelay, double gain=defaultGainRotational){
+  double throwawayInt;
+  degreesTarget = CCW*(turnCircumfranceMinor*modf(degreesTarget/360, &throwawayInt)); //Length of circumfrance needed to be traveled
+  degreesTarget = (degreesTarget / measureWheelC)*360; // Degres measure wheel needs to be turned
+
+  resetEncoders();
+  results r = PID(degreesTarget, getRightVertEnc(), gain);
+  if(abs(r.lastError) < minDegreesPerTimeUnit){
+    stopMotors();
+    return;
+  }
+  rotate();
+  int currTimeUnit = 0;
+  while((abs(r.lastError) > minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
+    r = PID(degreesTarget, getRightVertEnc(), gain, r);
+    setDPS(r.speed);
+    std::cout << currTimeUnit << ", " << getRightVertEnc() << ", " << r.lastError << ", " << r.speed << std::endl;
+    wait(timeUnit, msec);
+    currTimeUnit++;
+  }
+  stopMotors();
+  wait(stopDelay, timeUnits::msec);
 }

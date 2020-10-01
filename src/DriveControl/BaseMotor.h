@@ -6,16 +6,7 @@
 //    Description:  Header file that contains functions that interface with motors and sensors directly                                               
 //                                                                            
 //--------------------------------------------------------------------------*/
-
-#include "vex.h"
-
-using namespace vex;
-
-//Constants - Adjustible based on robot design
-const double minDPSSpeed = 6; //To adjust; TEMP set to 1RPM; = 6 DPS;
-
-//Constants based on known facts
-const double maxDPSSpeed = 1200; //18:1 cartiage has 200 RPM; 200 RPM = 1200 DPS;
+#include "config.h"
 
 //Wheel Bias
 double fRB = 1;
@@ -141,15 +132,15 @@ double getHeading(){
 }
 
 double getAxisEncoder(int axis){
+  double ver = getRightVertEnc();
+  double hor = getHorEnc();
   if(axis == 0){
     //Vertical - Positive is fwd
-    return getRightVertEnc();
+    return ver;
   }else if(axis == 1){
     //Horizontal - Positive is right
-    return getHorEnc();
+    return hor;
   }else{
-    double ver = getRightVertEnc();
-    double hor = getRightVertEnc();
     if(axis == 2){
       //Diagnal - Positive is fwd-right
       if((hor>0) && (ver>0)){
@@ -166,6 +157,6 @@ double getAxisEncoder(int axis){
       }
     }
   }
-  std::cout << "ERROR" << std::endl;
+  //std::cout << "ERROR AXIS ENCODER: " << ver << ", " << hor << std::endl;
   return 0;
 }
