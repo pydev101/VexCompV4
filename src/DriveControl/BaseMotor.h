@@ -17,6 +17,9 @@ struct biasStruct{
 };
 biasStruct bias = {0,0,0,0};
 
+const double PI = 3.14159265358979323846264338327950288419716;
+const double PIover180 = PI/180;
+
 //Function Definitions
 void setDPS(double targetVel){
   //Sets velocity of motors; directon depends on current axis; Units in degrees per second
@@ -27,8 +30,8 @@ void setDPS(double targetVel){
 }
 
 void stopMotors(){
-  setDPS(0);
   bias = {0,0,0,0};
+  setDPS(0);
   frontLeft.stop();
   frontRight.stop();
   backLeft.stop();
@@ -62,10 +65,12 @@ void setAxis(int axis){
   startSpin();
 }
 
-void setDPSVector(int axis, double vel){
-  //Sets Axis and Velocity
-  setAxis(axis);
-  setDPS(vel);
+void setVector(double deg){
+  //Sets Angle of Velocity; 90 is fwd
+  double a = (sqrt(2)*(sin(deg*PIover180) + cos(deg*PIover180)))/4;
+  double b = (sqrt(2)*(sin(deg*PIover180) - cos(deg*PIover180)))/4;
+  bias = {b, a, a, b};
+  startSpin();
 }
 
 //Rotational Movement
@@ -92,6 +97,7 @@ void resetEncoders(){
 
 void resetHeading(){
   ISensor.resetHeading();
+  ISensor.setHeading(90, rotationUnits::deg);
 }
 
 double getRightVertEnc(){
@@ -119,23 +125,25 @@ double getAxisEncoder(int axis){
   }else if(axis == 1){
     //Horizontal - Positive is right
     return hor;
-  }else{
-    if(axis == 2){
-      //Diagnal - Positive is fwd-right
-      if((hor>0) && (ver>0)){
-        return sqrt((ver*ver)+(hor*hor));
-      }else if((hor<0) && (ver<0)){
-        return -sqrt((ver*ver)+(hor*hor));
-      }
-    }else if(axis == 3){
-      //Diagnal - Positive is fwd-left
-      if((hor<0) && (ver>0)){
-        return sqrt((ver*ver)+(hor*hor));
-      }else if((hor>0) && (ver<0)){
-        return -sqrt((ver*ver)+(hor*hor));
-      }
+  }else if(axis == 2){
+    //Diagnal - Positive is fwd-right
+    if((hor>0) && (ver>0)){
+      return sqrt((ver*ver)+(hor*hor));
+    }else if((hor<0) && (ver<0)){
+      return -sqrt((ver*ver)+(hor*hor));
     }
+  }else if(axis == 3){
+    //Diagnal - Positive is fwd-left
+    if((hor<0) && (ver>0)){
+      return sqrt((ver*ver)+(hor*hor));
+    }else if((hor>0) && (ver<0)){
+      return -sqrt((ver*ver)+(hor*hor));
+    }
+  }else{
+    //Absolute motion
+    return sqrt((ver*ver)+(hor*hor));
   }
+  
   //std::cout << "ERROR AXIS ENCODER: " << ver << ", " << hor << std::endl;
   return 0;
 }

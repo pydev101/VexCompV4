@@ -12,9 +12,9 @@
 //Known constants
 const double timeUnitsPerSecond = 1000/timeUnit; //How many time units per second (t/s)
 const double minDegreesPerTimeUnit = minDPSSpeed/timeUnitsPerSecond; //The least ammount of degrees travelable in one time unit
-const double turnCircumfranceMajor = (3.1415*sqrt((widthOfBaseMeters*widthOfBaseMeters) + (heightOfBaseMeters*heightOfBaseMeters))); //Diagboal length across wheels in inches times pi
-const double turnCircumfranceMinor = (2*centerToMeasureWheelRadius*3.1415);
-const double measureWheelC = (3.1415)*diameterOfMeasureWheel;
+const double turnCircumfranceMajor = (PI*sqrt((widthOfBaseMeters*widthOfBaseMeters) + (heightOfBaseMeters*heightOfBaseMeters))); //Diagboal length across wheels in inches times pi
+const double turnCircumfranceMinor = (2*centerToMeasureWheelRadius*PI);
+const double measureWheelC = PI*diameterOfMeasureWheel;
 
 //Helper
 double abs(double x){
@@ -53,6 +53,29 @@ void axisPID(int axis, double degrees, int stopDelay=defaultStopDelay, double ga
     r = PID(degrees, getAxisEncoder(axis), gain, r);
     setDPS(r.speed);
     std::cout << currTimeUnit << ", " << getAxisEncoder(axis) << ", " << r.lastError << ", " << r.speed << std::endl;
+    wait(timeUnit, msec);
+    currTimeUnit++;
+  }
+  stopMotors();
+  wait(stopDelay, timeUnits::msec);
+}
+
+void vectorPID(double deg, double degrees, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
+  resetEncoders();
+
+  results r = PID(degrees, getAxisEncoder(4), gain);
+  
+  if(abs(r.lastError) < minDegreesPerTimeUnit){
+    stopMotors();
+    return;
+  }
+  setVector(deg);
+  
+  int currTimeUnit = 0;
+  while((abs(r.lastError) > minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
+    r = PID(degrees, getAxisEncoder(4), gain, r);
+    setDPS(r.speed);
+    std::cout << currTimeUnit << ", " << getAxisEncoder(4) << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
     currTimeUnit++;
   }

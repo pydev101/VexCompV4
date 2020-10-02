@@ -34,16 +34,7 @@ int main() {
   backRight.setBrake(brakeType::hold);
   setDPS(0);
 
-  double deg = 10;
-  double a = ((sin(deg*(3.14159265358979/180)+cos(deg*(3.14159265358979/180))*sqrt(2))/4));
-  double b = ((sin(deg*(3.14159265358979/180)-cos(deg*(3.14159265358979/180))*sqrt(2))/4));
-
-  bias = {b,a,a,b};
-  setDPS(400);
-  startSpin();
-  wait(2000, msec);
-  stopMotors();
-
-  //rotatePID(90, -1);
+  //Test setVector, PIDVector, and work on rotatePID
+  
   std::cout << "END " << std::endl;
 }
