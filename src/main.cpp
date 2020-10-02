@@ -20,7 +20,7 @@
 // ISensor              inertial      15              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 #include "AutoPrograms.h"
-//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
@@ -34,6 +34,16 @@ int main() {
   backRight.setBrake(brakeType::hold);
   setDPS(0);
 
-  rotatePID(90, -1);
-  std::cout << "END " << getHeading() << std::endl;
+  double deg = 10;
+  double a = ((sin(deg*(3.14159265358979/180)+cos(deg*(3.14159265358979/180))*sqrt(2))/4));
+  double b = ((sin(deg*(3.14159265358979/180)-cos(deg*(3.14159265358979/180))*sqrt(2))/4));
+
+  bias = {b,a,a,b};
+  setDPS(400);
+  startSpin();
+  wait(2000, msec);
+  stopMotors();
+
+  //rotatePID(90, -1);
+  std::cout << "END " << std::endl;
 }

@@ -9,72 +9,57 @@
 #include "config.h"
 
 //Wheel Bias
-double fRB = 1;
-double fLB = 1;
-double bRB = 1;
-double bLB = 1;
+struct biasStruct{
+  double fRB;
+  double fLB;
+  double bRB;
+  double bLB;
+};
+biasStruct bias = {0,0,0,0};
 
 //Function Definitions
 void setDPS(double targetVel){
   //Sets velocity of motors; directon depends on current axis; Units in degrees per second
-  frontLeft.setVelocity(targetVel*fLB, velocityUnits::dps);
-  frontRight.setVelocity(targetVel*fRB, velocityUnits::dps);
-  backLeft.setVelocity(targetVel*bLB, velocityUnits::dps);
-  backRight.setVelocity(targetVel*bRB, velocityUnits::dps);
+  frontLeft.setVelocity(targetVel*bias.fLB, velocityUnits::dps);
+  frontRight.setVelocity(targetVel*bias.fRB, velocityUnits::dps);
+  backLeft.setVelocity(targetVel*bias.bLB, velocityUnits::dps);
+  backRight.setVelocity(targetVel*bias.bRB, velocityUnits::dps);
 }
 
 void stopMotors(){
   setDPS(0);
-  fRB = 1;
-  fLB = 1;
-  bRB = 1;
-  bLB = 1;
+  bias = {0,0,0,0};
   frontLeft.stop();
   frontRight.stop();
   backLeft.stop();
   backRight.stop();
 }
 
-//Non Rotation Movement
+//Linear Movement
+void startSpin(){
+  frontRight.spin(directionType::fwd);
+  frontLeft.spin(directionType::fwd);
+  backRight.spin(directionType::fwd);
+  backLeft.spin(directionType::fwd);
+}
 
 void setAxis(int axis){
   //Sets/Starts wheels spining in direction needed for axis
-
   if(axis == 0){
     //Vertical - Positive is fwd
-    fRB = 1;
-    fLB = 1;
-    bRB = 1;
-    bLB = 1;
-    frontRight.spin(directionType::fwd);
-    frontLeft.spin(directionType::fwd);
-    backRight.spin(directionType::fwd);
-    backLeft.spin(directionType::fwd);
-
+    bias = {1,1,1,1};
   }else if(axis == 1){
     //Horizontal - Positive is right
-    fRB = -1;
-    fLB = 1;
-    bRB = 1;
-    bLB = -1;
-    frontRight.spin(directionType::fwd);
-    frontLeft.spin(directionType::fwd);
-    backRight.spin(directionType::fwd);
-    backLeft.spin(directionType::fwd);
+    bias = {1,1,1,1};
   }else if(axis == 2){
     //Diagnal - Positive is fwd-right
-    fLB = 1;
-    bRB = 1;
-    frontLeft.spin(directionType::fwd);
-    backRight.spin(directionType::fwd);
+    bias = {0,1,1,0};
   }
-  else if(axis == 3){
+  else{
     //Diagnal - Positive is fwd-left
-    fRB = 1;
-    bLB = 1;
-    backLeft.spin(directionType::fwd);
-    frontRight.spin(directionType::fwd);
+    bias = {1,0,0,1};
   }
+  startSpin();
 }
 
 void setDPSVector(int axis, double vel){
@@ -83,17 +68,11 @@ void setDPSVector(int axis, double vel){
   setDPS(vel);
 }
 
-//Rotation Movement
+//Rotational Movement
 void rotate(){
   //Starts the robot moving counterclockwise around the center of the base
-  fRB = 1;
-  fLB = -1;
-  bRB = 1;
-  bLB = -1;
-  frontRight.spin(directionType::fwd);
-  frontLeft.spin(directionType::fwd);
-  backRight.spin(directionType::fwd);
-  backLeft.spin(directionType::fwd);
+  bias = {1,-1,1,-1};
+  startSpin();
 }
 
 bool isSpining(){
@@ -104,7 +83,7 @@ bool isSpining(){
   }
 }
 
-//Encoder
+//Encoders
 void resetEncoders(){
   horEncoder.resetRotation();
   rightEncoder.resetRotation();
