@@ -17,7 +17,7 @@ struct biasStruct{
 };
 biasStruct bias = {0,0,0,0};
 
-const double PI = 3.14159265358979323846264338327950288419716;
+const double PI = 3.141592653;
 const double PIover180 = PI/180;
 
 //Function Definitions

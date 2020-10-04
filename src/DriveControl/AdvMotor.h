@@ -36,7 +36,7 @@ results PID(double encTarget, double encCurr, double gain, results r={0,0,0}, do
   return results{p+reset+d, error, reset};
 }
 
-
+//TODO Return actual rotation in degrees
 void axisPID(int axis, double degrees, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
   resetEncoders();
 
@@ -60,6 +60,7 @@ void axisPID(int axis, double degrees, int stopDelay=defaultStopDelay, double ga
   wait(stopDelay, timeUnits::msec);
 }
 
+//TODO Return actual rotation in degrees
 void vectorPID(double deg, double degrees, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
   resetEncoders();
 
@@ -83,16 +84,17 @@ void vectorPID(double deg, double degrees, int stopDelay=defaultStopDelay, doubl
   wait(stopDelay, timeUnits::msec);
 }
 
-void rotatePID(double degreesTarget, int CCW=1, int stopDelay=defaultStopDelay, double gain=defaultGainRotational){
+//TODO Return actual rotation in degrees
+double rotatePID(double degreesTarget, int stopDelay=defaultStopDelay, double gain=defaultGainRotational){
   double throwawayInt;
-  degreesTarget = CCW*(turnCircumfranceMinor*modf(degreesTarget/360, &throwawayInt)); //Length of circumfrance needed to be traveled
+  degreesTarget = (turnCircumfranceMinor*modf(degreesTarget/360, &throwawayInt)); //Length of circumfrance needed to be traveled
   degreesTarget = (degreesTarget / measureWheelC)*360; // Degres measure wheel needs to be turned
 
   resetEncoders();
   results r = PID(degreesTarget, getRightVertEnc(), gain);
   if(abs(r.lastError) < minDegreesPerTimeUnit){
     stopMotors();
-    return;
+    return (((getRightVertEnc()/360)*measureWheelC)/turnCircumfranceMinor);
   }
   rotate();
   int currTimeUnit = 0;
@@ -105,4 +107,5 @@ void rotatePID(double degreesTarget, int CCW=1, int stopDelay=defaultStopDelay, 
   }
   stopMotors();
   wait(stopDelay, timeUnits::msec);
+  return (((getRightVertEnc()/360)*measureWheelC)/turnCircumfranceMinor);
 }
