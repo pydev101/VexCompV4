@@ -16,13 +16,14 @@ encoder rightEncoder = encoder(Brain.ThreeWirePort.C);
 encoder leftEncoder = encoder(Brain.ThreeWirePort.E);
 encoder horEncoder = encoder(Brain.ThreeWirePort.A);
 inertial ISensor = inertial(PORT15);
+controller Controller1 = controller(primary);
 
 // VEXcode generated functions
-
-
+// define variable for remote controller enable/disable
+bool RemoteControlCodeEnabled = true;
 
 /**
- * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
+ * Used to initialize code/tasks/devices added using tools in VEXcode Text.
  * 
  * This should be called at the start of your int main function.
  */

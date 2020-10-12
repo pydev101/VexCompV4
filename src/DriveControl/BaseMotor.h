@@ -53,7 +53,7 @@ void setAxis(int axis){
     bias = {1,1,1,1};
   }else if(axis == 1){
     //Horizontal - Positive is right
-    bias = {1,1,1,1};
+    bias = {-1,1,1,-1};
   }else if(axis == 2){
     //Diagnal - Positive is fwd-right
     bias = {0,1,1,0};
