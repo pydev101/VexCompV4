@@ -34,7 +34,7 @@
 // ---- END VEXCODE CONFIGURED DEVICES ----
 #include "AutoPrograms.h"
 
-competition Competition;
+//competition Competition;
 
 void pre_auton(void) {
   vexcodeInit();
@@ -86,10 +86,12 @@ void usercontrol(void) {
 
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
+  //Competition.autonomous(autonomous);
+  //Competition.drivercontrol(usercontrol);
   pre_auton();
+  //AAAAAAAAAA
 
+  vectorPID(200, 1000);
 
   while (true) {
     wait(100, msec);

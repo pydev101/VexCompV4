@@ -12,9 +12,7 @@
 //Known constants
 const double timeUnitsPerSecond = 1000/timeUnit; //How many time units per second (t/s)
 const double minDegreesPerTimeUnit = minDPSSpeed/timeUnitsPerSecond; //The least ammount of degrees travelable in one time unit
-const double turnCircumfranceMajor = (PI*sqrt((widthOfBaseMeters*widthOfBaseMeters) + (heightOfBaseMeters*heightOfBaseMeters))); //Diagboal length across wheels in inches times pi
-const double turnCircumfranceMinor = (2*centerToMeasureWheelRadius*PI);
-const double measureWheelC = PI*diameterOfMeasureWheel;
+const double measureWheelDegsOverInches = 360/(PI*diameterOfMeasureWheel);
 
 //Helper
 double abs(double x){
@@ -36,76 +34,80 @@ results PID(double encTarget, double encCurr, double gain, results r={0,0,0}, do
   return results{p+reset+d, error, reset};
 }
 
-//TODO Return actual rotation in degrees
-void axisPID(int axis, double degrees, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
+//Keep a straight line in one of 6 vectors
+double axisPID(int axis, double degrees, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
   resetEncoders();
 
   results r = PID(degrees, getAxisEncoder(axis), gain);
   
   if(abs(r.lastError) < minDegreesPerTimeUnit){
     stopMotors();
-    return;
+    return 0;
   }
   setAxis(axis);
-  
+
   int currTimeUnit = 0;
   while((abs(r.lastError) > minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
     r = PID(degrees, getAxisEncoder(axis), gain, r);
     setDPS(r.speed);
-    std::cout << currTimeUnit << ", " << getAxisEncoder(axis) << ", " << r.lastError << ", " << r.speed << std::endl;
+    //std::cout << currTimeUnit << ", " << getAxisEncoder(axis) << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
     currTimeUnit++;
   }
   stopMotors();
   wait(stopDelay, timeUnits::msec);
+  return getAxisEncoder(axis);
 }
 
-//TODO Return actual rotation in degrees
-void vectorPID(double deg, double degrees, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
+//Will travel in any 2d direction
+double vectorPID(double rads, double degrees, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
   resetEncoders();
 
   results r = PID(degrees, getAxisEncoder(4), gain);
   
   if(abs(r.lastError) < minDegreesPerTimeUnit){
     stopMotors();
-    return;
+    return 0;
   }
-  setVector(deg);
+  setVector(rads);
   
   int currTimeUnit = 0;
   while((abs(r.lastError) > minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
     r = PID(degrees, getAxisEncoder(4), gain, r);
     setDPS(r.speed);
-    std::cout << currTimeUnit << ", " << getAxisEncoder(4) << ", " << r.lastError << ", " << r.speed << std::endl;
+    //std::cout << currTimeUnit << ", " << getAxisEncoder(4) << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
     currTimeUnit++;
   }
   stopMotors();
   wait(stopDelay, timeUnits::msec);
+  return getAxisEncoder(4);
 }
 
-//TODO Return actual rotation in degrees
-double rotatePID(double degreesTarget, int stopDelay=defaultStopDelay, double gain=defaultGainRotational){
+//Will rotate
+double rotatePID(double radians, int stopDelay=defaultStopDelay, double gain=defaultGainRotational){
   double throwawayInt;
-  degreesTarget = (turnCircumfranceMinor*modf(degreesTarget/360, &throwawayInt)); //Length of circumfrance needed to be traveled
-  degreesTarget = (degreesTarget / measureWheelC)*360; // Degres measure wheel needs to be turned
+  double degreesTarget = (2*PI)*modf(radians/(2*PI), &throwawayInt); //Radians needed
+  //std::cout << degreesTarget << std::endl;
+  degreesTarget = degreesTarget*centerToMeasureWheelRadius*measureWheelDegsOverInches; //Travel distance in degs
 
   resetEncoders();
   results r = PID(degreesTarget, getRightVertEnc(), gain);
   if(abs(r.lastError) < minDegreesPerTimeUnit){
     stopMotors();
-    return (((getRightVertEnc()/360)*measureWheelC)/turnCircumfranceMinor);
+    return 0;
   }
   rotate();
+
   int currTimeUnit = 0;
   while((abs(r.lastError) > minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
     r = PID(degreesTarget, getRightVertEnc(), gain, r);
     setDPS(r.speed);
-    std::cout << currTimeUnit << ", " << getRightVertEnc() << ", " << r.lastError << ", " << r.speed << std::endl;
+    //std::cout << currTimeUnit << ", " << getRightVertEnc() << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
     currTimeUnit++;
   }
   stopMotors();
   wait(stopDelay, timeUnits::msec);
-  return (((getRightVertEnc()/360)*measureWheelC)/turnCircumfranceMinor);
+  return getRightVertEnc()/centerToMeasureWheelRadius;
 }

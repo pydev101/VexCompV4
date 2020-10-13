@@ -65,10 +65,10 @@ void setAxis(int axis){
   startSpin();
 }
 
-void setVector(double deg){
-  //Sets Angle of Velocity; 90 is fwd
-  double a = (sqrt(2)*(sin(deg*PIover180) + cos(deg*PIover180)))/4;
-  double b = (sqrt(2)*(sin(deg*PIover180) - cos(deg*PIover180)))/4;
+void setVector(double rads){
+  //Sets Angle of Velocity
+  double a = (sqrt(2)*(sin(rads) + cos(rads)))/4;
+  double b = (sqrt(2)*(sin(rads) - cos(rads)))/4;
   bias = {b, a, a, b};
   startSpin();
 }
@@ -101,11 +101,11 @@ void resetHeading(){
 }
 
 double getRightVertEnc(){
-  return -1*rightEncoder.position(rotationUnits::deg);
+  return rightEncoder.position(rotationUnits::deg);
 }
 
 double getLeftVertEnc(){
-  return leftEncoder.position(rotationUnits::deg);
+  return -1*leftEncoder.position(rotationUnits::deg);
 }
 
 double getHorEnc(){
