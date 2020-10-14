@@ -1,16 +1,3 @@
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// frontLeft            motor         13              
-// frontRight           motor         12              
-// backLeft             motor         11              
-// backRight            motor         14              
-// rightEncoder         encoder       C, D            
-// leftEncoder          encoder       E, F            
-// horEncoder           encoder       A, B            
-// ISensor              inertial      15              
-// Controller1          controller                    
-// ---- END VEXCODE CONFIGURED DEVICES ----
 /*----------------------------------------------------------------------------
 //                                                                            
 //    Module:       main.cpp                                               
@@ -31,7 +18,9 @@
 // leftEncoder          encoder       E, F            
 // horEncoder           encoder       A, B            
 // ISensor              inertial      15              
+// Controller1          controller                    
 // ---- END VEXCODE CONFIGURED DEVICES ----
+
 #include "AutoPrograms.h"
 
 //competition Competition;
@@ -89,9 +78,9 @@ int main() {
   //Competition.autonomous(autonomous);
   //Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAA
+  //AAAAAAAAAAAAA
 
-  vectorPID(200, 1000);
+  move(12, 12, true);
 
   while (true) {
     wait(100, msec);
