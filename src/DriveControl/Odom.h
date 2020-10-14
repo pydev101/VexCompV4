@@ -22,6 +22,23 @@ void debug(){
   std::cout << "--------------------------" << std::endl;
 }
 
+double getTargetHeading(double deltaX, double deltaY){
+  double theta = atan(abs(deltaY/deltaX));
+  if(deltaX > 0){
+    if(deltaY > 0){
+      return theta;
+    }else{
+      return 360-theta;
+    }
+  }else{
+    if(deltaY > 0){
+      return 180-theta;
+    }else{
+      return 180+theta;
+    }
+  }
+}
+
 void move(double deltaX, double deltaY, bool rotate=true){
   Xt += deltaX;
   Yt += deltaY;
@@ -30,15 +47,15 @@ void move(double deltaX, double deltaY, bool rotate=true){
 
   double travelDistance = sqrt((deltaX*deltaX) + (deltaY*deltaY))*measureWheelDegsOverInches;
   //TODO Test Ht and see if it spins right
-  double Ht = atan2(deltaY, deltaX); //Returns in radians; PID requires radians; see if deltaX and deltaY need to be special
+  double Ht = getTargetHeading(deltaX, deltaY); //Returns in degrees; PID requires radians; see if deltaX and deltaY need to be special
 
   resetEncoders();
   if(rotate){
-    tHead = Ht*(180/PI);
-    Head += rotatePID((tHead-Head)/(180/PI))*(180/PI);
+    tHead = Ht;
+    Head += rotatePID((tHead-Head)*(PI/180))*(180/PI);
     axisPID(0, travelDistance);
   }else{
-    vectorPID(Ht, travelDistance);
+    vectorPID(Ht*(PI/180), travelDistance);
   }
   X += getHorEnc()/measureWheelDegsOverInches;
   Y += getRightVertEnc()/measureWheelDegsOverInches;
