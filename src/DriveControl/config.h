@@ -11,7 +11,7 @@
 using namespace vex;
 
 //Module: Basemotor.h
-const double minDPSSpeed = 6; //Minimum velocity set to the motors that the robot is able to move at
+const double minDPSSpeed = 8; //Minimum velocity set to the motors that the robot is able to move at
 const double maxDPSSpeed = 1200; //18:1 cartiage has 200 RPM; 200 RPM = 1200 DPS; Max speed of motors
 
 //Module: AdvMotor.h

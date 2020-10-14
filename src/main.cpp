@@ -78,9 +78,11 @@ int main() {
   //Competition.autonomous(autonomous);
   //Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAA
 
   move(12, 12, true);
+  move(-36, 0, true);
+  move(0, 0, false);
 
   while (true) {
     wait(100, msec);

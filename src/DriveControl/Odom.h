@@ -16,6 +16,12 @@ double Yt = 0;
 double Head = 90;
 double tHead = 90;
 
+void debug(){
+  std::cout << "X: " << X << " Y: " << Y << " Head: " << Head << std::endl;
+  std::cout << "Xt: " << Xt << " Yt: " << Yt << " Headt: " << tHead << std::endl;
+  std::cout << "--------------------------" << std::endl;
+}
+
 void move(double deltaX, double deltaY, bool rotate=true){
   Xt += deltaX;
   Yt += deltaY;
@@ -25,6 +31,7 @@ void move(double deltaX, double deltaY, bool rotate=true){
   double travelDistance = sqrt((deltaX*deltaX) + (deltaY*deltaY))*measureWheelDegsOverInches;
   //TODO Test Ht and see if it spins right
   double Ht = atan2(deltaY, deltaX); //Returns in radians; PID requires radians; see if deltaX and deltaY need to be special
+
   resetEncoders();
   if(rotate){
     tHead = Ht*(180/PI);
@@ -35,4 +42,6 @@ void move(double deltaX, double deltaY, bool rotate=true){
   }
   X += getHorEnc()/measureWheelDegsOverInches;
   Y += getRightVertEnc()/measureWheelDegsOverInches;
+
+  debug();
 }
