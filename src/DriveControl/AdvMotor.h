@@ -109,5 +109,5 @@ double rotatePID(double radians, int stopDelay=defaultStopDelay, double gain=def
   }
   stopMotors();
   wait(stopDelay, timeUnits::msec);
-  return getRightVertEnc()/centerToMeasureWheelRadius;
+  return getRightVertEnc()/(centerToMeasureWheelRadius*measureWheelDegsOverInches);
 }

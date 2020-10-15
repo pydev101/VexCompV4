@@ -13,17 +13,32 @@ double X = 0;
 double Y = 0;
 double Xt = 0;
 double Yt = 0;
-double Head = 90;
 double tHead = 90;
 
 void debug(){
-  std::cout << "X: " << X << " Y: " << Y << " Head: " << Head << std::endl;
+  std::cout << "X: " << X << " Y: " << Y << " Head: " << ISensor.heading() << std::endl;
   std::cout << "Xt: " << Xt << " Yt: " << Yt << " Headt: " << tHead << std::endl;
   std::cout << "--------------------------" << std::endl;
 }
 
 double getTargetHeading(double deltaX, double deltaY){
-  double theta = atan(abs(deltaY/deltaX));
+  double theta = atan(abs(deltaY/deltaX))*(180/PI);
+  if(deltaX > 0){
+    if(deltaY > 0){
+      return theta;
+    }else{
+      return 360-theta;
+    }
+  }else{
+    if(deltaY > 0){
+      return 180-theta;
+    }else{
+      return 180+theta;
+    }
+  }
+}
+
+double getTheta(){
   if(deltaX > 0){
     if(deltaY > 0){
       return theta;
@@ -52,13 +67,15 @@ void move(double deltaX, double deltaY, bool rotate=true){
   resetEncoders();
   if(rotate){
     tHead = Ht;
-    Head += rotatePID((tHead-Head)*(PI/180))*(180/PI);
+    rotatePID((tHead-getHeading())*(PI/180));
     axisPID(0, travelDistance);
+    X += cos((PI/180)*getHeading())*(getRightVertEnc()/measureWheelDegsOverInches);
+    Y += sin((PI/180)*getHeading())*(getRightVertEnc()/measureWheelDegsOverInches);
   }else{
     vectorPID(Ht*(PI/180), travelDistance);
+    X += getHorEnc()/measureWheelDegsOverInches;
+    Y += getRightVertEnc()/measureWheelDegsOverInches;
   }
-  X += getHorEnc()/measureWheelDegsOverInches;
-  Y += getRightVertEnc()/measureWheelDegsOverInches;
 
   debug();
 }

@@ -17,7 +17,7 @@
 // rightEncoder         encoder       C, D            
 // leftEncoder          encoder       E, F            
 // horEncoder           encoder       A, B            
-// ISensor              inertial      15              
+// ISensor              inertial      20              
 // Controller1          controller                    
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
@@ -36,6 +36,9 @@ void pre_auton(void) {
   backLeft.setBrake(brakeType::hold);
   backRight.setBrake(brakeType::hold);
   setDPS(0);
+
+  resetHeading();
+  resetEncoders();
 }
 
 
@@ -78,7 +81,7 @@ int main() {
   //Competition.autonomous(autonomous);
   //Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAA
 
   move(12, 12, true);
   move(-36, 0, true);

@@ -15,7 +15,7 @@ motor backRight = motor(PORT14, ratio18_1, true);
 encoder rightEncoder = encoder(Brain.ThreeWirePort.C);
 encoder leftEncoder = encoder(Brain.ThreeWirePort.E);
 encoder horEncoder = encoder(Brain.ThreeWirePort.A);
-inertial ISensor = inertial(PORT15);
+inertial ISensor = inertial(PORT20);
 controller Controller1 = controller(primary);
 
 // VEXcode generated functions
