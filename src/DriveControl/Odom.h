@@ -38,21 +38,6 @@ double getTargetHeading(double deltaX, double deltaY){
   }
 }
 
-double getTheta(){
-  if(deltaX > 0){
-    if(deltaY > 0){
-      return theta;
-    }else{
-      return 360-theta;
-    }
-  }else{
-    if(deltaY > 0){
-      return 180-theta;
-    }else{
-      return 180+theta;
-    }
-  }
-}
 
 void move(double deltaX, double deltaY, bool rotate=true){
   Xt += deltaX;

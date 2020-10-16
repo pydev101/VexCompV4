@@ -23,7 +23,7 @@
 
 #include "AutoPrograms.h"
 
-//competition Competition;
+competition Competition;
 
 void pre_auton(void) {
   vexcodeInit();
@@ -58,34 +58,37 @@ void usercontrol(void) {
   backRight.setBrake(brakeType::brake);
   startSpin();
   
-  double driverMax = 1000;
-  double left = 0;
-  double right = 0;
+  double lV = 0;
+  double lH = 0;
+  double rV = 0;
+  double rH = 0;
 
   while (true) {
     if(tank){
-      left = ((double)Controller1.Axis3.position()/100.0)*driverMax;
-      right = ((double)Controller1.Axis2.position()/100.0)*driverMax;
+      lV = Controller1.Axis3.position();
+      lH = Controller1.Axis4.position();
+      rV = Controller1.Axis2.position();
+      rH = Controller1.Axis1.position();
 
-      frontLeft.setVelocity(left, velocityUnits::dps);
-      frontRight.setVelocity(right, velocityUnits::dps);
-      backLeft.setVelocity(left, velocityUnits::dps);
-      backRight.setVelocity(right, velocityUnits::dps); 
+      frontLeft.setVelocity(lV+lH, velocityUnits::pct);
+      frontRight.setVelocity(rV-rH, velocityUnits::pct);
+      backLeft.setVelocity(lV-lH, velocityUnits::pct);
+      backRight.setVelocity(rV+rH, velocityUnits::pct);
+      wait(20, msec);
     }
-    wait(20, msec);
   }
 }
 
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
-  //Competition.autonomous(autonomous);
-  //Competition.drivercontrol(usercontrol);
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAA
 
-  move(12, 12, true);
-  move(-36, 0, true);
-  move(0, 0, false);
+  //move(12, 12, true);
+  //move(-36, 0, true);
+  //move(0, 0, false);
 
   while (true) {
     wait(100, msec);
