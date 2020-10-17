@@ -23,19 +23,21 @@ double abs(double x){
 //Main Functions
 struct results{double speed; double lastError; double reset;};
 
-results PID(double encTarget, double encCurr, double gain, results r={0,0,0}, double rGain=0, double dGain=0){
+results PID(double encTarget, double encCurr, double gain, results r={0,0,0}, double maxSpeed = 0,double rGain=0, double dGain=0){
   //EncTarget is in degrees
   double error = encTarget - encCurr;
   
   double reset = r.reset + (rGain * error);
-  double d = dGain * (error - r.lastError);
-  double p = gain * error;
+  double speed = (gain*error)+reset+(dGain*(error - r.lastError));
 
-  return results{p+reset+d, error, reset};
+  if((maxSpeed != 0) && (abs(speed) > maxSpeed) && (speed != 0)){
+    speed = (abs(speed)/speed)*maxSpeed;
+  }
+  return results{speed, error, reset};
 }
 
 //Keep a straight line in one of 6 vectors
-double axisPID(int axis, double degrees, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
+double axisPID(int axis, double degrees, double maxSpeed=0, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
   resetEncoders();
 
   results r = PID(degrees, getAxisEncoder(axis), gain);
@@ -48,7 +50,7 @@ double axisPID(int axis, double degrees, int stopDelay=defaultStopDelay, double 
 
   int currTimeUnit = 0;
   while((abs(r.lastError) > minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
-    r = PID(degrees, getAxisEncoder(axis), gain, r);
+    r = PID(degrees, getAxisEncoder(axis), gain, r, maxSpeed);
     setDPS(r.speed);
     //std::cout << currTimeUnit << ", " << getAxisEncoder(axis) << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
@@ -60,7 +62,7 @@ double axisPID(int axis, double degrees, int stopDelay=defaultStopDelay, double 
 }
 
 //Will travel in any 2d direction
-double vectorPID(double rads, double degrees, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
+double vectorPID(double rads, double degrees, double maxSpeed=0, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
   resetEncoders();
 
   results r = PID(degrees, getAxisEncoder(4), gain);
@@ -73,7 +75,7 @@ double vectorPID(double rads, double degrees, int stopDelay=defaultStopDelay, do
   
   int currTimeUnit = 0;
   while((abs(r.lastError) > minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
-    r = PID(degrees, getAxisEncoder(4), gain, r);
+    r = PID(degrees, getAxisEncoder(4), gain, r, maxSpeed);
     setDPS(r.speed);
     //std::cout << currTimeUnit << ", " << getAxisEncoder(4) << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
@@ -85,7 +87,7 @@ double vectorPID(double rads, double degrees, int stopDelay=defaultStopDelay, do
 }
 
 //Will rotate
-double rotatePID(double radians, int stopDelay=defaultStopDelay, double gain=defaultGainRotational){
+double rotatePID(double radians, double maxSpeed=0, int stopDelay=defaultStopDelay, double gain=defaultGainRotational){
   double throwawayInt;
   double degreesTarget = (2*PI)*modf(radians/(2*PI), &throwawayInt); //Radians needed
   //std::cout << degreesTarget << std::endl;
@@ -101,7 +103,7 @@ double rotatePID(double radians, int stopDelay=defaultStopDelay, double gain=def
 
   int currTimeUnit = 0;
   while((abs(r.lastError) > minDegreesPerTimeUnit) && (abs(r.speed) >= minDPSSpeed)){
-    r = PID(degreesTarget, getRightVertEnc(), gain, r);
+    r = PID(degreesTarget, getRightVertEnc(), gain, r, maxSpeed);
     setDPS(r.speed);
     //std::cout << currTimeUnit << ", " << getRightVertEnc() << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);

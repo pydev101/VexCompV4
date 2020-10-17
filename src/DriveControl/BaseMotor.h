@@ -112,8 +112,12 @@ double getHorEnc(){
   return -1*horEncoder.position(rotationUnits::deg);
 }
 
-double getHeading(){
-  return ISensor.heading();
+double getHeading(bool inDeg=false){
+  double r = ISensor.heading();
+  if(inDeg){
+    return r;
+  }
+  return r*(PI/180);
 }
 
 double getAxisEncoder(int axis){
