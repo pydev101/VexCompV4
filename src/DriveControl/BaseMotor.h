@@ -96,16 +96,15 @@ void resetEncoders(){
 }
 
 void resetHeading(){
-  ISensor.resetHeading();
-  ISensor.setHeading(90, rotationUnits::deg);
+  ISensor.resetRotation();
 }
 
 double getRightVertEnc(){
-  return rightEncoder.position(rotationUnits::deg);
+  return -1*rightEncoder.position(rotationUnits::deg);
 }
 
 double getLeftVertEnc(){
-  return -1*leftEncoder.position(rotationUnits::deg);
+  return leftEncoder.position(rotationUnits::deg);
 }
 
 double getHorEnc(){
@@ -113,7 +112,7 @@ double getHorEnc(){
 }
 
 double getHeading(bool inDeg=false){
-  double r = ISensor.heading();
+  double r = ISensor.rotation();
   if(inDeg){
     return r;
   }

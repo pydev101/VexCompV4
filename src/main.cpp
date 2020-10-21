@@ -1,12 +1,3 @@
-/*----------------------------------------------------------------------------
-//                                                                            
-//    Module:       main.cpp                                               
-//    Author:       Carson E                                 
-//    Created:      Thu Sep 10 2020                                           
-//    Description:  Primary file that implements controls and movement                                           
-//                                                                            
-//--------------------------------------------------------------------------*/
-
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
@@ -20,10 +11,18 @@
 // ISensor              inertial      20              
 // Controller1          controller                    
 // ---- END VEXCODE CONFIGURED DEVICES ----
+/*----------------------------------------------------------------------------
+//                                                                            
+//    Module:       main.cpp                                               
+//    Author:       Carson E                                 
+//    Created:      Thu Sep 10 2020                                           
+//    Description:  Primary file that implements controls and movement                                           
+//                                                                            
+//--------------------------------------------------------------------------*/
 
 #include "AutoPrograms.h"
 
-competition Competition;
+//competition Competition;
 
 void pre_auton(void) {
   vexcodeInit();
@@ -35,6 +34,7 @@ void pre_auton(void) {
   frontRight.setBrake(brakeType::hold);
   backLeft.setBrake(brakeType::hold);
   backRight.setBrake(brakeType::hold);
+  
   setDPS(0);
 
   resetHeading();
@@ -52,16 +52,16 @@ void autonomous(void) {
 
 bool tank = true;
 void usercontrol(void) {
-  frontLeft.setBrake(brakeType::brake);
-  frontRight.setBrake(brakeType::brake);
-  backLeft.setBrake(brakeType::brake);
-  backRight.setBrake(brakeType::brake);
-  startSpin();
-  
+  frontLeft.setBrake(brakeType::coast);
+  frontRight.setBrake(brakeType::coast);
+  backLeft.setBrake(brakeType::coast);
+  backRight.setBrake(brakeType::coast);
+
   double lV = 0;
   double lH = 0;
   double rV = 0;
   double rH = 0;
+  int threshold = 5;
 
   while (true) {
     if(tank){
@@ -69,6 +69,12 @@ void usercontrol(void) {
       lH = Controller1.Axis4.position();
       rV = Controller1.Axis2.position();
       rH = Controller1.Axis1.position();
+
+      if((abs(lV)<threshold)&&(abs(lH)<threshold)&&(abs(rV)<threshold)&&(abs(rH)<threshold)){
+        stopMotors();
+      }else{
+        startSpin();
+      }
 
       frontLeft.setVelocity(lV+lH, velocityUnits::pct);
       frontRight.setVelocity(rV-rH, velocityUnits::pct);
@@ -81,14 +87,16 @@ void usercontrol(void) {
 
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
+  //Competition.autonomous(autonomous);
+  //Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
-  //move(12, 12, true);
-  //move(-36, 0, true);
-  //move(0, 0, false);
+  //move(24, 36*3, false);
+  //move(-12, 15);
+  //move(-X, -Y, false);
+
+  rotateSensor(PI/2);
 
   while (true) {
     wait(100, msec);

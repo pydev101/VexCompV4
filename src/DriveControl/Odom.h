@@ -13,14 +13,29 @@ double X = 0;
 double Y = 0;
 double Xt = 0;
 double Yt = 0;
+double Heading = PI/2;
 double tHead = PI/2;
 
-double turnTo(double x, bool inDeg = true){
+void stats(){
+  std::cout << "Current (" << X <<", " << Y << ") |";
+  std::cout << "Target (" << Xt <<", " << Yt << ") |";
+  std::cout << "Heading: " << Heading <<" | Target: " << tHead << std::endl;
+}
+
+double turnTo(double x, bool inDeg = true, bool useSenor = true){
   if(inDeg){
     x = x * (PI/180);
   }
   tHead = x;
-  return rotatePID(tHead-getHeading());
+  resetHeading();
+  if(useSenor){
+    rotateSensor(tHead-Heading);
+  }else{
+    rotatePID(tHead-Heading);
+  }
+  double throwawayInt;
+  Heading -= (2*PI)*modf(getHeading()/(2*PI), &throwawayInt);
+  return -getHeading();
 }
 
 void move(double deltaX, double deltaY, double maxSpeed, bool rotate=true){
@@ -28,6 +43,9 @@ void move(double deltaX, double deltaY, double maxSpeed, bool rotate=true){
   Yt += deltaY;
   deltaX = Xt-X;
   deltaY = Yt-Y;
+  
+  std::cout << "Start: " << deltaX << ", " << deltaY <<std::endl;
+  //stats();
 
   double travelDistance = sqrt((deltaX*deltaX) + (deltaY*deltaY))*measureWheelDegsOverInches;
   //TODO Test Ht and see if it spins right
@@ -41,8 +59,12 @@ void move(double deltaX, double deltaY, double maxSpeed, bool rotate=true){
     vectorPID(Ht, travelDistance, maxSpeed);
   }
 
-  X += (getRightVertEnc()*cos(getHeading()) + getHorEnc()*cos(getHeading()-(PI/2)))/measureWheelDegsOverInches;
-  Y += (getRightVertEnc()*sin(getHeading()) + getHorEnc()*sin(getHeading()-(PI/2)))/measureWheelDegsOverInches;
+  X += (getRightVertEnc()*cos(Heading) + getHorEnc()*cos(Heading-(PI/2)))/measureWheelDegsOverInches; //should be delta x
+  Y += (getRightVertEnc()*sin(Heading) + getHorEnc()*sin(Heading-(PI/2)))/measureWheelDegsOverInches; //should b delta y
+
+  std::cout << "End: " << deltaX << ", " << deltaY <<std::endl;
+  stats();
+  std::cout << "---------------------------------------" <<std::endl;
 }
 
 void move(double deltaX, double deltaY, bool rotate=true){
