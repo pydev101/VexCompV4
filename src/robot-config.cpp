@@ -17,6 +17,10 @@ encoder leftEncoder = encoder(Brain.ThreeWirePort.E);
 encoder horEncoder = encoder(Brain.ThreeWirePort.A);
 inertial ISensor = inertial(PORT20);
 controller Controller1 = controller(primary);
+motor intakeLeft = motor(PORT1, ratio18_1, false);
+motor intakeRight = motor(PORT2, ratio18_1, true);
+motor liftL = motor(PORT3, ratio18_1, false);
+motor liftR = motor(PORT4, ratio18_1, false);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

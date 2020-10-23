@@ -12,6 +12,10 @@ extern encoder leftEncoder;
 extern encoder horEncoder;
 extern inertial ISensor;
 extern controller Controller1;
+extern motor intakeLeft;
+extern motor intakeRight;
+extern motor liftL;
+extern motor liftR;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Text.

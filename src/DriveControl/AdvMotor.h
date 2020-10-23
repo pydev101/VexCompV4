@@ -39,9 +39,8 @@ results PID(double encTarget, double encCurr, double gain, results r={0,0,0}, do
 
 //Keep a straight line in one of 6 vectors
 double axisPID(int axis, double degrees, double maxSpeed=0, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
-  resetEncoders();
-
-  results r = PID(degrees, getAxisEncoder(axis), gain);
+  double startEnc = getAxisEncoder(axis);
+  results r = PID(degrees, getAxisEncoder(axis)-startEnc, gain);
   
   if(abs(r.lastError) < (minDegreesPerTimeUnit+linearMotionThresholdBoost)){
     stopMotors();
@@ -51,22 +50,22 @@ double axisPID(int axis, double degrees, double maxSpeed=0, int stopDelay=defaul
 
   int currTimeUnit = 0;
   while((abs(r.lastError) > (minDegreesPerTimeUnit+linearMotionThresholdBoost)) && (abs(r.speed) >= minDPSSpeed)){
-    r = PID(degrees, getAxisEncoder(axis), gain, r, maxSpeed);
+    r = PID(degrees, getAxisEncoder(axis)-startEnc, gain, r, maxSpeed);
     setDPS(r.speed);
-    //std::cout << currTimeUnit << ", " << getAxisEncoder(axis) << ", " << r.lastError << ", " << r.speed << std::endl;
+    //std::cout << currTimeUnit << ", " << getAxisEncoder(axis)-startEnc << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
     currTimeUnit++;
   }
   stopMotors();
   wait(stopDelay, timeUnits::msec);
-  return getAxisEncoder(axis);
+  return getAxisEncoder(axis)-startEnc;
 }
 
 //Will travel in any 2d direction
 double vectorPID(double rads, double degrees, double maxSpeed=0, int stopDelay=defaultStopDelay, double gain=defaultGainLinear){
-  resetEncoders();
+  double startEnc = getAxisEncoder(4);
 
-  results r = PID(degrees, getAxisEncoder(4), gain);
+  results r = PID(degrees, getAxisEncoder(4)-startEnc, gain);
   
   if(abs(r.lastError) < (minDegreesPerTimeUnit+linearMotionThresholdBoost)){
     stopMotors();
@@ -76,15 +75,15 @@ double vectorPID(double rads, double degrees, double maxSpeed=0, int stopDelay=d
   
   int currTimeUnit = 0;
   while((abs(r.lastError) > (minDegreesPerTimeUnit+linearMotionThresholdBoost)) && (abs(r.speed) >= minDPSSpeed)){
-    r = PID(degrees, getAxisEncoder(4), gain, r, maxSpeed);
+    r = PID(degrees, getAxisEncoder(4)-startEnc, gain, r, maxSpeed);
     setDPS(r.speed);
-    //std::cout << currTimeUnit << ", " << getAxisEncoder(4) << ", " << r.lastError << ", " << r.speed << std::endl;
+    //std::cout << currTimeUnit << ", " << getAxisEncoder(4)-startEnc << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
     currTimeUnit++;
   }
   stopMotors();
   wait(stopDelay, timeUnits::msec);
-  return getAxisEncoder(4);
+  return getAxisEncoder(4)-startEnc;
 }
 
 //Robot rotation using robot motor encoders
@@ -100,8 +99,8 @@ double rotatePID(double radians, double maxSpeed=0, int stopDelay=defaultStopDel
   }
   degreesTarget = degreesTarget*centerToMeasureWheelRadius*measureWheelDegsOverInches; //Travel distance in mDegs
 
-  resetEncoders();
-  results r = PID(degreesTarget, getRightVertEnc(), gain);
+  double startEnc = getRightVertEnc();
+  results r = PID(degreesTarget, getRightVertEnc()-startEnc, gain);
   if(abs(r.lastError) < (minDegreesPerTimeUnit+rotationalMotionThresholdBoost)){
     stopMotors();
     return 0;
@@ -110,15 +109,15 @@ double rotatePID(double radians, double maxSpeed=0, int stopDelay=defaultStopDel
 
   int currTimeUnit = 0;
   while((abs(r.lastError) > (minDegreesPerTimeUnit+rotationalMotionThresholdBoost)) && (abs(r.speed) >= minDPSSpeed)){
-    r = PID(degreesTarget, getRightVertEnc(), gain, r, maxSpeed);
+    r = PID(degreesTarget, getRightVertEnc()-startEnc, gain, r, maxSpeed);
     setDPS(r.speed);
-    //std::cout << currTimeUnit << ", " << getRightVertEnc() << ", " << r.lastError << ", " << r.speed << std::endl;
+    //std::cout << currTimeUnit << ", " << getRightVertEnc()-startEnc << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
     currTimeUnit++;
   }
   stopMotors();
   wait(stopDelay, timeUnits::msec);
-  return getRightVertEnc()/(centerToMeasureWheelRadius*measureWheelDegsOverInches);
+  return (getRightVertEnc()-startEnc)/(centerToMeasureWheelRadius*measureWheelDegsOverInches);
 }
 
 //Robot rotation using inertial sensor

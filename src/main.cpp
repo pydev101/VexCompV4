@@ -10,7 +10,12 @@
 // horEncoder           encoder       A, B            
 // ISensor              inertial      20              
 // Controller1          controller                    
+// intakeLeft           motor         1               
+// intakeRight          motor         2               
+// liftL                motor         3               
+// liftR                motor         4               
 // ---- END VEXCODE CONFIGURED DEVICES ----
+                 
 /*----------------------------------------------------------------------------
 //                                                                            
 //    Module:       main.cpp                                               
@@ -22,7 +27,7 @@
 
 #include "AutoPrograms.h"
 
-//competition Competition;
+competition Competition;
 
 void pre_auton(void) {
   vexcodeInit();
@@ -30,10 +35,10 @@ void pre_auton(void) {
   ISensor.startCalibration();
   while(ISensor.isCalibrating()){wait(5, msec);}
 
-  frontLeft.setBrake(brakeType::hold);
-  frontRight.setBrake(brakeType::hold);
-  backLeft.setBrake(brakeType::hold);
-  backRight.setBrake(brakeType::hold);
+  //frontLeft.setBrake(brakeType::hold);
+  //frontRight.setBrake(brakeType::hold);
+  //backLeft.setBrake(brakeType::hold);
+  //backRight.setBrake(brakeType::hold);
   
   setDPS(0);
 
@@ -80,55 +85,48 @@ void usercontrol(void) {
       frontRight.setVelocity(rV-rH, velocityUnits::pct);
       backLeft.setVelocity(lV-lH, velocityUnits::pct);
       backRight.setVelocity(rV+rH, velocityUnits::pct);
+
+      if(Controller1.ButtonR1.pressing()){
+        intakeRight.spin(fwd);
+        intakeLeft.spin(fwd);
+        intakeRight.setVelocity(100, pct);
+        intakeLeft.setVelocity(100, pct);
+      }else if(Controller1.ButtonR2.pressing()){
+        intakeRight.spin(fwd);
+        intakeLeft.spin(fwd);
+        intakeRight.setVelocity(-100, pct);
+        intakeLeft.setVelocity(-100, pct);
+      }else{
+        intakeLeft.stop();
+        intakeRight.stop();
+      }
+
+      if(Controller1.ButtonRight.pressing()){
+        liftR.spin(fwd);
+        liftL.spin(fwd);
+        liftR.setVelocity(50, pct);
+        liftL.setVelocity(50, pct);
+      }else if(Controller1.ButtonLeft.pressing()){
+        liftR.spin(fwd);
+        liftL.spin(fwd);
+        liftR.setVelocity(-50, pct);
+        liftL.setVelocity(-50, pct);
+      }else{
+        liftL.stop();
+        liftR.stop();
+      }
+
       wait(20, msec);
     }
   }
 }
 
-mutex testVarMutex;
-double testHead = PI/2;
-double testX = 0;
-double testY = 0;
-int testTask(){
-  resetEncoders();
-  double E = getRightVertEnc(); //Right Measurement
-  double L = getLeftVertEnc(); //Left measurement
-  double H = getHorEnc(); //Horizontal measurement
-  double D = 0; //Current difference
-  double El = 0; //Last encoder measurement
-  double Hl = 0; //Last horizontal measurement
-  double Dl = 0; //Last differnce
-  double deltaF = 0; //Change in forward direction
-  double deltaH = 0; //Change in horizontal direction
-  while(true){
-    E = getRightVertEnc(); //Right Measurement
-    L = getLeftVertEnc(); //Left measurement
-    H = getHorEnc(); //Horizontal measurement
-
-    D = (E-L-Dl)/2; //Change in difference on one side - The only thing that signals if there has been rotation
-    Dl = E-L; //Last difference = current difference
-    
-    deltaF = E-El-D; //Delta X = change in position - change in position due to rotation divided by 2 (Rotation doesnt change XY because opposite sides cancel out)
-    deltaH = H - Hl; //TODO!!!!! If there is a rotation then if the wheel is not in the exact center then it might spin its circumfrance around the center as it rotates!!!! POSSIBLE
-    El = E; //Last forward encoder = current
-    Hl = H; //Last horiztonal encoder = current
-
-    testVarMutex.lock();
-    testHead += D/centerToMeasureWheelRadius; //Change of rotation in radians              //Possible change: Could update with delta heading since last checked to allow for other sensores to set the heading; or could use (E-L)/2 to get the absolute rotation
-    testX += deltaF*cos(testHead) + deltaH*cos(testHead-(PI/2)); //Update the current X
-    testY += deltaF*sin(testHead) + deltaH*sin(testHead-(PI/2)); //Update the current Y
-    testVarMutex.unlock();
-    wait(10, msec);
-  }
-  return 0;
-}
-
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
-  //Competition.autonomous(autonomous);
-  //Competition.drivercontrol(usercontrol);
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   //move(24, 36*3, false);
   //move(-12, 15);
@@ -136,12 +134,12 @@ int main() {
 
   //rotateSensor(PI/2);
 
-  task updateTask(testTask);
+  task updateTask(trackingTask);
 
   std::cout << "Heading | X | Y" << std::endl;
   while (true) {
     testVarMutex.lock();
-    std::cout << (testHead*(180/PI)) << ", " << testX/measureWheelDegsOverInches << ", " << testY/measureWheelDegsOverInches << std::endl;
+    std::cout << (Heading*(180/PI)) << ", " << X/measureWheelDegsOverInches << ", " << Y/measureWheelDegsOverInches << std::endl;
     testVarMutex.unlock();
     wait(500, msec);
   }

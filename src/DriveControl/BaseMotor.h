@@ -104,7 +104,7 @@ double getRightVertEnc(){
 }
 
 double getLeftVertEnc(){
-  return leftEncoder.position(rotationUnits::deg);
+  return -1*leftEncoder.position(rotationUnits::deg);
 }
 
 double getHorEnc(){
