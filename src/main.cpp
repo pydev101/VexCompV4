@@ -85,6 +85,44 @@ void usercontrol(void) {
   }
 }
 
+mutex testVarMutex;
+double testHead = PI/2;
+double testX = 0;
+double testY = 0;
+int testTask(){
+  resetEncoders();
+  double E = getRightVertEnc(); //Right Measurement
+  double L = getLeftVertEnc(); //Left measurement
+  double H = getHorEnc(); //Horizontal measurement
+  double D = 0; //Current difference
+  double El = 0; //Last encoder measurement
+  double Hl = 0; //Last horizontal measurement
+  double Dl = 0; //Last differnce
+  double deltaF = 0; //Change in forward direction
+  double deltaH = 0; //Change in horizontal direction
+  while(true){
+    E = getRightVertEnc(); //Right Measurement
+    L = getLeftVertEnc(); //Left measurement
+    H = getHorEnc(); //Horizontal measurement
+
+    D = (E-L-Dl)/2; //Change in difference on one side - The only thing that signals if there has been rotation
+    Dl = E-L; //Last difference = current difference
+    
+    deltaF = E-El-D; //Delta X = change in position - change in position due to rotation divided by 2 (Rotation doesnt change XY because opposite sides cancel out)
+    deltaH = H - Hl; //TODO!!!!! If there is a rotation then if the wheel is not in the exact center then it might spin its circumfrance around the center as it rotates!!!! POSSIBLE
+    El = E; //Last forward encoder = current
+    Hl = H; //Last horiztonal encoder = current
+
+    testVarMutex.lock();
+    testHead += D/centerToMeasureWheelRadius; //Change of rotation in radians              //Possible change: Could update with delta heading since last checked to allow for other sensores to set the heading; or could use (E-L)/2 to get the absolute rotation
+    testX += deltaF*cos(testHead) + deltaH*cos(testHead-(PI/2)); //Update the current X
+    testY += deltaF*sin(testHead) + deltaH*sin(testHead-(PI/2)); //Update the current Y
+    testVarMutex.unlock();
+    wait(10, msec);
+  }
+  return 0;
+}
+
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   //Competition.autonomous(autonomous);
@@ -96,9 +134,15 @@ int main() {
   //move(-12, 15);
   //move(-X, -Y, false);
 
-  rotateSensor(PI/2);
+  //rotateSensor(PI/2);
 
+  task updateTask(testTask);
+
+  std::cout << "Heading | X | Y" << std::endl;
   while (true) {
-    wait(100, msec);
+    testVarMutex.lock();
+    std::cout << (testHead*(180/PI)) << ", " << testX/measureWheelDegsOverInches << ", " << testY/measureWheelDegsOverInches << std::endl;
+    testVarMutex.unlock();
+    wait(500, msec);
   }
 }
