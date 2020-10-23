@@ -119,27 +119,3 @@ double rotatePID(double radians, double maxSpeed=0, int stopDelay=defaultStopDel
   wait(stopDelay, timeUnits::msec);
   return (getRightVertEnc()-startEnc)/(centerToMeasureWheelRadius*measureWheelDegsOverInches);
 }
-
-//Robot rotation using inertial sensor
-void rotateSensor(double radians, double maxSpeed=0, int stopDelay=defaultStopDelay, double gain=defaultGainRotationalWSensor){
-  resetHeading();
-  double throwawayInt;
-  double degreesTarget = (2*PI)*modf(radians/(2*PI), &throwawayInt); //Radians needed
-  if(abs(radians) > PI){
-    if(radians < 0){
-      radians = (2*PI)-abs(radians);
-    }else{
-      radians = -(2*PI)+abs(radians);
-    }
-  }
-  radians = radians * -1;
-
-  rotate();
-  double error = radians-getHeading();
-  while(abs(error) > (minRotationalRadsPerTimeUnit+rotationalSensorThresholdBoost)){
-    setDPS(-error*gain);
-    error = radians-getHeading();
-    wait(timeUnit, timeUnits::msec);
-  }
-  stopMotors();
-}

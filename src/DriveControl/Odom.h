@@ -33,7 +33,6 @@ int trackingTask(){
     E = getRightVertEnc(); //Right Measurement
     L = getLeftVertEnc(); //Left measurement
     H = getHorEnc(); //Horizontal measurement
-    //std::cout << E << ", " << L << ", " << H << std::endl;
 
     D = (E-L-Dl)/2; //Change in difference on one side - The only thing that signals if there has been rotation
     Dl = E-L; //Last difference = current difference
@@ -44,10 +43,11 @@ int trackingTask(){
     Hl = H; //Last horiztonal encoder = current
 
     testVarMutex.lock();
-    Heading += (D/measureWheelDegsOverInches)/centerToMeasureWheelRadius; //Change of rotation in radians              //Possible change: Could update with delta heading since last checked to allow for other sensores to set the heading; or could use (E-L)/2 to get the absolute rotation
+    Heading -=  getHeading(); //Change of rotation in radians              //Possible change: Could update with delta heading since last checked to allow for other sensores to set the heading; or could use (E-L)/2 to get the absolute rotation
     X += deltaF*cos(Heading) + deltaH*cos(Heading-(PI/2)); //Update the current X
     Y += deltaF*sin(Heading) + deltaH*sin(Heading-(PI/2)); //Update the current Y
     testVarMutex.unlock();
+    resetHeading();
     wait(10, msec);
   }
   return 0;
@@ -59,7 +59,7 @@ void turnTo(double x, bool inDeg = true, bool useSenor = true){
   }
   tHead = x;
   if(useSenor){
-    rotateSensor(tHead-Heading);
+    //rotateSensor(tHead-Heading);
   }else{
     rotatePID(tHead-Heading);
   }

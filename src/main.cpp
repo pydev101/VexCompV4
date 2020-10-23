@@ -126,7 +126,7 @@ int main() {
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   //move(24, 36*3, false);
   //move(-12, 15);
@@ -139,6 +139,16 @@ int main() {
   std::cout << "Heading | X | Y" << std::endl;
   while (true) {
     testVarMutex.lock();
+    Controller1.Screen.clearScreen();
+    Controller1.Screen.setCursor(0, 0);
+    Controller1.Screen.print("Heading | X | Y");
+    Controller1.Screen.newLine();
+    Controller1.Screen.print(Heading*(180/PI));
+    Controller1.Screen.print(" | ");
+    Controller1.Screen.print(X/measureWheelDegsOverInches);
+    Controller1.Screen.print(" | ");
+    Controller1.Screen.print(Y/measureWheelDegsOverInches);
+
     std::cout << (Heading*(180/PI)) << ", " << X/measureWheelDegsOverInches << ", " << Y/measureWheelDegsOverInches << std::endl;
     testVarMutex.unlock();
     wait(500, msec);

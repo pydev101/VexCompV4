@@ -21,7 +21,7 @@ const double widthOfBaseMeters = 13; //Inches; Length between left center of whe
 const double heightOfBaseMeters = 11; //Inches; Length between front wheel axle and back wheel axle
 const double diameterOfTravelWheel = 4; //Inches; Diameter of main moving wheels
 const double diameterOfMeasureWheel = 3; //Inches; Diameter of measurement wheels
-const double centerToMeasureWheelRadius = 6; //Inches; Distance between center of rotation to center of vertical measurement wheel
+const double centerToMeasureWheelRadius = 7.3; //Inches; Distance between center of rotation to center of vertical measurement wheel
 //Arbitary
 const double timeUnit = 10; //msec; Delay time between updates of PID function
 const double defaultStopDelay = 500; //Msec; Wait time after a move function has been called
