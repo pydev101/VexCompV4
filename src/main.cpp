@@ -35,10 +35,10 @@ void pre_auton(void) {
   ISensor.startCalibration();
   while(ISensor.isCalibrating()){wait(5, msec);}
 
-  //frontLeft.setBrake(brakeType::hold);
-  //frontRight.setBrake(brakeType::hold);
-  //backLeft.setBrake(brakeType::hold);
-  //backRight.setBrake(brakeType::hold);
+  frontLeft.setBrake(brakeType::hold);
+  frontRight.setBrake(brakeType::hold);
+  backLeft.setBrake(brakeType::hold);
+  backRight.setBrake(brakeType::hold);
   
   setDPS(0);
 
@@ -128,7 +128,7 @@ int main() {
   pre_auton();
   //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
-  //move(24, 36*3, false);
+  move(24, 36*3, false);
   //move(-12, 15);
   //move(-X, -Y, false);
 

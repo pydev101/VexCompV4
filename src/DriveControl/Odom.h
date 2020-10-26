@@ -18,6 +18,7 @@ double tHead = PI/2;
 
 //Continous tracking
 mutex testVarMutex;
+mutex headlingLock;
 int trackingTask(){
   resetEncoders();
   double E = getRightVertEnc(); //Right Measurement
@@ -29,6 +30,7 @@ int trackingTask(){
   double Dl = 0; //Last differnce
   double deltaF = 0; //Change in forward direction
   double deltaH = 0; //Change in horizontal direction
+  int toss = 0;
   while(true){
     E = getRightVertEnc(); //Right Measurement
     L = getLeftVertEnc(); //Left measurement
@@ -46,11 +48,22 @@ int trackingTask(){
     Heading -=  getHeading(); //Change of rotation in radians              //Possible change: Could update with delta heading since last checked to allow for other sensores to set the heading; or could use (E-L)/2 to get the absolute rotation
     X += deltaF*cos(Heading) + deltaH*cos(Heading-(PI/2)); //Update the current X
     Y += deltaF*sin(Heading) + deltaH*sin(Heading-(PI/2)); //Update the current Y
-    testVarMutex.unlock();
     resetHeading();
+    testVarMutex.unlock();
     wait(10, msec);
   }
   return 0;
+}
+
+void rotateHeading(double tTheta, double threshold){
+  //Determine direction using a closed heading (0-359.99); rotate to target using full rotation (-inf, inf)
+  int spinCCW = 1;
+  if(tTheta<0){
+    //Theta is CW
+    spinCCW = -1;
+  }
+
+  
 }
 
 void turnTo(double x, bool inDeg = true, bool useSenor = true){
@@ -58,31 +71,39 @@ void turnTo(double x, bool inDeg = true, bool useSenor = true){
     x = x * (PI/180);
   }
   tHead = x;
+  testVarMutex.lock();
+  double d = tHead-Heading;
+  testVarMutex.unlock();
+
   if(useSenor){
-    //rotateSensor(tHead-Heading);
+    rotateHeading(d, 0.1);
   }else{
-    rotatePID(tHead-Heading);
+
+    rotatePID(d);
   }
 }
 
-void move(double deltaX, double deltaY, double maxSpeed, bool rotate=true){
-  Xt += deltaX;
-  Yt += deltaY;
-  deltaX = Xt-X;
-  deltaY = Yt-Y;
+void translatePID(double dX, double dY){
+
+}
+
+void move(double deltaFWD, double deltaRIGHT, double maxSpeed, bool rotate=true){
+  deltaFWD = deltaFWD/measureWheelDegsOverInches;
+  deltaRIGHT = deltaRIGHT/deltaRIGHT;
+
+  testVarMutex.lock();
+  Xt += deltaFWD*cos(Heading) + deltaRIGHT*cos(Heading-(PI/2));
+  Yt += deltaFWD*sin(Heading) + deltaRIGHT*sin(Heading-(PI/2));
+  double deltaX = Xt-X;
+  double deltaY = Yt-Y;
+  testVarMutex.unlock();
   
   std::cout << "Start: " << deltaX << ", " << deltaY <<std::endl;
 
-  double travelDistance = sqrt((deltaX*deltaX) + (deltaY*deltaY))*measureWheelDegsOverInches;
-  //TODO Test Ht and see if it spins right
-  double Ht = atan2(deltaY, deltaX); //Returns in radians; PID requires radians; see if deltaX and deltaY need to be special
+  double travelDistance = sqrt((deltaX*deltaX) + (deltaY*deltaY));
+  double Ht = atan2(deltaY, deltaX);
 
-  if(rotate){
-    turnTo(Ht, false);
-    axisPID(0, travelDistance, maxSpeed);
-  }else{
-    vectorPID(Ht, travelDistance, maxSpeed);
-  }
+  translatePID(deltaX, deltaY);
 }
 
 void move(double deltaX, double deltaY, bool rotate=true){
