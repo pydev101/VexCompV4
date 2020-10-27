@@ -27,7 +27,7 @@
 
 #include "AutoPrograms.h"
 
-competition Competition;
+//competition Competition;
 
 void pre_auton(void) {
   vexcodeInit();
@@ -44,6 +44,7 @@ void pre_auton(void) {
 
   resetHeading();
   resetEncoders();
+  task updateTask(trackingTask);
 }
 
 
@@ -123,21 +124,20 @@ void usercontrol(void) {
 
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
+  //Competition.autonomous(autonomous);
+  //Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
-  move(24, 36*3, false);
+  //move(24, 36*3, false);
   //move(-12, 15);
   //move(-X, -Y, false);
 
-  //rotateSensor(PI/2);
-
-  task updateTask(trackingTask);
+  rotateUsingHeading(PI/4, 0.08, 300);
 
   std::cout << "Heading | X | Y" << std::endl;
   while (true) {
+    /*
     testVarMutex.lock();
     Controller1.Screen.clearScreen();
     Controller1.Screen.setCursor(0, 0);
@@ -150,7 +150,7 @@ int main() {
     Controller1.Screen.print(Y/measureWheelDegsOverInches);
 
     std::cout << (Heading*(180/PI)) << ", " << X/measureWheelDegsOverInches << ", " << Y/measureWheelDegsOverInches << std::endl;
-    testVarMutex.unlock();
+    testVarMutex.unlock();*/
     wait(500, msec);
   }
 }

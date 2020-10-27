@@ -15,23 +15,26 @@ double Xt = 0;
 double Yt = 0;
 double Heading = PI/2;
 double tHead = PI/2;
+double E = 0; //Right Measurement
+double L = 0; //Left measurement
+double H = 0; //Horizontal measurement
 
 //Continous tracking
 mutex testVarMutex;
-mutex headlingLock;
 int trackingTask(){
   resetEncoders();
-  double E = getRightVertEnc(); //Right Measurement
-  double L = getLeftVertEnc(); //Left measurement
-  double H = getHorEnc(); //Horizontal measurement
+  E = getRightVertEnc(); //Right Measurement
+  L = getLeftVertEnc(); //Left measurement
+  H = getHorEnc(); //Horizontal measurement
   double D = 0; //Current difference
   double El = 0; //Last encoder measurement
   double Hl = 0; //Last horizontal measurement
   double Dl = 0; //Last differnce
   double deltaF = 0; //Change in forward direction
   double deltaH = 0; //Change in horizontal direction
-  int toss = 0;
+  double toss = 0;
   while(true){
+    testVarMutex.lock();
     E = getRightVertEnc(); //Right Measurement
     L = getLeftVertEnc(); //Left measurement
     H = getHorEnc(); //Horizontal measurement
@@ -44,7 +47,6 @@ int trackingTask(){
     El = E; //Last forward encoder = current
     Hl = H; //Last horiztonal encoder = current
 
-    testVarMutex.lock();
     Heading -=  getHeading(); //Change of rotation in radians              //Possible change: Could update with delta heading since last checked to allow for other sensores to set the heading; or could use (E-L)/2 to get the absolute rotation
     X += deltaF*cos(Heading) + deltaH*cos(Heading-(PI/2)); //Update the current X
     Y += deltaF*sin(Heading) + deltaH*sin(Heading-(PI/2)); //Update the current Y
@@ -55,15 +57,42 @@ int trackingTask(){
   return 0;
 }
 
-void rotateHeading(double tTheta, double threshold){
+void rotateUsingHeading(double tTheta, double threshold=0.08, double gain=200){
   //Determine direction using a closed heading (0-359.99); rotate to target using full rotation (-inf, inf)
-  int spinCCW = 1;
-  if(tTheta<0){
-    //Theta is CW
-    spinCCW = -1;
+  if(tTheta<(-PI)){
+    tTheta += (2*PI);
+  }else if (tTheta>(PI)) {
+    tTheta -= (2*PI);
   }
 
-  
+  testVarMutex.lock();
+  double localHead = Heading;
+  testVarMutex.unlock();
+  double startHead = localHead; //Used as 0 point for the full rotatin based heading
+
+  results r = PID(tTheta+startHead, localHead, gain);
+
+  if(abs(r.lastError) < threshold){
+    return;
+  }
+
+  setDPS(r.speed);
+  rotate();
+
+  while(abs(r.lastError) > threshold){
+    testVarMutex.lock();
+    localHead = Heading;
+    testVarMutex.unlock();
+    r = PID(tTheta+startHead, localHead, gain);
+    std::cout << r.lastError << ", " << r.speed << std::endl;
+    setDPS(r.speed);
+    if(r.speed < minDPSSpeed){
+      break;
+    }
+    wait(10, msec);
+  }
+  setDPS(0);
+  stopMotors();
 }
 
 void turnTo(double x, bool inDeg = true, bool useSenor = true){
@@ -76,14 +105,13 @@ void turnTo(double x, bool inDeg = true, bool useSenor = true){
   testVarMutex.unlock();
 
   if(useSenor){
-    rotateHeading(d, 0.1);
+    rotateUsingHeading(d);
   }else{
-
     rotatePID(d);
   }
 }
 
-void translatePID(double dX, double dY){
+void translatePID(double head, double dis, double maxSpeed, bool rotate=true){
 
 }
 
@@ -102,8 +130,7 @@ void move(double deltaFWD, double deltaRIGHT, double maxSpeed, bool rotate=true)
 
   double travelDistance = sqrt((deltaX*deltaX) + (deltaY*deltaY));
   double Ht = atan2(deltaY, deltaX);
-
-  translatePID(deltaX, deltaY);
+  translatePID(Ht, travelDistance, maxSpeed, rotate);
 }
 
 void move(double deltaX, double deltaY, bool rotate=true){
