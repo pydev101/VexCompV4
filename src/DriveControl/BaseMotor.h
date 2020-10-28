@@ -21,6 +21,14 @@ const double PI = 3.141592653;
 const double PIover180 = PI/180;
 
 //Function Definitions
+void setLeftDPS(double targetVel){
+  frontLeft.setVelocity(targetVel*bias.fLB, velocityUnits::dps);
+  backLeft.setVelocity(targetVel*bias.bLB, velocityUnits::dps);
+}
+void setRightDPS(double targetVel){
+  frontRight.setVelocity(targetVel*bias.fRB, velocityUnits::dps);
+  backRight.setVelocity(targetVel*bias.bRB, velocityUnits::dps);
+}
 void setDPS(double targetVel){
   //Sets velocity of motors; directon depends on current axis; Units in degrees per second
   frontLeft.setVelocity(targetVel*bias.fLB, velocityUnits::dps);

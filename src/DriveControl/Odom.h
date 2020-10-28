@@ -57,14 +57,8 @@ int trackingTask(){
   return 0;
 }
 
-void rotateUsingHeading(double tTheta, double threshold=0.08, double gain=200){
+void rotateUsingHeading(double tTheta, double threshold=0.08, double gain=300){
   //Determine direction using a closed heading (0-359.99); rotate to target using full rotation (-inf, inf)
-  if(tTheta<(-PI)){
-    tTheta += (2*PI);
-  }else if (tTheta>(PI)) {
-    tTheta -= (2*PI);
-  }
-
   testVarMutex.lock();
   double localHead = Heading;
   testVarMutex.unlock();
@@ -83,7 +77,7 @@ void rotateUsingHeading(double tTheta, double threshold=0.08, double gain=200){
     testVarMutex.lock();
     localHead = Heading;
     testVarMutex.unlock();
-    r = PID(tTheta+startHead, localHead, gain);
+    r = PID(tTheta+startHead, localHead, gain, r);
     std::cout << r.lastError << ", " << r.speed << std::endl;
     setDPS(r.speed);
     if(r.speed < minDPSSpeed){
@@ -99,10 +93,17 @@ void turnTo(double x, bool inDeg = true, bool useSenor = true){
   if(inDeg){
     x = x * (PI/180);
   }
+  double toss;
+
   tHead = x;
   testVarMutex.lock();
-  double d = tHead-Heading;
+  double d = tHead-((2*PI)*modf(Heading/(2*PI), &toss));
   testVarMutex.unlock();
+  if(d<(-PI)){
+    d += (2*PI);
+  }else if (d>(PI)) {
+    d -= (2*PI);
+  }
 
   if(useSenor){
     rotateUsingHeading(d);
@@ -111,8 +112,45 @@ void turnTo(double x, bool inDeg = true, bool useSenor = true){
   }
 }
 
-void translatePID(double head, double dis, double maxSpeed, bool rotate=true){
+void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, double gain=1.25){
+  if(rotate){
+    turnTo(head, false);
+    double toss;
+    testVarMutex.lock();
+    double wE = E;
+    double workHead = Heading;
+    testVarMutex.unlock();
+    double sE = E;
+    dis += sE;
 
+    double adjGain = 2;
+
+    results r = PID(dis, wE, gain);
+    if(abs(r.lastError) < minDegreesPerTimeUnit){
+      return;
+    }
+
+    while(abs(r.lastError) > minDegreesPerTimeUnit){
+      testVarMutex.lock();
+      wE = E;
+      workHead = Heading;
+      testVarMutex.unlock();
+
+      r = PID(dis, wE, gain, r, maxSpeed);
+      setRightDPS((adjGain*(tHead-((2*PI)*modf(Heading/(2*PI), &toss))))+r.speed);
+      setLeftDPS(r.speed);
+
+      if(r.speed < minDPSSpeed){
+        break;
+      }
+      
+      wait(timeUnit, msec);
+    }
+    setDPS(0);
+    stopMotors();
+  }else{
+    vectorPID(tHead, dis);
+  }
 }
 
 void move(double deltaFWD, double deltaRIGHT, double maxSpeed, bool rotate=true){
