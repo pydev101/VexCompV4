@@ -127,13 +127,13 @@ int main() {
   //Competition.autonomous(autonomous);
   //Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   //move(24, 36*3, false);
   //move(-12, 15);
   //move(-X, -Y, false);
 
-  rotateUsingHeading(PI/4, 0.08, 300);
+  move(36, 0);
 
   std::cout << "Heading | X | Y" << std::endl;
   while (true) {

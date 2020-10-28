@@ -80,7 +80,7 @@ void rotateUsingHeading(double tTheta, double threshold=0.08, double gain=300){
     r = PID(tTheta+startHead, localHead, gain, r);
     std::cout << r.lastError << ", " << r.speed << std::endl;
     setDPS(r.speed);
-    if(r.speed < minDPSSpeed){
+    if(abs(r.speed) < minDPSSpeed){
       break;
     }
     wait(10, msec);
@@ -140,7 +140,7 @@ void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, 
       setRightDPS((adjGain*(tHead-((2*PI)*modf(Heading/(2*PI), &toss))))+r.speed);
       setLeftDPS(r.speed);
 
-      if(r.speed < minDPSSpeed){
+      if(abs(r.speed) < minDPSSpeed){
         break;
       }
       
@@ -154,10 +154,11 @@ void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, 
 }
 
 void move(double deltaFWD, double deltaRIGHT, double maxSpeed, bool rotate=true){
-  deltaFWD = deltaFWD/measureWheelDegsOverInches;
-  deltaRIGHT = deltaRIGHT/deltaRIGHT;
+  deltaFWD = deltaFWD*measureWheelDegsOverInches;
+  deltaRIGHT = deltaRIGHT*measureWheelDegsOverInches;
 
   testVarMutex.lock();
+  std::cout << "Fwd: " << deltaFWD << "; Heading: " << (Heading*(180/PI)) <<std::endl;
   Xt += deltaFWD*cos(Heading) + deltaRIGHT*cos(Heading-(PI/2));
   Yt += deltaFWD*sin(Heading) + deltaRIGHT*sin(Heading-(PI/2));
   double deltaX = Xt-X;
@@ -168,6 +169,8 @@ void move(double deltaFWD, double deltaRIGHT, double maxSpeed, bool rotate=true)
 
   double travelDistance = sqrt((deltaX*deltaX) + (deltaY*deltaY));
   double Ht = atan2(deltaY, deltaX);
+  std::cout << "Travel: " << travelDistance << "; Heading Target: " << Ht <<std::endl;
+
   translatePID(Ht, travelDistance, maxSpeed, rotate);
 }
 
