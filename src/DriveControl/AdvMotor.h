@@ -77,7 +77,7 @@ double vectorPID(double rads, double degrees, double maxSpeed=0, int stopDelay=d
   while((abs(r.lastError) > (minDegreesPerTimeUnit+linearMotionThresholdBoost)) && (abs(r.speed) >= minDPSSpeed)){
     r = PID(degrees, getAxisEncoder(4)-startEnc, gain, r, maxSpeed);
     setDPS(r.speed);
-    //std::cout << currTimeUnit << ", " << getAxisEncoder(4)-startEnc << ", " << r.lastError << ", " << r.speed << std::endl;
+    std::cout << currTimeUnit << ", " << getAxisEncoder(4)-startEnc << ", " << r.lastError << ", " << r.speed << std::endl;
     wait(timeUnit, msec);
     currTimeUnit++;
   }

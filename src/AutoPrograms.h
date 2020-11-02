@@ -22,7 +22,9 @@ void rightBlue(){
 }
 
 void rightRed(){
-  
+  intake(1);
+  move(13, 60, false);
+  move(60,0);
 }
 
 void BrainGUIProgram(){

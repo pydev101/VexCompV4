@@ -25,8 +25,8 @@ const double centerToMeasureWheelRadius = 7.3; //Inches; Distance between center
 //Arbitary
 const double timeUnit = 10; //msec; Delay time between updates of PID function
 const double defaultStopDelay = 500; //Msec; Wait time after a move function has been called
-const double defaultGainLinear = 1.25; //Default K value for linear movements
-const double defaultGainRotational = 1.5; //Default K value for rotational movements
+const double defaultGainLinear = 1.35; //Default K value for linear movements
+const double defaultGainRotational = 1.53; //Default K value for rotational movements
 const double defaultGainRotationalWSensor = 250; //Default K value for values regarding sensor rotation
 const double linearMotionThresholdBoost = 0; //Value added to the default threshold value to decease accuracy for moving on
 const double rotationalMotionThresholdBoost = 0; //Value added to the default rotation threshold value to decease accuracy for moving on

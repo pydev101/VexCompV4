@@ -112,7 +112,7 @@ void turnTo(double x, bool inDeg = true, bool useSenor = true){
   }
 }
 
-void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, double gain=1.25){
+void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, double gain=defaultGainLinear){
   if(rotate){
     turnTo(head, false);
     double toss;
@@ -129,7 +129,8 @@ void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, 
     if(abs(r.lastError) < minDegreesPerTimeUnit){
       return;
     }
-
+    
+    setAxis(0);
     while(abs(r.lastError) > minDegreesPerTimeUnit){
       testVarMutex.lock();
       wE = E;
@@ -137,6 +138,8 @@ void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, 
       testVarMutex.unlock();
 
       r = PID(dis, wE, gain, r, maxSpeed);
+      std::cout << r.lastError << ", " << r.speed << std::endl;
+
       setRightDPS((adjGain*(tHead-((2*PI)*modf(Heading/(2*PI), &toss))))+r.speed);
       setLeftDPS(r.speed);
 
@@ -149,7 +152,33 @@ void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, 
     setDPS(0);
     stopMotors();
   }else{
-    vectorPID(tHead, dis);
+    testVarMutex.lock();
+    double deltaX = Xt-X;
+    double deltaY = Yt-Y;
+    testVarMutex.unlock();
+    dis = sqrt((deltaX*deltaX) + (deltaY*deltaY));
+    head = atan2(deltaY, deltaX);
+    if(dis < 10){
+      return;
+    }
+
+    while(dis > 10){
+      testVarMutex.lock();
+      deltaX = Xt-X;
+      deltaY = Yt-Y;
+      testVarMutex.unlock();
+      dis = sqrt((deltaX*deltaX) + (deltaY*deltaY));
+      head = atan2(deltaY, deltaX);
+
+      std::cout << "Head: " << head << "; Dis: " << dis << "; Speed: " << dis*gain << std::endl;
+
+      setVector(head);
+      setDPS(dis*gain);
+      if(dis*gain < minDPSSpeed){
+        break;
+      }
+    }
+    stopMotors();
   }
 }
 
@@ -158,22 +187,23 @@ void move(double deltaFWD, double deltaRIGHT, double maxSpeed, bool rotate=true)
   deltaRIGHT = deltaRIGHT*measureWheelDegsOverInches;
 
   testVarMutex.lock();
-  std::cout << "Fwd: " << deltaFWD << "; Heading: " << (Heading*(180/PI)) <<std::endl;
   Xt += deltaFWD*cos(Heading) + deltaRIGHT*cos(Heading-(PI/2));
   Yt += deltaFWD*sin(Heading) + deltaRIGHT*sin(Heading-(PI/2));
   double deltaX = Xt-X;
   double deltaY = Yt-Y;
+  std::cout << "Fwd: " << deltaFWD << "; Right: " << deltaRIGHT << "; Heading: " << (Heading*(180/PI)) <<std::endl;
   testVarMutex.unlock();
-  
-  std::cout << "Start: " << deltaX << ", " << deltaY <<std::endl;
+  std::cout << "Xt: " << Xt << "; Yt: " << Yt <<std::endl;
+  std::cout << "DeltaXY: " << deltaX << ", " << deltaY <<std::endl;
 
   double travelDistance = sqrt((deltaX*deltaX) + (deltaY*deltaY));
   double Ht = atan2(deltaY, deltaX);
+
   std::cout << "Travel: " << travelDistance << "; Heading Target: " << Ht <<std::endl;
 
   translatePID(Ht, travelDistance, maxSpeed, rotate);
 }
 
-void move(double deltaX, double deltaY, bool rotate=true){
-  move(deltaX, deltaY, 0, rotate);
+void move(double deltaFWD, double deltaRIGHT, bool rotate=true){
+  move(deltaFWD, deltaRIGHT, 0, rotate);
 }

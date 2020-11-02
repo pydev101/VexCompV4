@@ -78,6 +78,7 @@ void setVector(double rads){
   double a = (sqrt(2)*(sin(rads) + cos(rads)))/4;
   double b = (sqrt(2)*(sin(rads) - cos(rads)))/4;
   bias = {b, a, a, b};
+  std::cout << "A: " << a << "; B: " << b << std::endl;
   startSpin();
 }
 
@@ -157,4 +158,17 @@ double getAxisEncoder(int axis){
   
   //std::cout << "ERROR AXIS ENCODER: " << ver << ", " << hor << std::endl;
   return 0;
+}
+
+//Misc.
+void intake(double d=0){
+  if(d==0){
+    intakeLeft.stop();
+    intakeRight.stop();
+  }else{
+    intakeRight.spin(fwd);
+    intakeLeft.spin(fwd);
+    intakeRight.setVelocity(100*d, pct);
+    intakeLeft.setVelocity(100*d, pct);
+  }
 }
