@@ -45,6 +45,8 @@ void pre_auton(void) {
   resetHeading();
   resetEncoders();
   task updateTask(trackingTask);
+
+  BrainGUIProgram();
 }
 
 
@@ -53,6 +55,7 @@ void autonomous(void) {
   frontRight.setBrake(brakeType::hold);
   backLeft.setBrake(brakeType::hold);
   backRight.setBrake(brakeType::hold);
+  selectedAutoProgram.function(selectedAutoProgram.mod);
 }
 
 void usercontrol(void) {

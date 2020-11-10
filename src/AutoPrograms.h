@@ -11,23 +11,24 @@
 
 typedef struct {
   std::string name;
-  void (*function)(void);
+  void (*function)(int);
+  int mod;
 
 } autoEntry;
 
-void leftBlue(){
+void leftBlue(int mod){
 
 }
 
-void leftRed(){
+void leftRed(int mod){
   
 }
 
-void rightBlue(){
+void rightBlue(int mod){
   
 }
 
-void rightRed(){
+void rightRed(int mod){
   intake(1);
   move(10, 0);
   move(12, 54);
@@ -37,10 +38,14 @@ void rightRed(){
 }
 
 autoEntry entries[] = {
+  {"Right Red", rightRed},
+  {"Left Red", leftRed},
+  {"Right Blue", rightBlue},
   {"Left Blue", leftBlue}
 };
 
-autoEntry selectedAutoProgram;
+autoEntry selectedAutoProgram = entries[0];
 void BrainGUIProgram(){
+  int index = 0;
 
 }
