@@ -12,8 +12,8 @@
 // Controller1          controller                    
 // intakeLeft           motor         1               
 // intakeRight          motor         2               
-// liftL                motor         3               
-// liftR                motor         4               
+// liftT                motor         3               
+// liftB                motor         4               
 // ---- END VEXCODE CONFIGURED DEVICES ----
                  
 /*----------------------------------------------------------------------------
@@ -27,7 +27,7 @@
 
 #include "AutoPrograms.h"
 
-//competition Competition;
+competition Competition;
 
 void pre_auton(void) {
   vexcodeInit();
@@ -35,10 +35,10 @@ void pre_auton(void) {
   ISensor.startCalibration();
   while(ISensor.isCalibrating()){wait(5, msec);}
 
-  frontLeft.setBrake(brakeType::hold);
-  frontRight.setBrake(brakeType::hold);
-  backLeft.setBrake(brakeType::hold);
-  backRight.setBrake(brakeType::hold);
+  //frontLeft.setBrake(brakeType::hold);
+  //frontRight.setBrake(brakeType::hold);
+  //backLeft.setBrake(brakeType::hold);
+  //backRight.setBrake(brakeType::hold);
   
   setDPS(0);
 
@@ -55,8 +55,6 @@ void autonomous(void) {
   backRight.setBrake(brakeType::hold);
 }
 
-
-bool tank = true;
 void usercontrol(void) {
   frontLeft.setBrake(brakeType::coast);
   frontRight.setBrake(brakeType::coast);
@@ -68,68 +66,77 @@ void usercontrol(void) {
   double rV = 0;
   double rH = 0;
   int threshold = 5;
+  int intakeToggle = 0;
 
   while (true) {
-    if(tank){
-      lV = Controller1.Axis3.position();
-      lH = Controller1.Axis4.position();
-      rV = Controller1.Axis2.position();
-      rH = Controller1.Axis1.position();
+    lV = Controller1.Axis3.position();
+    lH = Controller1.Axis4.position();
+    rV = Controller1.Axis2.position();
+    rH = Controller1.Axis1.position();
 
-      if((abs(lV)<threshold)&&(abs(lH)<threshold)&&(abs(rV)<threshold)&&(abs(rH)<threshold)){
-        stopMotors();
-      }else{
-        startSpin();
-      }
-
-      frontLeft.setVelocity(lV+lH, velocityUnits::pct);
-      frontRight.setVelocity(rV-rH, velocityUnits::pct);
-      backLeft.setVelocity(lV-lH, velocityUnits::pct);
-      backRight.setVelocity(rV+rH, velocityUnits::pct);
-
-      if(Controller1.ButtonR1.pressing()){
-        intakeRight.spin(fwd);
-        intakeLeft.spin(fwd);
-        intakeRight.setVelocity(100, pct);
-        intakeLeft.setVelocity(100, pct);
-      }else if(Controller1.ButtonR2.pressing()){
-        intakeRight.spin(fwd);
-        intakeLeft.spin(fwd);
-        intakeRight.setVelocity(-100, pct);
-        intakeLeft.setVelocity(-100, pct);
-      }else{
-        intakeLeft.stop();
-        intakeRight.stop();
-      }
-
-      if(Controller1.ButtonRight.pressing()){
-        liftR.spin(fwd);
-        liftL.spin(fwd);
-        liftR.setVelocity(50, pct);
-        liftL.setVelocity(50, pct);
-      }else if(Controller1.ButtonLeft.pressing()){
-        liftR.spin(fwd);
-        liftL.spin(fwd);
-        liftR.setVelocity(-50, pct);
-        liftL.setVelocity(-50, pct);
-      }else{
-        liftL.stop();
-        liftR.stop();
-      }
-
-      wait(20, msec);
+    if((abs(lV)<threshold)&&(abs(lH)<threshold)&&(abs(rV)<threshold)&&(abs(rH)<threshold)){
+      stopMotors();
+    }else{
+      startSpin();
     }
+
+    frontLeft.setVelocity(lV+lH, velocityUnits::pct);
+    frontRight.setVelocity(rV-rH, velocityUnits::pct);
+    backLeft.setVelocity(lV-lH, velocityUnits::pct);
+    backRight.setVelocity(rV+rH, velocityUnits::pct);
+
+    if(Controller1.ButtonR1.pressing()){
+      liftT.spin(fwd);
+      liftT.setVelocity(100, pct);
+    }else if(Controller1.ButtonR2.pressing()){
+      liftT.spin(fwd);
+      liftT.setVelocity(-100, pct);
+    }else{
+      liftT.setVelocity(0, pct);
+      liftT.stop();
+    }
+
+    if(Controller1.ButtonL1.pressing()){
+      liftB.spin(fwd);
+      liftB.setVelocity(100, pct);
+    }else if(Controller1.ButtonL2.pressing()){
+      liftB.spin(fwd);
+      liftB.setVelocity(-100, pct);
+    }else{
+      liftB.setVelocity(0, pct);
+      liftB.stop();
+    }
+
+    if(Controller1.ButtonUp.pressing()){
+      if(intakeToggle == 1){
+        intake(0);
+        intakeToggle = 0;
+      }else{
+        intake(1);
+        intakeToggle = 1;
+      }
+      wait(250, msec);
+    }else if(Controller1.ButtonDown.pressing()){
+      if(intakeToggle == -1){
+        intake(0);
+        intakeToggle = 0;
+      }else{
+        intakeToggle = -1;
+        intake(-1);
+      }
+      wait(250, msec);
+    }
+
+    wait(20, msec);
   }
 }
 
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
-  //Competition.autonomous(autonomous);
-  //Competition.drivercontrol(usercontrol);
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-
-  rightRed();
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   std::cout << "Heading | X | Y" << std::endl;
   while (true) {

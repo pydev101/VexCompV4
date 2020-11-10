@@ -9,6 +9,12 @@
 
 #include "DriveControl/Odom.h"
 
+typedef struct {
+  std::string name;
+  void (*function)(void);
+
+} autoEntry;
+
 void leftBlue(){
 
 }
@@ -30,6 +36,11 @@ void rightRed(){
   intake(0);
 }
 
+autoEntry entries[] = {
+  {"Left Blue", leftBlue}
+};
+
+autoEntry selectedAutoProgram;
 void BrainGUIProgram(){
 
 }

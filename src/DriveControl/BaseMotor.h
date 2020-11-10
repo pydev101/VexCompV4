@@ -161,14 +161,15 @@ double getAxisEncoder(int axis){
 }
 
 //Misc.
-void intake(double d=0){
+void intake(int d=0){
+  intakeRight.setVelocity(100*d, pct);
+  intakeLeft.setVelocity(100*d, pct);
+  
   if(d==0){
     intakeLeft.stop();
     intakeRight.stop();
   }else{
     intakeRight.spin(fwd);
     intakeLeft.spin(fwd);
-    intakeRight.setVelocity(100*d, pct);
-    intakeLeft.setVelocity(100*d, pct);
   }
 }

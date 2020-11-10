@@ -14,8 +14,8 @@ extern inertial ISensor;
 extern controller Controller1;
 extern motor intakeLeft;
 extern motor intakeRight;
-extern motor liftL;
-extern motor liftR;
+extern motor liftT;
+extern motor liftB;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Text.
