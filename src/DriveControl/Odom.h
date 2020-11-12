@@ -123,7 +123,7 @@ void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, 
     double sE = E;
     dis += sE;
 
-    double adjGain = 2;
+    double adjGain = 500;
 
     results r = PID(dis, wE, gain);
     if(abs(r.lastError) < minDegreesPerTimeUnit){
@@ -140,7 +140,7 @@ void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, 
       r = PID(dis, wE, gain, r, maxSpeed);
       std::cout << r.lastError << ", " << r.speed << std::endl;
 
-      setRightDPS((adjGain*(tHead-((2*PI)*modf(Heading/(2*PI), &toss))))+r.speed);
+      setRightDPS((adjGain*(tHead-((2*PI)*modf(workHead/(2*PI), &toss))))+r.speed);
       setLeftDPS(r.speed);
 
       if(abs(r.speed) < minDPSSpeed){
@@ -152,10 +152,16 @@ void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, 
     setDPS(0);
     stopMotors();
   }else{
+    gain = 15;
+    double adjGain = 1000;
+
     testVarMutex.lock();
     double deltaX = Xt-X;
     double deltaY = Yt-Y;
+    double workHead = Heading;
     testVarMutex.unlock();
+    double toss;
+
     dis = sqrt((deltaX*deltaX) + (deltaY*deltaY));
     head = atan2(deltaY, deltaX);
     if(dis < 10){
@@ -166,14 +172,17 @@ void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, 
       testVarMutex.lock();
       deltaX = Xt-X;
       deltaY = Yt-Y;
+      workHead = Heading;
       testVarMutex.unlock();
       dis = sqrt((deltaX*deltaX) + (deltaY*deltaY));
       head = atan2(deltaY, deltaX);
-
+    
       std::cout << "Head: " << head << "; Dis: " << dis << "; Speed: " << dis*gain << std::endl;
 
       setVector(head);
-      setDPS(dis*gain);
+      setRightDPS((adjGain*(tHead-((2*PI)*modf(workHead/(2*PI), &toss))))+dis*gain);
+      setLeftDPS(dis*gain);
+
       if(dis*gain < minDPSSpeed){
         break;
       }

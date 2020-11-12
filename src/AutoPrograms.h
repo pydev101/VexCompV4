@@ -44,8 +44,54 @@ autoEntry entries[] = {
   {"Left Blue", leftBlue}
 };
 
+class ButtonGUI {
+  public:
+    int x;
+    int y;
+    int width;
+    int height;
+    void (*callback)();
+    int *point;
+
+    ButtonGUI(int X, int Y, int W, int H, void (*call)()){
+      x = X;
+      y = Y;
+      width = W;
+      height = H;
+      callback = call;
+    }
+
+    bool call(int X, int Y){
+      if((X >= x) && (X <= (x+width))){
+        if((Y >= y) && (Y <= (y+height))){
+          callback();
+          return true;
+        }
+      }
+      return false;
+    }
+
+    void draw(){
+      Brain.Screen.drawRectangle(x, y, width, height);
+    }
+};
+
+int indexAuto = 0;
+void changeIndex(){
+  indexAuto += 1;
+  std::cout << indexAuto << std::endl;
+}
+
 autoEntry selectedAutoProgram = entries[0];
 void BrainGUIProgram(){
-  int index = 0;
+  ButtonGUI test(10,10,50,70, changeIndex);
 
+  while(true){
+    Brain.Screen.clearScreen();
+    Brain.Screen.setCursor(1, 1);
+
+
+    
+    wait(1000, msec);
+  }
 }
