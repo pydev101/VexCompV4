@@ -44,6 +44,8 @@ autoEntry entries[] = {
   {"Left Blue", leftBlue}
 };
 
+
+//START OF GUI------------------------------------------------------------------------
 class ButtonGUI {
   public:
     int x;
@@ -52,6 +54,7 @@ class ButtonGUI {
     int height;
     void (*callback)();
     int *point;
+    bool isPressed = false;
 
     ButtonGUI(int X, int Y, int W, int H, void (*call)()){
       x = X;
@@ -65,6 +68,7 @@ class ButtonGUI {
       if((X >= x) && (X <= (x+width))){
         if((Y >= y) && (Y <= (y+height))){
           callback();
+          isPressed = true;
           return true;
         }
       }
@@ -72,6 +76,11 @@ class ButtonGUI {
     }
 
     void draw(){
+      if(isPressed){
+        Brain.Screen.setFillColor(green);
+      }else{
+        Brain.Screen.setFillColor(red);
+      }
       Brain.Screen.drawRectangle(x, y, width, height);
     }
 };
@@ -82,16 +91,45 @@ void changeIndex(){
   std::cout << indexAuto << std::endl;
 }
 
+ButtonGUI test(10,10,50,70, changeIndex);
+ButtonGUI zeta(10,10,50,70, changeIndex);
+ButtonGUI buttons[] = {test};
+
+void pressHandler(){
+  static bool free = true;
+
+  if(free){
+    free = false;
+  }else{
+    return;
+  }
+  
+  if(Brain.Screen.pressing()){
+    for(int i=(sizeof(buttons)/sizeof(ButtonGUI))-1; i >= 0; i--){
+      if(buttons[i].call(Brain.Screen.xPosition(), Brain.Screen.yPosition())){
+        waitUntil(!Brain.Screen.pressing());
+        buttons[i].isPressed = false;
+        free = true;
+        return;
+      }
+    }
+  }
+}
+
 autoEntry selectedAutoProgram = entries[0];
 void BrainGUIProgram(){
-  ButtonGUI test(10,10,50,70, changeIndex);
+  Brain.Screen.pressed(pressHandler);
 
   while(true){
     Brain.Screen.clearScreen();
     Brain.Screen.setCursor(1, 1);
 
+    for(int i=0; i < (sizeof(buttons)/sizeof(ButtonGUI)); i++){
+      buttons[i].x += 5;
+      if(buttons[i].x > 240){buttons[i].x=0;}
+      buttons[i].draw();
+    }
 
-    
-    wait(1000, msec);
+    wait(200, msec);
   }
 }
