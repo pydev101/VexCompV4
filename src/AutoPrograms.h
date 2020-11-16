@@ -53,15 +53,17 @@ class ButtonGUI {
     int width;
     int height;
     void (*callback)();
+    void (*drawing)(int x, int y, int w, int h, bool press);
     int *point;
     bool isPressed = false;
 
-    ButtonGUI(int X, int Y, int W, int H, void (*call)()){
+    ButtonGUI(int X, int Y, int W, int H, void (*call)(), void (*drawFunct)(int x, int y, int w, int h, bool press)){
       x = X;
       y = Y;
       width = W;
       height = H;
       callback = call;
+      drawing = drawFunct;
     }
 
     bool call(int X, int Y){
@@ -76,26 +78,74 @@ class ButtonGUI {
     }
 
     void draw(){
-      if(isPressed){
-        Brain.Screen.setFillColor(green);
-      }else{
-        Brain.Screen.setFillColor(red);
-      }
-      Brain.Screen.drawRectangle(x, y, width, height);
+      drawing(x, y, width, height, isPressed);
     }
 };
 
 int indexAuto = 0;
-void changeIndex(){
+void increaseIndex(){
   indexAuto += 1;
-  std::cout << indexAuto << std::endl;
+  if(indexAuto > (sizeof(entries)/sizeof(entries[0]))-1){
+    indexAuto = 0;
+  }
 }
 
-ButtonGUI test(10,10,50,70, changeIndex);
-ButtonGUI zeta(10,10,50,70, changeIndex);
-ButtonGUI buttons[] = {test};
+void drawAAA(int x, int y, int w, int h, bool press){
+  if(press){
+    Brain.Screen.setFillColor(green);
+  }else{
+    Brain.Screen.setFillColor(red);
+  }
+  Brain.Screen.drawRectangle(x, y, w, h);
+  Brain.Screen.setFillColor(white);
+  Brain.Screen.drawLine((w/4)+x, (3*h/4)+y, (w/2)+x, (h/4)+y);
+  Brain.Screen.drawLine((3*w/4)+x, (3*h/4)+y, (w/2)+x, (h/4)+y);
+}
+ButtonGUI increaseBTN(480-50,0,50,70, increaseIndex, drawAAA);
+
+void decreaseIndex(){
+  indexAuto -= 1;
+  if(indexAuto < 0){
+    indexAuto = (sizeof(entries)/sizeof(entries[0]))-1;
+  }
+}
+void drawAAB(int x, int y, int w, int h, bool press){
+  if(press){
+    Brain.Screen.setFillColor(green);
+  }else{
+    Brain.Screen.setFillColor(red);
+  }
+  Brain.Screen.drawRectangle(x, y, w, h);
+  Brain.Screen.setFillColor(white);
+  Brain.Screen.drawLine((w/4)+x, (h/4)+y, (w/2)+x, (3*h/4)+y);
+  Brain.Screen.drawLine((3*w/4)+x, (h/4)+y, (w/2)+x, (3*h/4)+y);
+}
+ButtonGUI decreaseBTN(480-50,80,50,70, decreaseIndex, drawAAB);
+
+bool GUIActivate = true;
+void setAuto(){
+  GUIActivate = false;
+}
+void drawAAC(int x, int y, int w, int h, bool press){
+  if(press){
+    Brain.Screen.setFillColor(white);
+  }else{
+    Brain.Screen.setFillColor(red);
+  }
+  Brain.Screen.drawRectangle(x, y, w, h);
+  if(press){
+    Brain.Screen.setFillColor(green);
+  }else{
+    Brain.Screen.setFillColor(white);
+  }
+  Brain.Screen.drawCircle((w/2)+x, (h/2)+y, (w/4));
+}
+ButtonGUI setBTN(480-50,160,50,70, setAuto, drawAAC);
+
+ButtonGUI buttons[] = {increaseBTN, decreaseBTN, setBTN};
 
 void pressHandler(){
+  if(!GUIActivate){return;}
   static bool free = true;
 
   if(free){
@@ -107,6 +157,7 @@ void pressHandler(){
   if(Brain.Screen.pressing()){
     for(int i=(sizeof(buttons)/sizeof(ButtonGUI))-1; i >= 0; i--){
       if(buttons[i].call(Brain.Screen.xPosition(), Brain.Screen.yPosition())){
+        buttons[i].draw();
         waitUntil(!Brain.Screen.pressing());
         buttons[i].isPressed = false;
         free = true;
@@ -116,20 +167,20 @@ void pressHandler(){
   }
 }
 
-autoEntry selectedAutoProgram = entries[0];
 void BrainGUIProgram(){
   Brain.Screen.pressed(pressHandler);
 
-  while(true){
+  while(GUIActivate){
     Brain.Screen.clearScreen();
     Brain.Screen.setCursor(1, 1);
 
+    std::string out = entries[indexAuto].name;
+    Brain.Screen.print("%s", out.c_str());
+
     for(int i=0; i < (sizeof(buttons)/sizeof(ButtonGUI)); i++){
-      buttons[i].x += 5;
-      if(buttons[i].x > 240){buttons[i].x=0;}
       buttons[i].draw();
     }
 
-    wait(200, msec);
+    wait(250, msec);
   }
 }

@@ -55,7 +55,7 @@ void autonomous(void) {
   frontRight.setBrake(brakeType::hold);
   backLeft.setBrake(brakeType::hold);
   backRight.setBrake(brakeType::hold);
-  selectedAutoProgram.function(selectedAutoProgram.mod);
+  entries[indexAuto].function(entries[indexAuto].mod);
 }
 
 void usercontrol(void) {
@@ -139,11 +139,11 @@ int main() {
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
-  std::cout << "Heading | X | Y" << std::endl;
+  //std::cout << "Heading | X | Y" << std::endl;
   while (true) {
-    testVarMutex.lock();
+    /*testVarMutex.lock();
     Controller1.Screen.clearScreen();
     Controller1.Screen.setCursor(0, 0);
     Controller1.Screen.print("Heading | X | Y");
@@ -163,7 +163,7 @@ int main() {
     Controller1.Screen.print(Yt/measureWheelDegsOverInches);
 
     //std::cout << (Heading*(180/PI)) << ", " << X/measureWheelDegsOverInches << ", " << Y/measureWheelDegsOverInches << std::endl;
-    testVarMutex.unlock();
+    testVarMutex.unlock();*/
     wait(1000, msec);
   }
 }
