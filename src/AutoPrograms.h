@@ -171,11 +171,13 @@ void BrainGUIProgram(){
   Brain.Screen.pressed(pressHandler);
 
   while(GUIActivate){
+    Brain.Screen.setFillColor(black);
+    Brain.Screen.setPenColor(white);
     Brain.Screen.clearScreen();
     Brain.Screen.setCursor(1, 1);
 
     std::string out = entries[indexAuto].name;
-    Brain.Screen.print("%s", out.c_str());
+    Brain.Screen.print(out.c_str());
 
     for(int i=0; i < (sizeof(buttons)/sizeof(ButtonGUI)); i++){
       buttons[i].draw();
