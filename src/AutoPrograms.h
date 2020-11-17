@@ -186,3 +186,5 @@ void BrainGUIProgram(){
     wait(250, msec);
   }
 }
+
+//480 pixels wide by 272 pixels high

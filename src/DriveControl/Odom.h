@@ -138,7 +138,7 @@ void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, 
       testVarMutex.unlock();
 
       r = PID(dis, wE, gain, r, maxSpeed);
-      std::cout << r.lastError << ", " << r.speed << std::endl;
+      //std::cout << r.lastError << ", " << r.speed << std::endl;
 
       setRightDPS((adjGain*(tHead-((2*PI)*modf(workHead/(2*PI), &toss))))+r.speed);
       setLeftDPS(r.speed);
@@ -200,10 +200,10 @@ void move(double deltaFWD, double deltaRIGHT, double maxSpeed, bool rotate=true)
   Yt += deltaFWD*sin(Heading) + deltaRIGHT*sin(Heading-(PI/2));
   double deltaX = Xt-X;
   double deltaY = Yt-Y;
-  std::cout << "Fwd: " << deltaFWD << "; Right: " << deltaRIGHT << "; Heading: " << (Heading*(180/PI)) <<std::endl;
+  //std::cout << "Fwd: " << deltaFWD << "; Right: " << deltaRIGHT << "; Heading: " << (Heading*(180/PI)) <<std::endl;
   testVarMutex.unlock();
-  std::cout << "Xt: " << Xt << "; Yt: " << Yt <<std::endl;
-  std::cout << "DeltaXY: " << deltaX << ", " << deltaY <<std::endl;
+  //std::cout << "Xt: " << Xt << "; Yt: " << Yt <<std::endl;
+  //std::cout << "DeltaXY: " << deltaX << ", " << deltaY <<std::endl;
 
   double travelDistance = sqrt((deltaX*deltaX) + (deltaY*deltaY));
   double Ht = atan2(deltaY, deltaX);

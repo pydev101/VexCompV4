@@ -27,7 +27,7 @@
 
 #include "AutoPrograms.h"
 
-competition Competition;
+//competition Competition;
 
 void pre_auton(void) {
   vexcodeInit();
@@ -36,10 +36,10 @@ void pre_auton(void) {
   ISensor.startCalibration();
   while(ISensor.isCalibrating()){wait(5, msec);}
 
-  //frontLeft.setBrake(brakeType::hold);
-  //frontRight.setBrake(brakeType::hold);
-  //backLeft.setBrake(brakeType::hold);
-  //backRight.setBrake(brakeType::hold);
+  frontLeft.setBrake(brakeType::hold);
+  frontRight.setBrake(brakeType::hold);
+  backLeft.setBrake(brakeType::hold);
+  backRight.setBrake(brakeType::hold);
   
   setDPS(0);
 
@@ -137,11 +137,13 @@ void usercontrol(void) {
 
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
+  //Competition.autonomous(autonomous);
+  //Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
+  entries[indexAuto].function(entries[indexAuto].mod);
+  
   //std::cout << "Heading | X | Y" << std::endl;
   while (true) {
     /*testVarMutex.lock();
