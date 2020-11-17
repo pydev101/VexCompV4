@@ -46,6 +46,13 @@ void stopMotors(){
   backRight.stop();
 }
 
+//100% VERY VERY Important DO NOT REMOVE 
+void preSettings(){
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.clearScreen();
+  Brain.Screen.drawImageFromFile("photoK.png", 0, 0);
+}
+
 //Linear Movement
 void startSpin(){
   frontRight.spin(directionType::fwd);

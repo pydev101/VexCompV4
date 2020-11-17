@@ -31,6 +31,7 @@ competition Competition;
 
 void pre_auton(void) {
   vexcodeInit();
+  preSettings();
 
   ISensor.startCalibration();
   while(ISensor.isCalibrating()){wait(5, msec);}
