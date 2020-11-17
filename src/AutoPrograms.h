@@ -182,8 +182,8 @@ void BrainGUIProgram(){
     for(int i=0; i < (sizeof(buttons)/sizeof(ButtonGUI)); i++){
       buttons[i].draw();
     }
-
-    wait(250, msec);
+    Brain.Screen.render();
+    wait(50, msec);
   }
 }
 

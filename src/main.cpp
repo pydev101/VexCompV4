@@ -140,33 +140,30 @@ int main() {
   //Competition.autonomous(autonomous);
   //Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   entries[indexAuto].function(entries[indexAuto].mod);
-  
-  //std::cout << "Heading | X | Y" << std::endl;
+
+  double workX = 0;
+  double workY = 0;
+  double workH = 0;
+
+  double horScale = 1/67.5;
+  double vertScale = horScale*0.5;;
+
+  Brain.Screen.clearScreen(black);
   while (true) {
-    /*testVarMutex.lock();
-    Controller1.Screen.clearScreen();
-    Controller1.Screen.setCursor(0, 0);
-    Controller1.Screen.print("Heading | X | Y");
+    testVarMutex.lock();
+    workX = X;
+    workY = Y;
+    workH = Heading;
+    testVarMutex.unlock();
 
-    Controller1.Screen.newLine();
-    Controller1.Screen.print(Heading*(180/PI));
-    Controller1.Screen.print(" | ");
-    Controller1.Screen.print(X/measureWheelDegsOverInches);
-    Controller1.Screen.print(" | ");
-    Controller1.Screen.print(Y/measureWheelDegsOverInches);
+    Brain.Screen.drawImageFromFile("gameMap.png", 0, 0);
+    Brain.Screen.setFillColor(green);
+    Brain.Screen.drawCircle(130+(workX*horScale), 220-(workY*vertScale), 10);
 
-    Controller1.Screen.newLine();
-    Controller1.Screen.print(tHead*(180/PI));
-    Controller1.Screen.print(" | ");
-    Controller1.Screen.print(Xt/measureWheelDegsOverInches);
-    Controller1.Screen.print(" | ");
-    Controller1.Screen.print(Yt/measureWheelDegsOverInches);
-
-    //std::cout << (Heading*(180/PI)) << ", " << X/measureWheelDegsOverInches << ", " << Y/measureWheelDegsOverInches << std::endl;
-    testVarMutex.unlock();*/
-    wait(1000, msec);
+    Brain.Screen.render();
+    wait(100, msec);
   }
 }
