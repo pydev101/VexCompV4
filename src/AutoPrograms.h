@@ -187,4 +187,4 @@ void BrainGUIProgram(){
   }
 }
 
-//480 pixels wide by 272 pixels high
+//480 pixels wide by 240 pixels high

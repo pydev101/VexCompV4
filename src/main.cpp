@@ -27,7 +27,7 @@
 
 #include "AutoPrograms.h"
 
-//competition Competition;
+competition Competition;
 
 void pre_auton(void) {
   vexcodeInit();
@@ -36,10 +36,10 @@ void pre_auton(void) {
   ISensor.startCalibration();
   while(ISensor.isCalibrating()){wait(5, msec);}
 
-  frontLeft.setBrake(brakeType::hold);
-  frontRight.setBrake(brakeType::hold);
-  backLeft.setBrake(brakeType::hold);
-  backRight.setBrake(brakeType::hold);
+  //frontLeft.setBrake(brakeType::hold);
+  //frontRight.setBrake(brakeType::hold);
+  //backLeft.setBrake(brakeType::hold);
+  //backRight.setBrake(brakeType::hold);
   
   setDPS(0);
 
@@ -137,21 +137,24 @@ void usercontrol(void) {
 
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
-  //Competition.autonomous(autonomous);
-  //Competition.drivercontrol(usercontrol);
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-
-  entries[indexAuto].function(entries[indexAuto].mod);
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   double workX = 0;
   double workY = 0;
   double workH = 0;
 
-  double horScale = 1/67.5;
+  double horScale = 1/10.7;
   double vertScale = horScale*0.5;;
-
+  
+  double tempX = 130+(workX*horScale);
+  double tempY = 220-(workY*vertScale);
   Brain.Screen.clearScreen(black);
+  Brain.Screen.setPenColor(yellow);
+  Brain.Screen.setFillColor(green);
+
   while (true) {
     testVarMutex.lock();
     workX = X;
@@ -159,11 +162,17 @@ int main() {
     workH = Heading;
     testVarMutex.unlock();
 
+    tempX = 130+(workX*horScale);
+    tempY = 220-(workY*vertScale);
+
     Brain.Screen.drawImageFromFile("gameMap.png", 0, 0);
-    Brain.Screen.setFillColor(green);
-    Brain.Screen.drawCircle(130+(workX*horScale), 220-(workY*vertScale), 10);
+    Brain.Screen.setPenWidth(5);
+    Brain.Screen.drawLine(tempX, tempY, tempX+(20*cos(workH)), tempY-(20*sin(workH)));
+
+    Brain.Screen.setPenWidth(0);
+    Brain.Screen.drawCircle(tempX, tempY, 10);
 
     Brain.Screen.render();
-    wait(100, msec);
+    wait(1000, msec);
   }
 }
