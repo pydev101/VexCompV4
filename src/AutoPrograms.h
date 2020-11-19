@@ -170,7 +170,7 @@ void pressHandler(){
 void BrainGUIProgram(){
   Brain.Screen.pressed(pressHandler);
 
-  while(GUIActivate){
+  while(GUIActivate && !Competition.isAutonomous()){
     Brain.Screen.setFillColor(black);
     Brain.Screen.setPenColor(white);
     Brain.Screen.clearScreen();

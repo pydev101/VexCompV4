@@ -27,10 +27,10 @@
 
 #include "AutoPrograms.h"
 
-competition Competition;
-
+bool hasSD;
 void pre_auton(void) {
   vexcodeInit();
+  hasSD = Brain.SDcard.isInserted();
   preSettings();
 
   ISensor.startCalibration();
@@ -50,6 +50,10 @@ void pre_auton(void) {
   BrainGUIProgram();
 }
 
+int AutoRecorder(){
+  autoEntry ent = entries[indexAuto];
+  return 0;
+};
 
 void autonomous(void) {
   frontLeft.setBrake(brakeType::hold);
@@ -165,7 +169,12 @@ int main() {
     tempX = 130+(workX*horScale);
     tempY = 220-(workY*vertScale);
 
-    Brain.Screen.drawImageFromFile("gameMap.png", 0, 0);
+    if(hasSD){
+      Brain.Screen.drawImageFromFile("gameMap.png", 0, 0);
+    }else{
+      Brain.Screen.clearScreen(black);
+    }
+
     Brain.Screen.setPenWidth(5);
     Brain.Screen.drawLine(tempX, tempY, tempX+(20*cos(workH)), tempY-(20*sin(workH)));
 
