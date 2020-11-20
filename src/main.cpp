@@ -53,7 +53,7 @@ void pre_auton(void) {
 int AutoRecorder(){
   autoEntry ent = entries[indexAuto];
   if(Brain.SDcard.isInserted()){
-    char buffer [5050];
+    char buffer [8000];
     double workX = 0;
     double workY = 0;
     double workH = 0;
@@ -63,20 +63,21 @@ int AutoRecorder(){
 
     sprintf(buffer, "X,Y,Heading,Xt,Yt,Headingt/n"); //29 chars
     std::cout << "Setup complete" << std::endl;
-    while(Competition.isAutonomous() && programRunning){
+    while(programRunning){
       testVarMutex.lock();
-      workX = 0;
-      workY = 0;
-      workH = 0;
-      workXt = 0;
-      workYt = 0;
-      workHt = 0;
+      workX = X; 
+      workY = Y;
+      workH = Heading;
+      workXt = Xt;
+      workYt = Yt;
+      workHt = tHead;
       testVarMutex.unlock();
-      sprintf(buffer, "%f,%f,%f,%f,%f,%f/n", workX, workY, workH, workXt, workYt, workHt); //50 per loop
+      sprintf(buffer, "%s%f,%f,%f,%f,%f,%f\n", buffer, workX, workY, workH, workXt, workYt, workHt); //60 per loop
       std::cout << "Looping" << std::endl;
       wait(166, msec);
     }
-    Brain.SDcard.savefile("files/lastestAuto.csv", reinterpret_cast<unsigned char*>(buffer), sizeof(buffer));
+    puts(buffer);
+    Brain.SDcard.savefile("lastestAuto.csv", reinterpret_cast<unsigned char*>(buffer), sizeof(buffer));
   }
   return 0;
 };
@@ -173,7 +174,7 @@ int main() {
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   double workX = 0;
   double workY = 0;
