@@ -9,6 +9,8 @@
 
 #include "DriveControl/Odom.h"
 
+bool programRunning = false;
+
 typedef struct {
   std::string name;
   void (*function)(int);
@@ -170,7 +172,7 @@ void pressHandler(){
 void BrainGUIProgram(){
   Brain.Screen.pressed(pressHandler);
 
-  while(GUIActivate && !Competition.isAutonomous()){
+  while(GUIActivate){
     Brain.Screen.setFillColor(black);
     Brain.Screen.setPenColor(white);
     Brain.Screen.clearScreen();

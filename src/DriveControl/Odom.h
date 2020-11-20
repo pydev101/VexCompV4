@@ -78,7 +78,7 @@ void rotateUsingHeading(double tTheta, double threshold=0.08, double gain=300){
     localHead = Heading;
     testVarMutex.unlock();
     r = PID(tTheta+startHead, localHead, gain, r);
-    std::cout << r.lastError << ", " << r.speed << std::endl;
+    //std::cout << r.lastError << ", " << r.speed << std::endl;
     setDPS(r.speed);
     if(abs(r.speed) < minDPSSpeed){
       break;
@@ -177,7 +177,7 @@ void translatePID(double head, double dis, double maxSpeed=0, bool rotate=true, 
       dis = sqrt((deltaX*deltaX) + (deltaY*deltaY));
       head = atan2(deltaY, deltaX);
     
-      std::cout << "Head: " << head << "; Dis: " << dis << "; Speed: " << dis*gain << std::endl;
+      //std::cout << "Head: " << head << "; Dis: " << dis << "; Speed: " << dis*gain << std::endl;
 
       setVector(head);
       setRightDPS((adjGain*(tHead-((2*PI)*modf(workHead/(2*PI), &toss))))+dis*gain);

@@ -52,6 +52,32 @@ void pre_auton(void) {
 
 int AutoRecorder(){
   autoEntry ent = entries[indexAuto];
+  if(Brain.SDcard.isInserted()){
+    char buffer [5050];
+    double workX = 0;
+    double workY = 0;
+    double workH = 0;
+    double workXt = 0;
+    double workYt = 0;
+    double workHt = 0;
+
+    sprintf(buffer, "X,Y,Heading,Xt,Yt,Headingt/n"); //29 chars
+    std::cout << "Setup complete" << std::endl;
+    while(Competition.isAutonomous() && programRunning){
+      testVarMutex.lock();
+      workX = 0;
+      workY = 0;
+      workH = 0;
+      workXt = 0;
+      workYt = 0;
+      workHt = 0;
+      testVarMutex.unlock();
+      sprintf(buffer, "%f,%f,%f,%f,%f,%f/n", workX, workY, workH, workXt, workYt, workHt); //50 per loop
+      std::cout << "Looping" << std::endl;
+      wait(166, msec);
+    }
+    Brain.SDcard.savefile("files/lastestAuto.csv", reinterpret_cast<unsigned char*>(buffer), sizeof(buffer));
+  }
   return 0;
 };
 
@@ -60,7 +86,10 @@ void autonomous(void) {
   frontRight.setBrake(brakeType::hold);
   backLeft.setBrake(brakeType::hold);
   backRight.setBrake(brakeType::hold);
+  programRunning = true;
+  task fileTrackingTask (AutoRecorder);
   entries[indexAuto].function(entries[indexAuto].mod);
+  programRunning = false;
 }
 
 void usercontrol(void) {
@@ -144,7 +173,7 @@ int main() {
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   double workX = 0;
   double workY = 0;
