@@ -76,8 +76,13 @@ int AutoRecorder(){
       std::cout << "Looping" << std::endl;
       wait(166, msec);
     }
-    Brain.SDcard.savefile("lastestAuto.csv", reinterpret_cast<unsigned char*>(buffer), sizeof(buffer));
+    char* charToPrint = (char*)malloc(sizeof(char)*(strlen(buffer)+1));
+    strcpy (charToPrint,buffer);
+    //*(charToPrint+strlen(buffer)) = '\0';
+
+    Brain.SDcard.savefile("lastestAuto.csv", reinterpret_cast<unsigned char*>(charToPrint), sizeof(charToPrint));
     //Brain.SDcard.appendfile("lastestAuto.csv", reinterpret_cast<unsigned char*>(buffer), sizeof(buffer));
+    free(charToPrint);
     std::cout << "SAFE" << std::endl;
   }
   return 0;
