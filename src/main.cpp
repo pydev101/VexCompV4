@@ -47,25 +47,21 @@ void pre_auton(void) {
   resetEncoders();
   task updateTask(trackingTask);
 
-  std::cout << Brain.SDcard.isInserted() << std::endl;
   BrainGUIProgram();
 }
 
 int AutoRecorder(){
   autoEntry ent = entries[indexAuto];
   if(Brain.SDcard.isInserted()){
-    char buffer [10000];
+    char buffer [6000];
     double workX = 0;
     double workY = 0;
     double workH = 0;
     double workXt = 0;
     double workYt = 0;
     double workHt = 0;
-    int t = 1;
 
-    //sprintf(buffer, "T,X,Y,Heading,Xt,Yt,Headingt\n"); //29 chars
-    sprintf(buffer, "\n\n\n"); //29 chars
-
+    sprintf(buffer, "X,Y,Heading,Xt,Yt,Headingt\n"); //29 chars
     std::cout << "Setup complete" << std::endl;
     while(programRunning){
       testVarMutex.lock();
@@ -76,16 +72,15 @@ int AutoRecorder(){
       workYt = Yt;
       workHt = tHead;
       testVarMutex.unlock();
-      sprintf(buffer, "%s%d,%.5g,%.5g,%.5g,%.5g,%.5g,%.5g\n", buffer, t, workX, workY, workH, workXt, workYt, workHt); //200 per loop
-      t=t+1;
+      sprintf(buffer, "%s%.5g,%.5g,%.5g,%.5g,%.5g,%.5g\n", buffer, workX, workY, workH, workXt, workYt, workHt); //200 per loop
+      std::cout << "Looping" << std::endl;
       wait(166, msec);
     }
-    sprintf(buffer, "%s\n\n", buffer);
     char* charToPrint = (char*)malloc(sizeof(char)*(strlen(buffer)+1));
     strcpy (charToPrint,buffer);
 
-    //Brain.SDcard.savefile("lastestAuto.csv", reinterpret_cast<unsigned char*>(charToPrint), (sizeof(char)*(strlen(buffer)+1)));
-    Brain.SDcard.appendfile("lastestAuto.csv", reinterpret_cast<unsigned char*>(buffer), (sizeof(char)*(strlen(buffer)+1)));
+    Brain.SDcard.savefile("lastestAuto.csv", reinterpret_cast<unsigned char*>(charToPrint), (sizeof(char)*(strlen(buffer)+1)));
+    //Brain.SDcard.appendfile("lastestAuto.csv", reinterpret_cast<unsigned char*>(buffer), (sizeof(char)*(strlen(buffer)+1)));
     free(charToPrint);
     std::cout << "SAFE" << std::endl;
   }
@@ -104,7 +99,6 @@ void autonomous(void) {
 }
 
 void usercontrol(void) {
-  programRunning = false;
   frontLeft.setBrake(brakeType::coast);
   frontRight.setBrake(brakeType::coast);
   backLeft.setBrake(brakeType::coast);
@@ -185,7 +179,7 @@ int main() {
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   double workX = 0;
   double workY = 0;
