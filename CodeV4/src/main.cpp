@@ -11,7 +11,7 @@
 // ISensor              inertial      20              
 // Controller1          controller                    
 // intakeLeft           motor         1               
-// intakeRight          motor         2               
+// intakeRight          motor         5               
 // liftT                motor         3               
 // liftB                motor         4               
 // ---- END VEXCODE CONFIGURED DEVICES ----
@@ -134,10 +134,10 @@ void usercontrol(void) {
     backLeft.setVelocity(lV-lH, velocityUnits::pct);
     backRight.setVelocity(rV+rH, velocityUnits::pct);
 
-    if(Controller1.ButtonR1.pressing()){
+    if(Controller1.ButtonR2.pressing()){
       liftT.spin(fwd);
       liftT.setVelocity(100, pct);
-    }else if(Controller1.ButtonR2.pressing()){
+    }else if(Controller1.ButtonX.pressing()){
       liftT.spin(fwd);
       liftT.setVelocity(-100, pct);
     }else{
@@ -145,10 +145,10 @@ void usercontrol(void) {
       liftT.stop();
     }
 
-    if(Controller1.ButtonL1.pressing()){
+    if(Controller1.ButtonR1.pressing()){
       liftB.spin(fwd);
       liftB.setVelocity(100, pct);
-    }else if(Controller1.ButtonL2.pressing()){
+    }else if(Controller1.ButtonUp.pressing()){
       liftB.spin(fwd);
       liftB.setVelocity(-100, pct);
     }else{
@@ -156,7 +156,15 @@ void usercontrol(void) {
       liftB.stop();
     }
 
-    if(Controller1.ButtonUp.pressing()){
+    if(Controller1.ButtonL1.pressing()){
+      intake(1);
+    }else if(Controller1.ButtonDown.pressing()){
+      intake(-1);
+    }else{
+      intake(0);
+    }
+    
+    /*if(Controller1.ButtonUp.pressing()){
       if(intakeToggle == 1){
         intake(0);
         intakeToggle = 0;
@@ -173,8 +181,9 @@ void usercontrol(void) {
         intakeToggle = -1;
         intake(-1);
       }
+
       wait(250, msec);
-    }
+    }*/
 
     wait(20, msec);
   }
@@ -185,7 +194,7 @@ int main() {
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
   pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   double workX = 0;
   double workY = 0;

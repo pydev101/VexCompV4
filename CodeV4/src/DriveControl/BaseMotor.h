@@ -169,6 +169,8 @@ double getAxisEncoder(int axis){
 
 //Misc.
 void intake(int d=0){
+  intakeRight.setBrake(brakeType::brake);
+  intakeLeft.setBrake(brakeType::brake);
   intakeRight.setVelocity(100*d, pct);
   intakeLeft.setVelocity(100*d, pct);
   

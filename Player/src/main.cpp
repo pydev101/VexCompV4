@@ -1,3 +1,16 @@
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// Controller1          controller                    
+// frontLeft            motor         13              
+// frontRight           motor         12              
+// backLeft             motor         11              
+// backRight            motor         14              
+// intakeLeft           motor         1               
+// intakeRight          motor         5               
+// liftT                motor         3               
+// liftB                motor         4               
+// ---- END VEXCODE CONFIGURED DEVICES ----
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
@@ -79,10 +92,10 @@ int main() {
   }
   free(rawFileData);
 
-  frontLeft.setBrake(brakeType::coast);
-  frontRight.setBrake(brakeType::coast);
-  backLeft.setBrake(brakeType::coast);
-  backRight.setBrake(brakeType::coast);
+  frontLeft.setBrake(brakeType::hold);
+  frontRight.setBrake(brakeType::hold);
+  backLeft.setBrake(brakeType::hold);
+  backRight.setBrake(brakeType::hold);
   liftT.setBrake(brakeType::hold);
   liftB.setBrake(brakeType::hold);
 

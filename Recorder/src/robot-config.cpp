@@ -14,7 +14,7 @@ motor frontRight = motor(PORT12, ratio18_1, true);
 motor backLeft = motor(PORT11, ratio18_1, false);
 motor backRight = motor(PORT14, ratio18_1, true);
 motor intakeLeft = motor(PORT1, ratio18_1, false);
-motor intakeRight = motor(PORT2, ratio18_1, true);
+motor intakeRight = motor(PORT5, ratio18_1, true);
 motor liftT = motor(PORT3, ratio18_1, false);
 motor liftB = motor(PORT4, ratio18_1, false);
 
@@ -23,7 +23,7 @@ motor liftB = motor(PORT4, ratio18_1, false);
 bool RemoteControlCodeEnabled = true;
 
 /**
- * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
+ * Used to initialize code/tasks/devices added using tools in VEXcode Text.
  * 
  * This should be called at the start of your int main function.
  */
