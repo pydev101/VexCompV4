@@ -11,6 +11,23 @@
 // ISensor              inertial      20              
 // Controller1          controller                    
 // intakeLeft           motor         1               
+// intakeRight          motor         7               
+// liftT                motor         3               
+// liftB                motor         4               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// frontLeft            motor         13              
+// frontRight           motor         12              
+// backLeft             motor         11              
+// backRight            motor         14              
+// rightEncoder         encoder       C, D            
+// leftEncoder          encoder       E, F            
+// horEncoder           encoder       A, B            
+// ISensor              inertial      20              
+// Controller1          controller                    
+// intakeLeft           motor         1               
 // intakeRight          motor         5               
 // liftT                motor         3               
 // liftB                motor         4               

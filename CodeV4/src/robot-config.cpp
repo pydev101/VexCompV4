@@ -18,7 +18,7 @@ encoder horEncoder = encoder(Brain.ThreeWirePort.A);
 inertial ISensor = inertial(PORT20);
 controller Controller1 = controller(primary);
 motor intakeLeft = motor(PORT1, ratio18_1, false);
-motor intakeRight = motor(PORT5, ratio18_1, true);
+motor intakeRight = motor(PORT7, ratio18_1, true);
 motor liftT = motor(PORT3, ratio18_1, false);
 motor liftB = motor(PORT4, ratio18_1, false);
 
@@ -27,7 +27,7 @@ motor liftB = motor(PORT4, ratio18_1, false);
 bool RemoteControlCodeEnabled = true;
 
 /**
- * Used to initialize code/tasks/devices added using tools in VEXcode Text.
+ * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
  * 
  * This should be called at the start of your int main function.
  */
