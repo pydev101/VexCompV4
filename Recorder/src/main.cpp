@@ -51,7 +51,7 @@
 
 using namespace vex;
 
-char buffer[50000];
+char buffer[500000];
 
 void writeCommand(double cmd, double arg, bool isStart=false){
     if(isStart){
@@ -110,9 +110,14 @@ void usercontrol(void) {
   double rV = 0;
   double rH = 0;
   int threshold = 5;
-  int intakeToggle = 0;
+  //int intakeToggle = 0;
   int modeLiftA = 0;
   int modeLiftB = 0;
+  double a;
+  double b;
+  double c;
+  double d;
+  double speedControl = 0.7;
 
   while (true) {
     lV = Controller1.Axis3.position();
@@ -128,24 +133,33 @@ void usercontrol(void) {
       writeCommand(1, 0);
     }
 
-    frontLeft.setVelocity(lV+lH, velocityUnits::pct);
-    frontRight.setVelocity(rV-rH, velocityUnits::pct);
-    backLeft.setVelocity(lV-lH, velocityUnits::pct);
-    backRight.setVelocity(rV+rH, velocityUnits::pct);
+    if(Controller1.ButtonRight.pressing()){
+      speedControl = 0.3;
+    }
 
-    writeCommand(2, lV+lH);
-    writeCommand(3, rV-rH);
-    writeCommand(4, lV-lH);
-    writeCommand(5, rV+rH);
+    a = (lV+lH)*speedControl;
+    b = (rV-rH)*speedControl;
+    c = (lV-lH)*speedControl;
+    d = (rV+rH)*speedControl;
 
-    if(Controller1.ButtonR1.pressing()){
+    frontLeft.setVelocity(a, velocityUnits::pct);
+    frontRight.setVelocity(b, velocityUnits::pct);
+    backLeft.setVelocity(c, velocityUnits::pct);
+    backRight.setVelocity(d, velocityUnits::pct);
+
+    writeCommand(2, a);
+    writeCommand(3, b);
+    writeCommand(4, c);
+    writeCommand(5, d);
+
+    if(Controller1.ButtonR2.pressing()){
       if(!(modeLiftA == 1)){
         liftT.spin(fwd);
         liftT.setVelocity(100, pct);
         writeCommand(6, 1);
         modeLiftA = 1;
       }
-    }else if(Controller1.ButtonR2.pressing()){
+    }else if(Controller1.ButtonX.pressing()){
       if(!(modeLiftA == 2)){
         liftT.spin(fwd);
         liftT.setVelocity(-100, pct);
@@ -161,14 +175,14 @@ void usercontrol(void) {
       }
     }
 
-    if(Controller1.ButtonL1.pressing()){
+    if(Controller1.ButtonR1.pressing()){
       if(!(modeLiftB == 1)){
         liftB.spin(fwd);
         liftB.setVelocity(100, pct);
         writeCommand(7, 1);
         modeLiftB = 1;
       }
-    }else if(Controller1.ButtonL2.pressing()){
+    }else if(Controller1.ButtonUp.pressing()){
       if(!(modeLiftB == 2)){
         liftB.spin(fwd);
         liftB.setVelocity(-100, pct);
@@ -184,6 +198,18 @@ void usercontrol(void) {
       }
     }
 
+    if(Controller1.ButtonL1.pressing()){
+      intake(1);
+      writeCommand(8, 1);
+    }else if(Controller1.ButtonDown.pressing()){
+      intake(-1);
+      writeCommand(8, 2);
+    }else{
+      writeCommand(8, 0);
+      intake(0);
+    }
+
+    /*
     if(Controller1.ButtonUp.pressing()){
       if(intakeToggle == 1){
         intake(0);
@@ -208,7 +234,7 @@ void usercontrol(void) {
       }
       writeCommand(9, 250);
       wait(250, msec);
-    }
+    }*/
 
     if(Controller1.ButtonB.pressing()){
       break;

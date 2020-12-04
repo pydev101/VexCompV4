@@ -15,23 +15,6 @@
 // liftT                motor         3               
 // liftB                motor         4               
 // ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// frontLeft            motor         13              
-// frontRight           motor         12              
-// backLeft             motor         11              
-// backRight            motor         14              
-// rightEncoder         encoder       C, D            
-// leftEncoder          encoder       E, F            
-// horEncoder           encoder       A, B            
-// ISensor              inertial      20              
-// Controller1          controller                    
-// intakeLeft           motor         1               
-// intakeRight          motor         5               
-// liftT                motor         3               
-// liftB                motor         4               
-// ---- END VEXCODE CONFIGURED DEVICES ----
                  
 /*----------------------------------------------------------------------------
 //                                                                            
@@ -65,7 +48,7 @@ void pre_auton(void) {
   task updateTask(trackingTask);
 
   std::cout << Brain.SDcard.isInserted() << std::endl;
-  BrainGUIProgram();
+  //BrainGUIProgram();
 }
 
 int AutoRecorder(){
@@ -110,18 +93,20 @@ int AutoRecorder(){
 };
 
 void autonomous(void) {
+  pre_auton();
   frontLeft.setBrake(brakeType::hold);
   frontRight.setBrake(brakeType::hold);
   backLeft.setBrake(brakeType::hold);
   backRight.setBrake(brakeType::hold);
-  programRunning = true;
-  task fileTrackingTask (AutoRecorder);
-  entries[indexAuto].function(entries[indexAuto].mod);
-  programRunning = false;
+  //programRunning = true;
+  //task fileTrackingTask (AutoRecorder);
+  //entries[indexAuto].function(entries[indexAuto].mod);
+  //programRunning = false;
+  rightRed(0);
 }
 
 void usercontrol(void) {
-  programRunning = false;
+  //programRunning = false;
   frontLeft.setBrake(brakeType::coast);
   frontRight.setBrake(brakeType::coast);
   backLeft.setBrake(brakeType::coast);
@@ -132,7 +117,7 @@ void usercontrol(void) {
   double rV = 0;
   double rH = 0;
   int threshold = 5;
-  int intakeToggle = 0;
+  //int intakeToggle = 0;
 
   while (true) {
     lV = Controller1.Axis3.position();
@@ -210,8 +195,11 @@ int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-  pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  while(true){
+    wait(1000, msec);
+  }
+  /*pre_auton();
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   double workX = 0;
   double workY = 0;
@@ -250,5 +238,5 @@ int main() {
 
     Brain.Screen.render();
     wait(1000, msec);
-  }
+  }*/
 }

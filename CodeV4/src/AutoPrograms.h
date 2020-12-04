@@ -31,12 +31,18 @@ void rightBlue(int mod){
 }
 
 void rightRed(int mod){
-  intake(1);
-  move(10, 0);
-  move(12, 54);
-  turnTo(90);
-  move(60, 0, 500.0);
-  intake(0);
+  move(55, 0);
+  turnTo(0);
+  setAxis(0);
+
+  for(int i=0; i<3; i++){
+    setDPS(500);
+    wait(0.5, seconds);
+    setDPS(-480);
+    wait(0.5, seconds);
+  }
+  wait(0.2, seconds);
+  stopMotors();
 }
 
 autoEntry entries[] = {
