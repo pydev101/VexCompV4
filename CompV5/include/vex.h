@@ -36,6 +36,10 @@ int getSign(double x){
 }
 
 double getStandardAngle(double ang, bool isRad=true){
-  int toss;
-  
+  double toss;
+  if(isRad){
+    return ((2*PI)*modf(ang/(2*PI), &toss));
+  }else{
+    return (360*modf(ang/360, &toss));
+  }
 }

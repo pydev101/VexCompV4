@@ -37,7 +37,7 @@ class Rect{
   }
 };
 
-enum DirectionType {X, Y, HEAD, GRID} dirT;
+enum MeasureType {X, Y, HEAD, GRID} dirT;
 class Robot{
   static Point pos;
   static Point tPos;
@@ -65,18 +65,26 @@ class Robot{
     return lastSpeed;
   }
 
-  double calcRotationalSpeed(double maxSpeed=100000, double gain=1.386){
+  double calcRotationalSpeed(double maxSpeed=100000, double maxAcceleration=50, double gain=1.386){
     double static lastSpeed = 0;
+    double e = getError(HEAD);
+    if(abs(e) > 180){
+      if(e < 0){
+        e = 360+e; //Validate math
+      }else{
+        e = -(360-e); //Validate math
+      }
+    }
 
   }
 
-  double getError(DirectionType d){
+  double getError(MeasureType d){
     if(d == X){
       return tPos.x-pos.x;
     }else if(d == Y){
       return tPos.y-pos.y;
     }else if(d == HEAD){
-      return tPos.head-pos.head;
+      return getStandardAngle(tPos.head)-getStandardAngle(pos.head);
     }else{
       return sqrt((getError(X)*getError(X)) + (getError(Y)*getError(Y)));
     }
