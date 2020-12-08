@@ -199,7 +199,7 @@ int main() {
     wait(1000, msec);
   }
   /*pre_auton();
-  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   double workX = 0;
   double workY = 0;

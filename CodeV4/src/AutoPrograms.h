@@ -31,15 +31,15 @@ void rightBlue(int mod){
 }
 
 void rightRed(int mod){
-  move(55, 0);
+  move(64,0);
   turnTo(0);
   setAxis(0);
 
-  for(int i=0; i<3; i++){
+  for(int i=0; i<4; i++){
     setDPS(500);
-    wait(0.5, seconds);
-    setDPS(-480);
-    wait(0.5, seconds);
+    wait(1, seconds);
+    setDPS(-500);
+    wait(0.8, seconds);
   }
   wait(0.2, seconds);
   stopMotors();
