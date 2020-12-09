@@ -43,3 +43,11 @@ double getStandardAngle(double ang, bool isRad=true){
     return (360*modf(ang/360, &toss));
   }
 }
+
+double convert(double head, bool toRad=true){
+  if(toRad){
+    return head*(PI/180);
+  }else{
+    return head*(180/PI);
+  }
+}
