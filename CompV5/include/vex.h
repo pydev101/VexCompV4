@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
 
 #include "v5.h"
 #include "v5_vcs.h"
@@ -24,30 +25,3 @@
 
 #define repeat(iterations)                                                     \
   for (int iterator = 0; iterator < iterations; iterator++)
-
-const double PI = 3.14159;
-double abs(double x){
-  if(x < 0){x=x*-1;}
-  return x;
-}
-int getSign(double x){
-  if(x < 0){return -1;}
-  return 1;
-}
-
-double getStandardAngle(double ang, bool isRad=true){
-  double toss;
-  if(isRad){
-    return ((2*PI)*modf(ang/(2*PI), &toss));
-  }else{
-    return (360*modf(ang/360, &toss));
-  }
-}
-
-double convert(double head, bool toRad=true){
-  if(toRad){
-    return head*(PI/180);
-  }else{
-    return head*(180/PI);
-  }
-}

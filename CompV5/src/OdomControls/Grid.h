@@ -1,4 +1,32 @@
 #include "vex.h"
+const double PI = 3.14159;
+
+double abs(double x){
+  if(x < 0){x=x*-1;}
+  return x;
+}
+
+int getSign(double x){
+  if(x < 0){return -1;}
+  return 1;
+}
+
+double getStandardAngle(double ang, bool isRad=true){
+  double toss;
+  if(isRad){
+    return ((2*PI)*modf(ang/(2*PI), &toss));
+  }else{
+    return (360*modf(ang/360, &toss));
+  }
+}
+
+double convert(double head, bool toRad=true){
+  if(toRad){
+    return head*(PI/180);
+  }else{
+    return head*(180/PI);
+  }
+}
 
 typedef struct{
   double x;
@@ -37,12 +65,19 @@ class Rect{
   }
 };
 
+class Area: Rect{
+  void (*callback)(void);
+  Area(double x, double y, double width, double height, void (*call)(void)):Rect(x, y, width, height){
+    callback = call;
+  }
+};
+
 enum MeasureType {X, Y, HEAD, GRID} dirT;
 class Robot{
 private:
   Point pos;
   Point tPos;
-  double speedTargets[2] = {0,0};
+  double speedTargets[2] = {0.0,0.0};
 
   double maxMoveSpeed = 100000;
   double maxAcceleration = 50;
@@ -128,17 +163,34 @@ public:
     pos = {x, y, h};
   }
 
+  void setTRealitive(double fwd, double hor){
+    tPos.x = tPos.x + fwd*cos(pos.head) + hor*cos(pos.head-(PI/2));
+    tPos.y = tPos.y + fwd*sin(pos.head) + hor*sin(pos.head-(PI/2));
+    tPos.head = atan2((tPos.y - pos.y), (tPos.x-pos.x));
+  }
 
+  void setTAbsolute(double x, double y){
+    tPos.x = x;
+    tPos.y = y;
+    tPos.head = atan2((tPos.y - pos.y), (tPos.x-pos.x));
+  }
 
-  double[] getSpeedVars(int dir=1, double breakGain = 1.3){
+  double* getSpeedVars(int dir=1, double breakGain = 1.3){
     if(!breakMode){
       speedTargets[1] = calcLinearSpeed(dir);
       speedTargets[0] = speedTargets[1]  - (calcRotationalSpeed()*radius);
     }else{
-
+      if((abs(speedTargets[0]) + abs(speedTargets[1])) > 0){
+        if(abs(speedTargets[1]) > maxAcceleration){
+          speedTargets[1] = speedTargets[1] - (maxAcceleration*getSign(speedTargets[1]));
+        }else{
+          speedTargets[1] = 0;
+        }
+        speedTargets[0] = abs(speedTargets[1])*getSign(speedTargets[0]);
+      }
     }
 
-    if((abs(speedTargets[0]) < stopSpeed) && (abs(speedTargets[0]) < stopSpeed)){
+    if((abs(speedTargets[0]) < stopSpeed) && (abs(speedTargets[1]) < stopSpeed)){
       isStopped = true;
     }else{
       isStopped = false;
@@ -147,16 +199,11 @@ public:
     return speedTargets;
   }
 
-  //Odometry Controls
-  void setRealitive(double fwd, double hor){
-    tPos.x = tPos.x + fwd*cos(pos.head) + hor*cos(pos.head-(PI/2));
-    tPos.y = tPos.y + fwd*sin(pos.head) + hor*sin(pos.head-(PI/2));
-    tPos.head = atan2((tPos.y - pos.y), (tPos.x-pos.x));
+  void setMaxSpeed(double s){
+    maxMoveSpeed = s;
+  }
+  void setMaxAcceleration(double a){
+    maxAcceleration = a;
   }
 
-  void setAbsolute(double x, double y){
-    tPos.x = x;
-    tPos.y = y;
-    tPos.head = atan2((tPos.y - pos.y), (tPos.x-pos.x));
-  }
 };
