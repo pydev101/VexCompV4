@@ -89,13 +89,6 @@ private:
   double radius; //The length between the inertal sensor and the left drive base
   double unitsToEncoders;
 
-  Robot(double x, double y, double Head, double stopSpeeds, double r, double unitToEnc){
-    pos = {x,y, Head};
-    radius = r*unitToEnc;
-    unitsToEncoders = unitToEnc;
-    stopSpeed = stopSpeeds;
-  }
-
   //Helper
   double getError(MeasureType d){
     if(d == X){
@@ -159,8 +152,15 @@ private:
 
 
 public:
-  void setPos(double x, double y, double h){
-    pos = {x, y, h};
+  Robot(double x, double y, double Head, double stopSpeeds, double r, double unitToEnc){
+    pos = {x,y, Head};
+    radius = r*unitToEnc;
+    unitsToEncoders = unitToEnc;
+    stopSpeed = stopSpeeds;
+  }
+
+  void updatePos(double x, double y, double h){
+    pos = {x+pos.x, y+pos.y, h+pos.head};
   }
 
   void setTRealitive(double fwd, double hor){
@@ -173,6 +173,12 @@ public:
     tPos.x = x;
     tPos.y = y;
     tPos.head = atan2((tPos.y - pos.y), (tPos.x-pos.x));
+  }
+
+  void setTHead(double head){
+    tPos.x = pos.x;
+    tPos.y = pos.y;
+    tPos.head = head;
   }
 
   double* getSpeedVars(int dir=1, double breakGain = 1.3){

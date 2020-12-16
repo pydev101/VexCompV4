@@ -1,3 +1,13 @@
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// motorLF              motor         1               
+// motorLB              motor         2               
+// motorRF              motor         3               
+// motorRB              motor         4               
+// ISensor              inertial      5               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
@@ -10,9 +20,23 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
-#include "vex.h"
+#include "Intergration.h"
 
 using namespace vex;
+
+void pre_auton(void) {
+  vexcodeInit();
+
+  ISensor.startCalibration();
+  while(ISensor.isCalibrating()){wait(5, msec);}
+  
+  initMotors();
+  setDPS(0,0);
+
+  resetHeading();
+  resetEncoders();
+  task updateThread(updatePosThread);
+}
 
 int main() {
   //A
@@ -28,4 +52,6 @@ int main() {
   vexFileRead(buf, sizeof(buf)-1, 1, x);
   vexFileClose(x);
   puts(buf);
+
+  return 0;
 }
