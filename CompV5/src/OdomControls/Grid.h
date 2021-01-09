@@ -90,17 +90,6 @@ private:
   double unitsToEncoders;
 
   //Helper
-  double getError(MeasureType d){
-    if(d == X){
-      return tPos.x-pos.x;
-    }else if(d == Y){
-      return tPos.y-pos.y;
-    }else if(d == HEAD){
-      return getStandardAngle(tPos.head)-getStandardAngle(pos.head);
-    }else{
-      return sqrt((getError(X)*getError(X)) + (getError(Y)*getError(Y)));
-    }
-  }
 
   //Limited Proportinal Only control
   double calcLinearSpeed(int dir, double gain=1.386){
@@ -152,15 +141,28 @@ private:
 
 
 public:
-  Robot(double x, double y, double Head, double stopSpeeds, double r, double unitToEnc){
+  Robot(double x, double y, double Head, double stopSpeeds, double wheelRadius){
     pos = {x,y, Head};
-    radius = r*unitToEnc;
-    unitsToEncoders = unitToEnc;
+    unitsToEncoders = 360/(2*PI*wheelRadius);
+    radius = wheelRadius*unitsToEncoders;
     stopSpeed = stopSpeeds;
   }
 
-  void updatePos(double x, double y, double h){
-    pos = {x+pos.x, y+pos.y, h+pos.head};
+  double getError(MeasureType d){
+    if(d == X){
+      return tPos.x-pos.x;
+    }else if(d == Y){
+      return tPos.y-pos.y;
+    }else if(d == HEAD){
+      return getStandardAngle(tPos.head)-getStandardAngle(pos.head);
+      //Or using the motor encoders (rightEnc-leftEnc)/(2*radius) or the difference between the encoders divided by the distance between the drive wheels
+    }else{
+      return sqrt((getError(X)*getError(X)) + (getError(Y)*getError(Y)));
+    }
+  }
+
+  void updatePos(double Xd, double Yd, double h){
+    pos = {Xd+pos.x, Yd+pos.y, h};
   }
 
   void setTRealitive(double fwd, double hor){
@@ -181,20 +183,10 @@ public:
     tPos.head = head;
   }
 
-  double* getSpeedVars(int dir=1, double breakGain = 1.3){
-    if(!breakMode){
-      speedTargets[1] = calcLinearSpeed(dir);
-      speedTargets[0] = speedTargets[1]  - (calcRotationalSpeed()*radius);
-    }else{
-      if((abs(speedTargets[0]) + abs(speedTargets[1])) > 0){
-        if(abs(speedTargets[1]) > maxAcceleration){
-          speedTargets[1] = speedTargets[1] - (maxAcceleration*getSign(speedTargets[1]));
-        }else{
-          speedTargets[1] = 0;
-        }
-        speedTargets[0] = abs(speedTargets[1])*getSign(speedTargets[0]);
-      }
-    }
+  //TODO Set Speed to rotate if Heading is past threasehold
+  double* getSpeedVars(int dir=1){
+    speedTargets[1] = calcLinearSpeed(dir) + (dir*calcRotationalSpeed()*radius*0.5); //Right
+    speedTargets[0] = calcLinearSpeed(dir) - (dir*calcRotationalSpeed()*radius*0.5); //Left
 
     if((abs(speedTargets[0]) < stopSpeed) && (abs(speedTargets[1]) < stopSpeed)){
       isStopped = true;

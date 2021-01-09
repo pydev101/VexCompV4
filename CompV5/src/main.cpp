@@ -20,7 +20,8 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
-#include "Intergration.h"
+#include "programs.h"
+#include "driver.h"
 
 using namespace vex;
 
@@ -35,23 +36,17 @@ void pre_auton(void) {
 
   resetHeading();
   resetEncoders();
-  task updateThread(updatePosThread);
 }
 
+competition Competition;
 int main() {
   //AAA
-  // Initializing Robot Configuration. DO NOT REMOVE!
-  vexcodeInit();
-
-  char buf[10000];
-  vexFileDirectoryGet("", buf, sizeof(buf)-1);
-  puts(buf);
-
-  FIL* x = vexFileOpen("lastestAuto.csv", "r");
-  std::cout << vexFileSize(x) << std::endl;
-  vexFileRead(buf, sizeof(buf)-1, 1, x);
-  vexFileClose(x);
-  puts(buf);
+  pre_auton();
+  /*Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
+  while(true){
+    wait(1000, msec);
+  }*/
 
   return 0;
 }

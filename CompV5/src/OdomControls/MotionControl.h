@@ -1,12 +1,16 @@
+#ifndef __MOTIONCONTROL_H__
+#define __MOTIONCONTROL_H__
+
 #include "vex.h"
 
+const double PI_T = 3.14159;
 double minSpeed = 20;
 
 void initMotors(){
-  motorLF.setBrake(brakeType::coast);
-  motorLB.setBrake(brakeType::coast);
-  motorRF.setBrake(brakeType::coast);
-  motorRB.setBrake(brakeType::coast);
+  motorLF.setBrake(brakeType::hold);
+  motorLB.setBrake(brakeType::hold);
+  motorRF.setBrake(brakeType::hold);
+  motorRB.setBrake(brakeType::hold);
   motorLF.stop();
   motorLB.stop();
   motorRF.stop();
@@ -52,6 +56,10 @@ void setDPS(double velL, double velR){
   setRight(velR);
 }
 
+void setDPS(double speeds[2]){
+  setDPS(speeds[0], speeds[1]);
+}
+
 void setIntake(int d){
 
 }
@@ -61,21 +69,35 @@ void setOutput(int d){
 }
 
 void resetHeading(){
+  ISensor.resetRotation();
+}
 
+double getHeading(bool inDeg=false){
+  static double Heading = 90;
+  double r = ISensor.rotation();
+  Heading -= r;
+
+  if(inDeg){
+    return Heading;
+  }
+  return Heading*(PI_T/180);
 }
 
 void resetEncoders(){
-
+  motorLB.resetRotation();
+  motorRB.resetRotation();
 }
 
 double getLeft(){
-  
+  return motorLB.position(rotationUnits::deg);  
 }
 
 double getRight(){
-
+  return motorRB.position(rotationUnits::deg);
 }
 
 double getHor(){
-
+  return 0;
 }
+
+#endif
