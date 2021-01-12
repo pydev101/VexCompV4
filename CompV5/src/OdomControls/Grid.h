@@ -34,43 +34,6 @@ typedef struct{
   double head;
 } Point;
 
-class Rect{
-  public:
-    Point topLeft;
-    Point bottomRight;
-    Point center;
-
-    Rect(double x, double y, double width, double height){
-      topLeft = {x, y};
-      bottomRight = {x+width, y+height};
-      center = {x+(0.5*width), y+(0.5*height)};
-    }
-
-    Rect(Point topLeft, Point bottomRight){
-      this->topLeft = topLeft;
-      this->bottomRight = bottomRight;
-      center = {(topLeft.x+bottomRight.x)*0.5, (topLeft.y+bottomRight.y)*0.5};
-    }
-
-    bool checkCollide(Point p){
-      if((p.x >= topLeft.x) && (p.x <= bottomRight.x)){
-        if((p.y >= topLeft.y) && (p.y <= bottomRight.y)){
-          return true;
-        }else{
-          return false;
-        }
-      }else{
-        return false;
-      }
-  }
-};
-
-class Area: Rect{
-  void (*callback)(void);
-  Area(double x, double y, double width, double height, void (*call)(void)):Rect(x, y, width, height){
-    callback = call;
-  }
-};
 
 enum MeasureType {X, Y, HEAD, GRID} dirT;
 class Robot{
@@ -80,21 +43,23 @@ private:
   double speedTargets[2] = {0.0,0.0};
 
   double maxMoveSpeed = 100000;
+  double minMoveSpeed = 0.1;
   double maxAcceleration = 50;
+  double linThreshold = 1;
+  double angleThreshold = PI/60;
   double stopSpeed;
   bool breakMode = false;
   bool isRotating = false;
   bool isStopped = true;
-
-  double radius; //The length between the inertal sensor and the left drive base
   double unitsToEncoders;
-
-  //Helper
 
   //Limited Proportinal Only control
   double calcLinearSpeed(int dir, double gain=1.386){
     static double lastSpeed = 0;
     double changeSpeed = (dir*getError(GRID)*gain) - lastSpeed;
+    if(abs(getError(GRID)) < linThreshold){
+      changeSpeed = -lastSpeed;
+    }
     if(abs(changeSpeed) > maxAcceleration){
       changeSpeed = maxAcceleration*getSign(changeSpeed);
     }
@@ -108,10 +73,14 @@ private:
         lastSpeed = abs(abs(lastSpeed)-maxAcceleration)*getSign(lastSpeed);
       }
     }
+
+    if(abs(lastSpeed) < minMoveSpeed){
+      lastSpeed = 0;
+    }
     return lastSpeed*unitsToEncoders; //Encoders
   }
 
-  double calcRotationalSpeed(double maxRotSpeed=100000, double maxRotAcceleration=50, double gain=1){
+  double calcRotationalSpeed(double minRotSpeed=0.1, double maxRotSpeed=100000, double maxRotAcceleration=50, double gain=1){
     double e = getError(HEAD);
     if(abs(e) > PI){
       if(e < 0){
@@ -123,6 +92,10 @@ private:
 
     static double lastSpeed = 0;
     double changeSpeed = (e*gain) - lastSpeed;
+    if(abs(e) < angleThreshold){
+      changeSpeed = -lastSpeed;
+    }
+
     if(abs(changeSpeed) > maxRotAcceleration){
       changeSpeed = maxRotAcceleration*getSign(changeSpeed);
     }
@@ -136,6 +109,10 @@ private:
         lastSpeed = abs(abs(lastSpeed)-maxRotAcceleration)*getSign(lastSpeed);
       }
     }
+
+    if(abs(lastSpeed) < minRotSpeed){
+      lastSpeed = 0;
+    }
     return lastSpeed; //Rad
   }
 
@@ -144,7 +121,6 @@ public:
   Robot(double x, double y, double Head, double stopSpeeds, double wheelRadius){
     pos = {x,y, Head};
     unitsToEncoders = 360/(2*PI*wheelRadius);
-    radius = wheelRadius*unitsToEncoders;
     stopSpeed = stopSpeeds;
   }
 
@@ -183,25 +159,31 @@ public:
     tPos.head = head;
   }
 
-  //TODO Set Speed to rotate if Heading is past threasehold
-  double* getSpeedVars(int dir=1){
-    speedTargets[1] = calcLinearSpeed(dir) + (dir*calcRotationalSpeed()*radius*0.5); //Right
-    speedTargets[0] = calcLinearSpeed(dir) - (dir*calcRotationalSpeed()*radius*0.5); //Left
-
-    if((abs(speedTargets[0]) < stopSpeed) && (abs(speedTargets[1]) < stopSpeed)){
-      isStopped = true;
-    }else{
-      isStopped = false;
-    }
-
-    return speedTargets;
-  }
-
   void setMaxSpeed(double s){
     maxMoveSpeed = s;
   }
   void setMaxAcceleration(double a){
     maxAcceleration = a;
+  }
+
+  //Turns to exact head value
+  void turnToHead(double threshold){
+    
+  }
+
+  //Turns shortest angle to be inline with target; Returns 1 or -1 depending on robot move direction to reach target
+  int turnToVector(double threshold){
+    return 0;
+  }
+
+  //Moves in line until target is reached; dir is used to determine if should move straight or in reverse
+  void moveLin(int dir, double threshold){
+
+  }
+
+  //Moves to target pos in quickest direction
+  void move(){
+
   }
 
 };
