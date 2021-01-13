@@ -42,6 +42,7 @@ private:
   Point tPos;
   double speedTargets[2] = {0.0,0.0};
 
+  //TODO HAVE MAX/MIN ROT AND LIN SPEEDS BE DETERMINED FROM CONSTRUCTUR ARGS
   double maxMoveSpeed = 100000;
   double minMoveSpeed = 0.1;
   double maxAcceleration = 50;
@@ -52,6 +53,7 @@ private:
   bool isRotating = false;
   bool isStopped = true;
   double unitsToEncoders;
+  double robotRadius;
 
   //Limited Proportinal Only control
   double calcLinearSpeed(int dir, double gain=1.386){
@@ -118,10 +120,11 @@ private:
 
 
 public:
-  Robot(double x, double y, double Head, double stopSpeeds, double wheelRadius){
+  Robot(double x, double y, double Head, double stopSpeeds, double wheelRadius, double width){
     pos = {x,y, Head};
     unitsToEncoders = 360/(2*PI*wheelRadius);
     stopSpeed = stopSpeeds;
+    robotRadius = width*0.5*unitsToEncoders;
   }
 
   double getError(MeasureType d){
@@ -166,24 +169,45 @@ public:
     maxAcceleration = a;
   }
 
+  void setAngleThres(double thres){
+    angleThreshold = thres;
+  }
+
+  void setLinThres(double thres){
+    linThreshold = thres;
+  }
+
   //Turns to exact head value
-  void turnToHead(double threshold){
-    
+  double* turnToHead(){
+    speedTargets[0] = calcRotationalSpeed()*robotRadius*-0.5;
+    speedTargets[1] = calcRotationalSpeed()*robotRadius*0.5;
+    return speedTargets;
   }
 
   //Turns shortest angle to be inline with target; Returns 1 or -1 depending on robot move direction to reach target
-  int turnToVector(double threshold){
-    return 0;
+  int setToShortestVector(){
+    if(abs(getError(HEAD)) <= (PI/2)){
+      return 1;
+    }else{
+      tPos.head = tPos.head+180;
+      return -1;
+    }
   }
 
   //Moves in line until target is reached; dir is used to determine if should move straight or in reverse
-  void moveLin(int dir, double threshold){
-
+  double* moveLin(int dir){
+    speedTargets[0] = calcLinearSpeed(dir)+dir*calcRotationalSpeed()*robotRadius*-0.5;
+    speedTargets[1] = calcLinearSpeed(dir)+dir*calcRotationalSpeed()*robotRadius*0.5;
+    return speedTargets;
   }
 
   //Moves to target pos in quickest direction
-  void move(){
-
+  double* move(){
+    int dir = setToShortestVector();
+    if(abs(getError(HEAD)) > angleThreshold){
+      return turnToHead();
+    }
+    return moveLin(dir);
   }
 
 };

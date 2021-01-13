@@ -1,7 +1,7 @@
 #include "OdomControls/Grid.h"
 #include "OdomControls/MotionControl.h"
 
-Robot robot = Robot(0, 0, 0, minSpeed, 0); // NEED TO INIT
+Robot robot = Robot(0, 0, 0, minSpeed, 0, 0); // NEED TO INIT
 
 void updatePosition(){
   double E = getRight();
