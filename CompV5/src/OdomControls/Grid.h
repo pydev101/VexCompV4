@@ -1,4 +1,5 @@
 #include "math.h"
+#include <iostream>
 const double PI = 3.14159;
 
 double abs(double x){
@@ -35,7 +36,7 @@ typedef struct{
 } Point;
 
 
-enum MeasureType {X, Y, HEAD, GRID} dirT;
+enum MeasureType {X, Y, HEAD, GRID, LIN} dirT;
 class Robot{
 private:
   Point pos;
@@ -45,7 +46,7 @@ private:
   //TODO HAVE MAX/MIN ROT AND LIN SPEEDS BE DETERMINED FROM CONSTRUCTUR ARGS
   double maxMoveSpeed = 100000;
   double minMoveSpeed = 0.1;
-  double maxAcceleration = 50;
+  double maxAcceleration = 2;
   double linThreshold = 1;
   double angleThreshold = PI/60;
   double stopSpeed;
@@ -56,10 +57,20 @@ private:
   double robotRadius;
 
   //Limited Proportinal Only control
-  double calcLinearSpeed(int dir, double gain=1.386){
+  double calcLinearSpeed(int dir, double startError=-1, double gain=50){
     static double lastSpeed = 0;
-    double changeSpeed = (dir*getError(GRID)*gain) - lastSpeed;
-    if(abs(getError(GRID)) < linThreshold){
+    double linError = 0; //Target minus current
+
+    //TODO Follow example of old code somewhat subtract the current from the target but be mindfull that the grid error is always postive so you need to keep track of the actual distance left over or under
+
+    static startError = getError(GRID);
+    if(startError != -1){
+
+    }
+    double changeSpeed = (dir*getError(GRID)*gain) - lastSpeed; //ERROR NEEDS A SENSE OF DIRECTION
+
+
+    if(abs(linError) < linThreshold){
       changeSpeed = -lastSpeed;
     }
     if(abs(changeSpeed) > maxAcceleration){
@@ -141,7 +152,7 @@ public:
   }
 
   void updatePos(double Xd, double Yd, double h){
-    pos = {Xd+pos.x, Yd+pos.y, h};
+    pos = {(Xd/unitsToEncoders)+pos.x, (Yd/unitsToEncoders)+pos.y, h};
   }
 
   void setTRealitive(double fwd, double hor){

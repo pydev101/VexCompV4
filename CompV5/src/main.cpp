@@ -7,6 +7,24 @@
 // motorRB              motor         4               
 // ISensor              inertial      5               
 // ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// motorLF              motor         1               
+// motorLB              motor         2               
+// motorRF              motor         3               
+// motorRB              motor         4               
+// ISensor              inertial      5               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// motorLF              motor         1               
+// motorLB              motor         2               
+// motorRF              motor         3               
+// motorRB              motor         4               
+// ISensor              inertial      5               
+// ---- END VEXCODE CONFIGURED DEVICES ----
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
@@ -45,8 +63,17 @@ int main() {
   /*Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
   while(true){
-    wait(1000, msec);
+    wait(1000, msec);AAAA
   }*/
+  thread t = thread(threadTask);
+  robot.setTRealitive(10, 0);
+
+  setDPS(50, 50);
+
+  while(true){
+    std::cout << robot.getError(LIN) << std::endl;
+    wait(10, msec);
+  }
 
   return 0;
 }

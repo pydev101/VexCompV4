@@ -1,7 +1,7 @@
 #include "OdomControls/Grid.h"
 #include "OdomControls/MotionControl.h"
 
-Robot robot = Robot(0, 0, 0, minSpeed, 0, 0); // NEED TO INIT
+Robot robot = Robot(0, 0, PI/2, minSpeed, 4.25, 12.75); // NEED TO INIT
 
 void updatePosition(){
   double E = getRight();
@@ -23,4 +23,10 @@ void updatePosition(){
   robot.updatePos(deltaF*cos(Head)+deltaH*cos(Head-(PI/2)), deltaF*sin(Head)+deltaH*sin(Head-(PI/2)), Head);
 }
 
+void threadTask(){
+  while(true){
+    updatePosition();
+    wait(15, msec);
+  }
+}
 
