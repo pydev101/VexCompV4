@@ -68,14 +68,12 @@ void setOutput(int d){
   
 }
 
-void resetHeading(){
-  ISensor.resetRotation();
-}
-
+//RETURN MUST BE UNBOUNDED
 double getHeading(bool inDeg=false){
   static double Heading = 90;
   double r = ISensor.rotation();
   Heading -= r;
+  ISensor.resetRotation();
 
   if(inDeg){
     return Heading;

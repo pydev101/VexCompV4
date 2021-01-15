@@ -12,6 +12,7 @@ int getSign(double x){
   return 1;
 }
 
+//TODO ENSURE RETURN IS POSITIVE AND THAT THE ANGLE IS BOUNDED BY 0<=X<360
 double getStandardAngle(double ang, bool isRad=true){
   double toss;
   if(isRad){
@@ -36,7 +37,7 @@ typedef struct{
 } Point;
 
 
-enum MeasureType {X, Y, HEAD, GRID, LIN} dirT;
+enum MeasureType {X, Y, HEAD, GRID, POLAR} dirT;
 class Robot{
 private:
   Point pos;
@@ -61,11 +62,7 @@ private:
     static double lastSpeed = 0;
     int dir = 1;
 
-    if(abs(atan2((tPos.y - pos.y), (tPos.x-pos.x))-getStandardAngle(pos.head)) >= (PI/2)){
-      dir=-1;
-    }
-    
-    double changeSpeed = (dir*getError(GRID)*gain) - lastSpeed; //ERROR NEEDS A SENSE OF DIRECTION
+    double changeSpeed = (dir*getError(POLAR)*gain) - lastSpeed;
 
 
     if(getError(GRID) < linThreshold){
@@ -144,8 +141,16 @@ public:
     }else if(d == HEAD){
       return getStandardAngle(tPos.head)-getStandardAngle(pos.head);
       //Or using the motor encoders (rightEnc-leftEnc)/(2*radius) or the difference between the encoders divided by the distance between the drive wheels
-    }else{
+    }else if(d == GRID){
       return sqrt((getError(X)*getError(X)) + (getError(Y)*getError(Y)));
+    }else{
+      double r = getError(GRID);
+      //If robot is facing target point return pos r, else return -r
+      if(getStandardAngle(pos.head) > getStandardAngle(atan2(getError(Y), getError(X))+(PI/2)) && getStandardAngle(pos.head) < getStandardAngle(atan2(getError(Y), getError(X))-(PI/2))){
+        return r;
+      }else{
+        return -r;
+      }
     }
   }
 
