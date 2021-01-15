@@ -46,7 +46,7 @@ private:
   //TODO HAVE MAX/MIN ROT AND LIN SPEEDS BE DETERMINED FROM CONSTRUCTUR ARGS
   double maxMoveSpeed = 100000;
   double minMoveSpeed = 0.1;
-  double maxAcceleration = 2;
+  double maxAcceleration = 0.5;
   double linThreshold = 1;
   double angleThreshold = PI/60;
   double stopSpeed;
@@ -57,20 +57,18 @@ private:
   double robotRadius;
 
   //Limited Proportinal Only control
-  double calcLinearSpeed(int dir, double startError=-1, double gain=50){
+  double calcLinearSpeed(double gain=60){
     static double lastSpeed = 0;
-    double linError = 0; //Target minus current
+    int dir = 1;
 
-    //TODO Follow example of old code somewhat subtract the current from the target but be mindfull that the grid error is always postive so you need to keep track of the actual distance left over or under
-
-    static startError = getError(GRID);
-    if(startError != -1){
-
+    if(abs(atan2((tPos.y - pos.y), (tPos.x-pos.x))-getStandardAngle(pos.head)) >= (PI/2)){
+      dir=-1;
     }
+    
     double changeSpeed = (dir*getError(GRID)*gain) - lastSpeed; //ERROR NEEDS A SENSE OF DIRECTION
 
 
-    if(abs(linError) < linThreshold){
+    if(getError(GRID) < linThreshold){
       changeSpeed = -lastSpeed;
     }
     if(abs(changeSpeed) > maxAcceleration){
@@ -90,7 +88,7 @@ private:
     if(abs(lastSpeed) < minMoveSpeed){
       lastSpeed = 0;
     }
-    return lastSpeed*unitsToEncoders; //Encoders
+    return lastSpeed;//*unitsToEncoders; //Encoders
   }
 
   double calcRotationalSpeed(double minRotSpeed=0.1, double maxRotSpeed=100000, double maxRotAcceleration=50, double gain=1){
@@ -200,22 +198,22 @@ public:
     if(abs(getError(HEAD)) <= (PI/2)){
       return 1;
     }else{
-      tPos.head = tPos.head+180;
+      tPos.head = getStandardAngle(tPos.head+180);
       return -1;
     }
   }
 
   //Moves in line until target is reached; dir is used to determine if should move straight or in reverse
   double* moveLin(int dir){
-    speedTargets[0] = calcLinearSpeed(dir)+dir*calcRotationalSpeed()*robotRadius*-0.5;
-    speedTargets[1] = calcLinearSpeed(dir)+dir*calcRotationalSpeed()*robotRadius*0.5;
+    speedTargets[0] = calcLinearSpeed();//+dir*calcRotationalSpeed()*robotRadius*-0.5;
+    speedTargets[1] = calcLinearSpeed();//+dir*calcRotationalSpeed()*robotRadius*0.5;
     return speedTargets;
   }
 
   //Moves to target pos in quickest direction
   double* move(){
     int dir = setToShortestVector();
-    if(abs(getError(HEAD)) > angleThreshold){
+    if(abs(getError(HEAD)) > angleThreshold*2){
       return turnToHead();
     }
     return moveLin(dir);
