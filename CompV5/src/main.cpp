@@ -34,7 +34,6 @@ void pre_auton(void) {
   initMotors();
   setDPS(0,0);
 
-  resetHeading();
   resetEncoders();
 }
 

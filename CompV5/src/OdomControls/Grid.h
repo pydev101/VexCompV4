@@ -146,7 +146,7 @@ public:
     }else{
       double r = getError(GRID);
       //If robot is facing target point return pos r, else return -r
-      if(getStandardAngle(pos.head) > getStandardAngle(atan2(getError(Y), getError(X))+(PI/2)) && getStandardAngle(pos.head) < getStandardAngle(atan2(getError(Y), getError(X))-(PI/2))){
+      if((getSign(getError(X)) == getSign(cos(pos.head))) && (getSign(getError(Y)) == getSign(sin(pos.head)))) {
         return r;
       }else{
         return -r;
