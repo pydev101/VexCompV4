@@ -2,16 +2,19 @@
 #include <iostream>
 const double PI = 3.14159;
 
+//Absolute value for double type varibles
 double abs(double x){
   if(x < 0){x=x*-1;}
   return x;
 }
 
+//Returns 1 or -1 depending on the sign of input number
 int getSign(double x){
   if(x < 0){return -1;}
   return 1;
 }
 
+//Returns an angle bounded by 0<=X<360
 //TODO ENSURE RETURN IS POSITIVE AND THAT THE ANGLE IS BOUNDED BY 0<=X<360
 double getStandardAngle(double ang, bool isRad=true){
   double toss;
@@ -22,6 +25,7 @@ double getStandardAngle(double ang, bool isRad=true){
   }
 }
 
+//Converts radians and degrees back and forth
 double convert(double head, bool toRad=true){
   if(toRad){
     return head*(PI/180);
@@ -30,14 +34,17 @@ double convert(double head, bool toRad=true){
   }
 }
 
+//Point structure to store target and position data
 typedef struct{
   double x;
   double y;
   double head;
 } Point;
 
-
+//Type of value getError(dirT) returns
 enum MeasureType {X, Y, HEAD, GRID, POLAR} dirT;
+enum GearRatio {GR18To1, GR36to1, GR6to1} motorRatios;
+//Primary control of robot
 class Robot{
 private:
   Point pos;
@@ -45,12 +52,12 @@ private:
   double speedTargets[2] = {0.0,0.0};
 
   //TODO HAVE MAX/MIN ROT AND LIN SPEEDS BE DETERMINED FROM CONSTRUCTUR ARGS
-  double maxMoveSpeed = 100000;
-  double minMoveSpeed = 0.1;
+  double maxLinMoveSpeed;
+  double maxLinMoveSpeedDefault;
+  double minLinMoveSpeed;
   double maxAcceleration = 0.5;
   double linThreshold = 1;
   double angleThreshold = PI/60;
-  double stopSpeed;
   bool breakMode = false;
   bool isRotating = false;
   bool isStopped = true;
@@ -74,15 +81,15 @@ private:
     lastSpeed = lastSpeed + changeSpeed; //NewSpeed to set
 
     //Handle max speed
-    if(abs(lastSpeed) > maxMoveSpeed){
-      if(abs(abs(lastSpeed) - maxMoveSpeed) < maxAcceleration){
-        lastSpeed = maxMoveSpeed*getSign(lastSpeed);
+    if(abs(lastSpeed) > maxLinMoveSpeed){
+      if(abs(abs(lastSpeed) - maxLinMoveSpeed) < maxAcceleration){
+        lastSpeed = maxLinMoveSpeed*getSign(lastSpeed);
       }else{
         lastSpeed = abs(abs(lastSpeed)-maxAcceleration)*getSign(lastSpeed);
       }
     }
 
-    if(abs(lastSpeed) < minMoveSpeed){
+    if(abs(lastSpeed) < minLinMoveSpeed){
       lastSpeed = 0;
     }
     return lastSpeed;//*unitsToEncoders; //Encoders
@@ -126,11 +133,21 @@ private:
 
 
 public:
-  Robot(double x, double y, double Head, double stopSpeeds, double wheelRadius, double width){
+  /*TODO
+  -Calculate max rot speed using math and linear max speed
+  -Calculate min rot speed using min lin speed
+  
+  */
+
+  //X in units, y in units, Head in Rads, minSpeeds in deg/s, maxSpeeds in deg/s, wheelDiamter in units, robot drive base width in units
+  Robot(double x, double y, double Head, double minSpeeds, double maxSpeed, double wheelDiameter, double width){
     pos = {x,y, Head};
-    unitsToEncoders = 360/(2*PI*wheelRadius);
-    stopSpeed = stopSpeeds;
+    unitsToEncoders = 360/(PI*wheelDiameter);
+    minLinMoveSpeed = minSpeeds/unitsToEncoders;
+    maxLinMoveSpeed = maxSpeed/unitsToEncoders;
+    maxLinMoveSpeedDefault = maxLinMoveSpeed;
     robotRadius = width*0.5*unitsToEncoders;
+
   }
 
   double getError(MeasureType d){
@@ -176,19 +193,19 @@ public:
     tPos.head = head;
   }
 
-  void setMaxSpeed(double s){
-    maxMoveSpeed = s;
+  void setMaxSpeed(double pct){
+    maxLinMoveSpeed = abs(pct)*maxLinMoveSpeedDefault;
   }
   void setMaxAcceleration(double a){
-    maxAcceleration = a;
+    maxAcceleration = abs(a);
   }
 
   void setAngleThres(double thres){
-    angleThreshold = thres;
+    angleThreshold = abs(thres);
   }
 
   void setLinThres(double thres){
-    linThreshold = thres;
+    linThreshold = abs(thres);
   }
 
   //Turns to exact head value
@@ -209,9 +226,13 @@ public:
   }
 
   //Moves in line until target is reached; dir is used to determine if should move straight or in reverse
-  double* moveLin(int dir){
-    speedTargets[0] = calcLinearSpeed();//+dir*calcRotationalSpeed()*robotRadius*-0.5;
-    speedTargets[1] = calcLinearSpeed();//+dir*calcRotationalSpeed()*robotRadius*0.5;
+  double* moveLin(int dir, bool angleAdj=true){
+    speedTargets[0] = calcLinearSpeed();
+    speedTargets[1] = calcLinearSpeed();
+    if(angleAdj){
+      speedTargets[0] += dir*calcRotationalSpeed()*robotRadius*-0.5;
+      speedTargets[1] += dir*calcRotationalSpeed()*robotRadius*0.5;
+    }
     return speedTargets;
   }
 
