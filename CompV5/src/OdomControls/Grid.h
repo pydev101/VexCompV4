@@ -47,22 +47,24 @@ enum GearRatio {GR18To1, GR36to1, GR6to1} motorRatios;
 //Primary control of robot
 class Robot{
 private:
-  Point pos;
-  Point tPos;
-  double speedTargets[2] = {0.0,0.0};
+  //Units of radians for angles or same units of length as the measurment of the wheel diameter
+  Point pos; //Current X, Y, and Bearing of Robot
+  Point tPos; //Target X, Target Y, Target Heading
+  double speedTargets[2] = {0.0, 0.0}; //Left and Right target speed values
+  double maxLinMoveSpeed; //Maximum allowed travel speed
+  double maxLinMoveSpeedDefault; //Maximum speed able to be traveled 
+  double minLinMoveSpeed; //Minimum target speed the robot starts moving at
+  double maxLinAcceleration = 0.5; //Greatest change of speed allowed
+  double linThreshold = 1; //How close the robot tries to get to the target point
+  double angleThreshold = PI/60; //How close the robot tries to stay to the target heading; Default is 3 degrees
 
-  //TODO HAVE MAX/MIN ROT AND LIN SPEEDS BE DETERMINED FROM CONSTRUCTUR ARGS
-  double maxLinMoveSpeed;
-  double maxLinMoveSpeedDefault;
-  double minLinMoveSpeed;
-  double maxAcceleration = 0.5;
-  double linThreshold = 1;
-  double angleThreshold = PI/60;
+  double unitsToEncoders; // (Degrees/Units) used for conversion of distances
+  double robotRadius; //Distance from center of robot to drive wheel base in units of motor degrees
+
+  //WIP Worthless varibles
   bool breakMode = false;
   bool isRotating = false;
   bool isStopped = true;
-  double unitsToEncoders;
-  double robotRadius;
 
   //Limited Proportinal Only control
   double calcLinearSpeed(double gain=60){
@@ -75,24 +77,24 @@ private:
     if(getError(GRID) < linThreshold){
       changeSpeed = -lastSpeed;
     }
-    if(abs(changeSpeed) > maxAcceleration){
-      changeSpeed = maxAcceleration*getSign(changeSpeed);
+    if(abs(changeSpeed) > maxLinAcceleration){
+      changeSpeed = maxLinAcceleration*getSign(changeSpeed);
     }
     lastSpeed = lastSpeed + changeSpeed; //NewSpeed to set
 
     //Handle max speed
     if(abs(lastSpeed) > maxLinMoveSpeed){
-      if(abs(abs(lastSpeed) - maxLinMoveSpeed) < maxAcceleration){
+      if(abs(abs(lastSpeed) - maxLinMoveSpeed) < maxLinAcceleration){
         lastSpeed = maxLinMoveSpeed*getSign(lastSpeed);
       }else{
-        lastSpeed = abs(abs(lastSpeed)-maxAcceleration)*getSign(lastSpeed);
+        lastSpeed = abs(abs(lastSpeed)-maxLinAcceleration)*getSign(lastSpeed);
       }
     }
 
     if(abs(lastSpeed) < minLinMoveSpeed){
       lastSpeed = 0;
     }
-    return lastSpeed;//*unitsToEncoders; //Encoders
+    return lastSpeed*unitsToEncoders; //Encoders
   }
 
   double calcRotationalSpeed(double minRotSpeed=0.1, double maxRotSpeed=100000, double maxRotAcceleration=50, double gain=1){
@@ -197,7 +199,7 @@ public:
     maxLinMoveSpeed = abs(pct)*maxLinMoveSpeedDefault;
   }
   void setMaxAcceleration(double a){
-    maxAcceleration = abs(a);
+    maxLinAcceleration = abs(a);
   }
 
   void setAngleThres(double thres){
