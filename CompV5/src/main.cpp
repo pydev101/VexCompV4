@@ -44,7 +44,7 @@ void pre_auton(void) {
   resetEncoders();
 
   //Start tracking thread to log any movement of the robot onto the virtual grid
-  //thread t = thread(threadTask);
+  thread t = thread(threadTask);
 }
 
 competition Competition;
@@ -58,8 +58,8 @@ int main() {
 
   /*
   Checklist:
-  1) Motors: Wiring, Speed, and Direction
-  2) Encoders: getEncoder returns positive in the fwd direction; getHeading returns the Heading of the robot correctly in radians
+  DONE! 1) Motors: Wiring, Speed, and Direction
+  DONE! 2) Encoders: getEncoder returns positive in the fwd direction; getHeading returns the Heading of the robot correctly in radians
   3) Grid: Encoders map correctly to the grid and positive is reflected accuratly; Error values should be verified as well
   4) Linear Motion: Gain is tuned and direction, speed, acceleration are double checked or set
   5) Rotational Motion: Gain is set; Robot can turn in the shortest direction, both directions, and accuratly arrive at target; Close values should have a low speed value for use in grid movement
@@ -68,15 +68,21 @@ int main() {
 
   //TODO: Set motor speed fwd and reverse; above and below max to test functions
 
-
   //Need to check encoders then heading
-  setDPS(500, 500);
-  resetEncoders();
-  for(double msecs=0; msecs<5000; msecs=msecs+100){
-    std::cout << (msecs/1000) << ", " << getRight() << ", " << getLeft() << std::endl;
-    wait(100, msec);
-  }
+  //setDPS(minSpeed+3, minSpeed+3);AAA
+
+  motorLB.setBrake(brakeType::coast);
+  motorLF.setBrake(brakeType::coast);
+  motorRB.setBrake(brakeType::coast);
+  motorRF.setBrake(brakeType::coast);
   setDPS(0,0);
+
+  Point p;
+  while(true){
+    p = robot.getPos();
+    std::cout << p.x << ", " << p.y << ", " << p.head << std::endl;
+    wait(500, msec);
+  }
 
   return 0;
 }

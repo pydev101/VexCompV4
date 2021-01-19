@@ -249,4 +249,10 @@ public:
     return moveLin();
   }
 
+
+
+  //TEST FUNCTIONS
+  Point getPos(){
+    return pos;
+  }
 };
