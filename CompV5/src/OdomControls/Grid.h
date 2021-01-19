@@ -228,23 +228,25 @@ public:
   }
 
   //Moves in line until target is reached; dir is used to determine if should move straight or in reverse
-  double* moveLin(int dir, bool angleAdj=true){
+  double* moveLin(bool angleAdj=true){
     speedTargets[0] = calcLinearSpeed();
-    speedTargets[1] = calcLinearSpeed();
+    speedTargets[1] = speedTargets[0];
     if(angleAdj){
-      speedTargets[0] += dir*calcRotationalSpeed()*robotRadius*-0.5;
-      speedTargets[1] += dir*calcRotationalSpeed()*robotRadius*0.5;
+      speedTargets[0] += getSign(speedTargets[0])*calcRotationalSpeed()*robotRadius*-0.5;
+      speedTargets[1] += getSign(speedTargets[0])*calcRotationalSpeed()*robotRadius*0.5;
     }
     return speedTargets;
   }
 
   //Moves to target pos in quickest direction
-  double* move(){
-    int dir = setToShortestVector();
+  double* move(bool setShortV=true){
+    if(setShortV){
+      setToShortestVector();
+    }
     if(abs(getError(HEAD)) > angleThreshold*2){
       return turnToHead();
     }
-    return moveLin(dir);
+    return moveLin();
   }
 
 };
