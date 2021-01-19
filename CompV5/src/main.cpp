@@ -66,7 +66,10 @@ int main() {
   6) Grid Move: A target is set on the grid and the robot must arrive accuratly and turn to and stay straight
   */
 
-  //Need to check encoders
+  //TODO: Set motor speed fwd and reverse; above and below max to test functions
+
+
+  //Need to check encoders then heading
   setDPS(500, 500);
   resetEncoders();
   for(double msecs=0; msecs<5000; msecs=msecs+100){
