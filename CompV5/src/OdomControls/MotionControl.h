@@ -4,8 +4,13 @@
 #include "vex.h"
 
 const double PI_T = 3.14159;
-double minSpeed = 20;
+double minSpeed = 25;
+double maxSpeed = 1100;
 
+double _MOTORABS(double x){
+  if(x<0){x=-x;}
+  return x;
+}
 void initMotors(){
   motorLF.setBrake(brakeType::hold);
   motorLB.setBrake(brakeType::hold);
@@ -20,10 +25,13 @@ void initMotors(){
 void setLeft(double vel){
   static bool isStopped = true;
   
+  if(_MOTORABS(vel) > maxSpeed){
+    vel = maxSpeed;
+  }
   motorLF.setVelocity(vel, velocityUnits::dps);
   motorLB.setVelocity(vel, velocityUnits::dps);
 
-  if(vel < minSpeed){
+  if(_MOTORABS(vel) < minSpeed){
     motorLF.stop();
     motorLB.stop();
     isStopped = true;
@@ -37,10 +45,14 @@ void setLeft(double vel){
 void setRight(double vel){
   static bool isStopped = true;
   
+  if(_MOTORABS(vel) > maxSpeed){
+    vel = maxSpeed;
+  }
+  
   motorRF.setVelocity(vel, velocityUnits::dps);
   motorRB.setVelocity(vel, velocityUnits::dps);
 
-  if(vel < minSpeed){
+  if(_MOTORABS(vel) < minSpeed){
     motorRF.stop();
     motorRB.stop();
     isStopped = true;

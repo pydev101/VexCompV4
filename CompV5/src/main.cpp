@@ -1,12 +1,13 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// motorLF              motor         1               
-// motorLB              motor         2               
-// motorRF              motor         3               
-// motorRB              motor         4               
-// ISensor              inertial      5               
+// motorLF              motor         13              
+// motorLB              motor         14              
+// motorRF              motor         11              
+// motorRB              motor         12              
+// ISensor              inertial      15              
 // ---- END VEXCODE CONFIGURED DEVICES ----
+
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
@@ -43,7 +44,7 @@ void pre_auton(void) {
   resetEncoders();
 
   //Start tracking thread to log any movement of the robot onto the virtual grid
-  thread t = thread(threadTask);
+  //thread t = thread(threadTask);
 }
 
 competition Competition;
@@ -55,17 +56,24 @@ int main() {
   Competition.drivercontrol(usercontrol);
   */
 
-  robot.setTRealitive(100, 0);
+  /*
+  Checklist:
+  1) Motors: Wiring, Speed, and Direction
+  2) Encoders: getEncoder returns positive in the fwd direction; getHeading returns the Heading of the robot correctly in radians
+  3) Grid: Encoders map correctly to the grid and positive is reflected accuratly; Error values should be verified as well
+  4) Linear Motion: Gain is tuned and direction, speed, acceleration are double checked or set
+  5) Rotational Motion: Gain is set; Robot can turn in the shortest direction, both directions, and accuratly arrive at target; Close values should have a low speed value for use in grid movement
+  6) Grid Move: A target is set on the grid and the robot must arrive accuratly and turn to and stay straight
+  */
 
-  //setDPS(50, 50);
-
-  double* speed = robot.moveLin(1);
-  while(true){
-    speed = robot.moveLin(1);
-    std::cout << robot.getError(GRID) << "," << speed[0] << std::endl;
-    setDPS(speed[0]*360/(2*PI*4.25), speed[1]*360/(2*PI*4.25));
-    wait(10, msec);
+  //Need to check encoders
+  setDPS(500, 500);
+  resetEncoders();
+  for(double msecs=0; msecs<5000; msecs=msecs+100){
+    std::cout << (msecs/1000) << ", " << getRight() << ", " << getLeft() << std::endl;
+    wait(100, msec);
   }
+  setDPS(0,0);
 
   return 0;
 }
