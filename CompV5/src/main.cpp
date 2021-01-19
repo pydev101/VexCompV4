@@ -64,6 +64,9 @@ int main() {
   4) Linear Motion: Gain is tuned and direction, speed, acceleration are double checked or set
   5) Rotational Motion: Gain is set; Robot can turn in the shortest direction, both directions, and accuratly arrive at target; Close values should have a low speed value for use in grid movement
   6) Grid Move: A target is set on the grid and the robot must arrive accuratly and turn to and stay straight
+
+  Future Features:
+  -Self adjusting gain and max acceleration through gradient decsent
   */
 
   //TODO: Set motor speed fwd and reverse; above and below max to test functions
