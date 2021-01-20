@@ -98,6 +98,7 @@ private:
   }
 
   double calcRotationalSpeed(double minRotSpeed=0.1, double maxRotSpeed=100000, double maxRotAcceleration=50, double gain=1){
+    //If problems arise then consider doing while currentHead < currentHead+error to avoid problems with the 0-360 boundry
     double e = getError(HEAD);
     if(abs(e) > PI){
       if(e < 0){
