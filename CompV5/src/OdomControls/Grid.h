@@ -14,8 +14,7 @@ int getSign(double x){
   return 1;
 }
 
-//Returns an angle bounded by 0<=X<360
-//TODO ENSURE RETURN IS POSITIVE AND THAT THE ANGLE IS BOUNDED BY 0<=X<360
+//Returns an angle bounded by -360<X<360
 double getStandardAngle(double ang, bool isRad=true){
   double toss;
   if(isRad){
@@ -166,20 +165,14 @@ public:
     }else{
       double r = getError(GRID);
       //If robot is facing target point return pos r, else return -r
-      double z = cos(pos.head);
-      double y = sin(pos.head);
-      if(abs(getStandardAngle(pos.head)-(PI/2))<0.0002){z=getSign(y);}
-      if(abs(getStandardAngle(pos.head)-((3*PI)/2))<0.0002){z=getSign(y);}
+      double lowT = getStandardAngle(atan2(getError(Y), getError(X)) - (PI/2));
+      double highT = getStandardAngle(atan2(getError(Y), getError(X)) + (PI/2));
+      double curr = getStandardAngle(pos.head);
 
-      if(abs(getStandardAngle(pos.head)-(PI))<0.0002){y=getSign(z);}
-      if(abs(getStandardAngle(pos.head)-(2*PI))<0.0002){y=getSign(z);}
+      std::cout << "T: " << lowT << " < " << curr << " < " << highT << std::endl;
 
-      if(getSign(getError(X)) == getSign(z)) {
-        if(getSign(getError(Y)) == getSign(y)){
-          return r;
-        }else{
-          return -r;
-        }
+      if((lowT < curr) && (curr < highT)){
+        return r;
       }else{
         return -r;
       }
