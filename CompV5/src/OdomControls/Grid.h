@@ -166,8 +166,20 @@ public:
     }else{
       double r = getError(GRID);
       //If robot is facing target point return pos r, else return -r
-      if((getSign(getError(X)) == getSign(cos(pos.head))) && (getSign(getError(Y)) == getSign(sin(pos.head)))) {
-        return r;
+      double z = cos(pos.head);
+      double y = sin(pos.head);
+      if(abs(getStandardAngle(pos.head)-(PI/2))<0.0002){z=getSign(y);}
+      if(abs(getStandardAngle(pos.head)-((3*PI)/2))<0.0002){z=getSign(y);}
+
+      if(abs(getStandardAngle(pos.head)-(PI))<0.0002){y=getSign(z);}
+      if(abs(getStandardAngle(pos.head)-(2*PI))<0.0002){y=getSign(z);}
+
+      if(getSign(getError(X)) == getSign(z)) {
+        if(getSign(getError(Y)) == getSign(y)){
+          return r;
+        }else{
+          return -r;
+        }
       }else{
         return -r;
       }
