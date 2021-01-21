@@ -167,18 +167,19 @@ public:
       //If robot is facing target point return pos r, else return -r
 
       double tar = atan2(getError(Y), getError(X));
-      std::cout << tar << std::endl;
       if(tar < 0){
         tar += 2*PI;
       }
-      std::cout << tar << std::endl;
 
       double lowT = tar - (PI/2);
       double highT = tar + (PI/2);
       double curr = getStandardAngle(pos.head);
 
+      std::cout << tar << " : " << cos(tar) << std::endl;
+
       //Move the angles to the left side of teh circle in order to avoid the strange 0-360 problems that plague me
       if(getSign(cos(tar)) == 1){
+        std::cout << "FLIP" << std::endl;
         lowT = getStandardAngle(lowT+PI);
         highT = getStandardAngle(highT+PI);
         curr = getStandardAngle(curr+PI);
@@ -273,6 +274,6 @@ public:
 
   //TEST FUNCTIONS
   Point getPos(){
-    return pos;
+    return tPos;
   }
 };
