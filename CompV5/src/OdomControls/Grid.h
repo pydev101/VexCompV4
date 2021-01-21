@@ -175,17 +175,12 @@ public:
       double highT = tar + (PI/2);
       double curr = getStandardAngle(pos.head);
 
-      std::cout << tar << " : " << cos(tar) << std::endl;
-
       //Move the angles to the left side of teh circle in order to avoid the strange 0-360 problems that plague me
       if(getSign(cos(tar)) == 1){
-        std::cout << "FLIP" << std::endl;
         lowT = getStandardAngle(lowT+PI);
         highT = getStandardAngle(highT+PI);
         curr = getStandardAngle(curr+PI);
       }
-      std::cout << "T: " << lowT << " < " << curr << " < " << highT << std::endl;
-
       if((lowT < curr) && (curr < highT)){
         return r;
       }else{
@@ -274,6 +269,6 @@ public:
 
   //TEST FUNCTIONS
   Point getPos(){
-    return tPos;
+    return pos;
   }
 };
