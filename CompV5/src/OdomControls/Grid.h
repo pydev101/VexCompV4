@@ -14,13 +14,13 @@ int getSign(double x){
   return 1;
 }
 
-//Returns an angle bounded by -360<X<360
+//Returns an angle bounded by 0<X<360
 double getStandardAngle(double ang, bool isRad=true){
   double toss;
   if(isRad){
-    return ((2*PI)*modf(ang/(2*PI), &toss));
+    return abs((2*PI)*modf(ang/(2*PI), &toss));
   }else{
-    return (360*modf(ang/360, &toss));
+    return abs(360*modf(ang/360, &toss));
   }
 }
 
@@ -165,15 +165,23 @@ public:
     }else{
       double r = getError(GRID);
       //If robot is facing target point return pos r, else return -r
-      double lowT = getStandardAngle(atan2(getError(Y), getError(X)) - (PI/2));
-      double highT = getStandardAngle(atan2(getError(Y), getError(X)) + (PI/2));
+
+      double tar = atan2(getError(Y), getError(X));
+      std::cout << tar << std::endl;
+      if(tar < 0){
+        tar += 2*PI;
+      }
+      std::cout << tar << std::endl;
+
+      double lowT = tar - (PI/2);
+      double highT = tar + (PI/2);
       double curr = getStandardAngle(pos.head);
 
       //Move the angles to the left side of teh circle in order to avoid the strange 0-360 problems that plague me
-      if(getSign(cos(curr)) == 1){
-        lowT += PI;
-        highT += PI;
-        curr += PI;
+      if(getSign(cos(tar)) == 1){
+        lowT = getStandardAngle(lowT+PI);
+        highT = getStandardAngle(highT+PI);
+        curr = getStandardAngle(curr+PI);
       }
       std::cout << "T: " << lowT << " < " << curr << " < " << highT << std::endl;
 

@@ -72,7 +72,7 @@ int main() {
   //TODO: Set motor speed fwd and reverse; above and below max to test functions
 
   //Need to check encoders then heading
-  //setDPS(minSpeed+3, minSpeed+3);AAAAA
+  //setDPS(minSpeed+3, minSpeed+3);AAAAAAAAAA
 
   motorLB.setBrake(brakeType::coast);
   motorLF.setBrake(brakeType::coast);
@@ -80,15 +80,16 @@ int main() {
   motorRF.setBrake(brakeType::coast);
   setDPS(0,0);
 
-  robot.setTRealitive(20, 20);
+  robot.setTRealitive(20, -20);
 
   //POLAR ERROR IS MESSING UP
-  
+
   Point p;
   while(true){
     p = robot.getPos();
     std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ")" << std::endl;
-    std::cout << "Error" << robot.getError(POLAR) << std::endl;
+    robot.getError(POLAR);
+    //std::cout << "Error" << robot.getError(POLAR) << std::endl;
     wait(500, msec);
   }
 
