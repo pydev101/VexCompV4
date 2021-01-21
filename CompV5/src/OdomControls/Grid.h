@@ -169,6 +169,12 @@ public:
       double highT = getStandardAngle(atan2(getError(Y), getError(X)) + (PI/2));
       double curr = getStandardAngle(pos.head);
 
+      //Move the angles to the left side of teh circle in order to avoid the strange 0-360 problems that plague me
+      if(getSign(cos(curr)) == 1){
+        lowT += PI;
+        highT += PI;
+        curr += PI;
+      }
       std::cout << "T: " << lowT << " < " << curr << " < " << highT << std::endl;
 
       if((lowT < curr) && (curr < highT)){
