@@ -80,6 +80,8 @@ int main() {
   motorRF.setBrake(brakeType::coast);
   setDPS(0,0);
 
+  //TODO Test to see if sign switches upon passing the point
+
 
   robot.setTAbsolute(20, -20);
   

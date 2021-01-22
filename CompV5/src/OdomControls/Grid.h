@@ -100,9 +100,12 @@ private:
     //If problems arise then consider doing while currentHead < currentHead+error to avoid problems with the 0-360 boundry
     double e = getError(HEAD);
     if(abs(e) > PI){
+      //Other path is shorter travel
       if(e < 0){
+        //If E is CW then faster path is CCW
         e = (2*PI)+e;
       }else{
+        //If E is CCW; faster path is CW
         e = -((2*PI)-e);
       }
     }
