@@ -99,6 +99,7 @@ private:
   double calcRotationalSpeed(double minRotSpeed=0.3, double maxRotSpeed=100000, double maxRotAcceleration=50, double gain=6){
     //If problems arise then consider doing while currentHead < currentHead+error to avoid problems with the 0-360 boundry
     double e = getError(HEAD);
+    std::cout << "ORIGNAL ERROR: " << e << std::endl;
     if(abs(e) > PI){
       //Other path is shorter travel
       if(e < 0){
@@ -109,8 +110,7 @@ private:
         e = -((2*PI)-e);
       }
     }
-
-    //-3.92699
+    std::cout << "MOD ERROR: " << e << std::endl;
 
     static double lastSpeed = 0;
     double changeSpeed = (e*gain) - lastSpeed;
@@ -135,6 +135,8 @@ private:
     if(abs(lastSpeed) < minRotSpeed){
       lastSpeed = 0;
     }
+
+    std::cout << "RESULT: " << lastSpeed << std::endl;
     return lastSpeed; //Rad
   }
 
@@ -241,8 +243,11 @@ public:
 
   //Turns to exact head value
   double* turnToHead(){
-    speedTargets[0] = calcRotationalSpeed()*robotRadius*-0.5;
-    speedTargets[1] = calcRotationalSpeed()*robotRadius*0.5;
+    double s = calcRotationalSpeed();
+    s = 10;
+    speedTargets[0] = s*robotRadius*-0.5;
+    speedTargets[1] = s*robotRadius*0.5;
+
     return speedTargets;
   }
 
