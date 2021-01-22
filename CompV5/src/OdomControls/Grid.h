@@ -55,7 +55,7 @@ private:
   double minLinMoveSpeed; //Minimum target speed the robot starts moving at
   double maxLinAcceleration = 0.5; //Greatest change of speed allowed
   double linThreshold = 1; //How close the robot tries to get to the target point
-  double angleThreshold = PI/60; //How close the robot tries to stay to the target heading; Default is 3 degrees
+  double angleThreshold = PI/180; //How close the robot tries to stay to the target heading; Default is 1 degree
 
   double unitsToEncoders; // (Degrees/Units) used for conversion of distances
   double robotRadius; //Distance from center of robot to drive wheel base in units of motor degrees
@@ -96,7 +96,7 @@ private:
     return lastSpeed*unitsToEncoders; //Encoders
   }
 
-  double calcRotationalSpeed(double minRotSpeed=0.1, double maxRotSpeed=100000, double maxRotAcceleration=50, double gain=1){
+  double calcRotationalSpeed(double minRotSpeed=0.3, double maxRotSpeed=100000, double maxRotAcceleration=50, double gain=6){
     //If problems arise then consider doing while currentHead < currentHead+error to avoid problems with the 0-360 boundry
     double e = getError(HEAD);
     if(abs(e) > PI){
@@ -109,6 +109,8 @@ private:
         e = -((2*PI)-e);
       }
     }
+
+    //-3.92699
 
     static double lastSpeed = 0;
     double changeSpeed = (e*gain) - lastSpeed;
@@ -199,19 +201,27 @@ public:
   void setTRealitive(double fwd, double hor){
     tPos.x = tPos.x + fwd*cos(pos.head) + hor*cos(pos.head-(PI/2));
     tPos.y = tPos.y + fwd*sin(pos.head) + hor*sin(pos.head-(PI/2));
-    tPos.head = atan2((tPos.y - pos.y), (tPos.x-pos.x));
+    double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
+    if(ang<0){ang+=(2*PI);}
+    tPos.head = ang;
   }
 
   void setTAbsolute(double x, double y){
     tPos.x = x;
     tPos.y = y;
-    tPos.head = atan2((tPos.y - pos.y), (tPos.x-pos.x));
+    double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
+    if(ang<0){ang+=(2*PI);}
+    std::cout << getStandardAngle(ang) << std::endl;
+    tPos.head = ang;
   }
 
-  void setTHead(double head){
+  void setTHead(double head, bool inDegs=false){
     tPos.x = pos.x;
     tPos.y = pos.y;
     tPos.head = head;
+    if(inDegs){
+      tPos.head = (head*PI)/180;
+    }
   }
 
   void setMaxSpeed(double pct){
@@ -273,5 +283,9 @@ public:
   //TEST FUNCTIONS
   Point getPos(){
     return pos;
+  }
+
+  Point getTPOS(){
+    return tPos;
   }
 };
