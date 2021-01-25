@@ -72,7 +72,7 @@ int main() {
   //TODO: Set motor speed fwd and reverse; above and below max to test functions
 
   //Need to check encoders then heading
-  //setDPS(minSpeed+3, minSpeed+3);AAAAAAAAAAAAAAAAAAAAAAAAA
+  //setDPS(minSpeed+3, minSpeed+3);AAAAAAAAAAAAAAAAA
 
   motorLB.setBrake(brakeType::coast);
   motorLF.setBrake(brakeType::coast);
@@ -80,7 +80,8 @@ int main() {
   motorRF.setBrake(brakeType::coast);
   setDPS(0,0);
 
-  //TODO Test to see if sign switches upon passing the point
+  //TODO SET GAIN AND MAX ACCEL FOR TURNING!!!
+  //TODO GET TURNING MIN AND MAX SPEED BASED ON LINEAR LIMITS
 
 
   robot.setTHead(7*(PI/4));
@@ -89,9 +90,9 @@ int main() {
 
   while(abs(robot.turnToHead()[0]) > 0){
     p = robot.getPos();
-    //std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << ")" << std::endl;
+    std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ", " << ")" << std::endl;
     setDPS(robot.turnToHead());
-    wait(15, msec);
+    wait(1000, msec);
   }
   setDPS(robot.turnToHead());
   wait(1000, msec);

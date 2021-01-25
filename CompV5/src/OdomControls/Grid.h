@@ -18,9 +18,13 @@ int getSign(double x){
 double getStandardAngle(double ang, bool isRad=true){
   double toss;
   if(isRad){
-    return abs((2*PI)*modf(ang/(2*PI), &toss));
+    double r = (2*PI)*modf(ang/(2*PI), &toss);
+    if(r<0){r+=(2*PI);}
+    return r;
   }else{
-    return abs(360*modf(ang/360, &toss));
+    double r = (360)*modf(ang/(360), &toss);
+    if(r<0){r+=(360);}
+    return r;
   }
 }
 
@@ -96,7 +100,7 @@ private:
     return lastSpeed*unitsToEncoders; //Encoders
   }
 
-  double calcRotationalSpeed(double minRotSpeed=0.3, double maxRotSpeed=100000, double maxRotAcceleration=50, double gain=6){
+  double calcRotationalSpeed(double minRotSpeed=0.3, double maxRotSpeed=100000, double maxRotAcceleration=50, double gain=1){
     //If problems arise then consider doing while currentHead < currentHead+error to avoid problems with the 0-360 boundry
     double e = getError(HEAD);
 
