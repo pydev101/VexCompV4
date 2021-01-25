@@ -11,6 +11,12 @@ double _MOTORABS(double x){
   if(x<0){x=-x;}
   return x;
 }
+
+int _MOTORSIGN(double x){
+  if(x<0){return -1;}
+  return 1;
+}
+
 void initMotors(){
   motorLF.setBrake(brakeType::hold);
   motorLB.setBrake(brakeType::hold);
@@ -26,7 +32,7 @@ void setLeft(double vel){
   static bool isStopped = true;
   
   if(_MOTORABS(vel) > maxSpeed){
-    vel = maxSpeed;
+    vel = maxSpeed*_MOTORSIGN(vel);
   }
   motorLF.setVelocity(vel, velocityUnits::dps);
   motorLB.setVelocity(vel, velocityUnits::dps);
@@ -46,7 +52,7 @@ void setRight(double vel){
   static bool isStopped = true;
   
   if(_MOTORABS(vel) > maxSpeed){
-    vel = maxSpeed;
+    vel = maxSpeed*_MOTORSIGN(vel);
   }
   
   motorRF.setVelocity(vel, velocityUnits::dps);

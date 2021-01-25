@@ -72,7 +72,7 @@ int main() {
   //TODO: Set motor speed fwd and reverse; above and below max to test functions
 
   //Need to check encoders then heading
-  //setDPS(minSpeed+3, minSpeed+3);AAAAAAA
+  //setDPS(minSpeed+3, minSpeed+3);AAAAAAAAAAAAAAAAAAAAAAAAA
 
   motorLB.setBrake(brakeType::coast);
   motorLF.setBrake(brakeType::coast);
@@ -83,21 +83,18 @@ int main() {
   //TODO Test to see if sign switches upon passing the point
 
 
-  robot.setTHead(5*(PI/4));
+  robot.setTHead(7*(PI/4));
   
   Point p;
+
   while(abs(robot.turnToHead()[0]) > 0){
     p = robot.getPos();
-    std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << ")" << std::endl;
+    //std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << ")" << std::endl;
     setDPS(robot.turnToHead());
-    wait(10, msec);
+    wait(15, msec);
   }
   setDPS(robot.turnToHead());
   wait(1000, msec);
-  double ang = atan2(-21, -21);
-  if(ang<0){ang+=(2*PI);}
-  std::cout << "Target: " << robot.getTPOS().head << " : " << ang <<  std::endl;
-  std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << 0 << ")" << std::endl;
-
+  //std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << 0 << ")" << std::endl;
   return 0;
 }

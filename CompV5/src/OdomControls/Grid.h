@@ -99,7 +99,8 @@ private:
   double calcRotationalSpeed(double minRotSpeed=0.3, double maxRotSpeed=100000, double maxRotAcceleration=50, double gain=6){
     //If problems arise then consider doing while currentHead < currentHead+error to avoid problems with the 0-360 boundry
     double e = getError(HEAD);
-    std::cout << "ORIGNAL ERROR: " << e << std::endl;
+
+    //std::cout << "ORIGNAL ERROR: " << e << std::endl;
     if(abs(e) > PI){
       //Other path is shorter travel
       if(e < 0){
@@ -110,7 +111,7 @@ private:
         e = -((2*PI)-e);
       }
     }
-    std::cout << "MOD ERROR: " << e << std::endl;
+    //std::cout << "MOD ERROR: " << e << std::endl;
 
     static double lastSpeed = 0;
     double changeSpeed = (e*gain) - lastSpeed;
@@ -136,7 +137,7 @@ private:
       lastSpeed = 0;
     }
 
-    std::cout << "RESULT: " << lastSpeed << std::endl;
+    //std::cout << "RESULT: " << lastSpeed << std::endl;
     return lastSpeed; //Rad
   }
 
@@ -165,6 +166,7 @@ public:
     }else if(d == Y){
       return tPos.y-pos.y;
     }else if(d == HEAD){
+      std::cout << "POSITIONS, " << getStandardAngle(tPos.head) << ", " << getStandardAngle(pos.head) << std::endl;
       return getStandardAngle(tPos.head)-getStandardAngle(pos.head);
       //Or using the motor encoders (rightEnc-leftEnc)/(2*radius) or the difference between the encoders divided by the distance between the drive wheels
     }else if(d == GRID){
@@ -244,8 +246,7 @@ public:
   //Turns to exact head value
   double* turnToHead(){
     double s = calcRotationalSpeed();
-    s = 10;
-    speedTargets[0] = s*robotRadius*-0.5;
+    speedTargets[0] = s*robotRadius*0.5*-1;
     speedTargets[1] = s*robotRadius*0.5;
 
     return speedTargets;
