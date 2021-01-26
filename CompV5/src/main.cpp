@@ -72,7 +72,7 @@ int main() {
   //TODO: Set motor speed fwd and reverse; above and below max to test functions
 
   //Need to check encoders then heading
-  //setDPS(minSpeed+3, minSpeed+3);AAAAA
+  //setDPS(minSpeed+3, minSpeed+3);AAAAAAAA
 
   motorLB.setBrake(brakeType::coast);
   motorLF.setBrake(brakeType::coast);
@@ -93,7 +93,7 @@ int main() {
     setDPS(robot.moveLin());
     wait(1000, msec);
   }
-  //setDPS(robot.moveLin());
+  setDPS(robot.moveLin());
   wait(1000, msec);
   std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << 0 << ")" << std::endl;
 

@@ -57,7 +57,7 @@ private:
   double maxLinMoveSpeed; //Maximum allowed travel speed
   double maxLinMoveSpeedDefault; //Maximum speed able to be traveled 
   double minLinMoveSpeed; //Minimum target speed the robot starts moving at
-  double maxLinAcceleration = 10; //Greatest change of speed allowed
+  double maxLinAcceleration; //Greatest change of speed allowed
   double linThreshold = 1; //How close the robot tries to get to the target point
   double angleThreshold = PI/180; //How close the robot tries to stay to the target heading; Default is 1 degree
   double minRotSpeed; //Minimum rotation speed in rad
@@ -77,10 +77,11 @@ private:
   //Limited Proportinal Only control
   double calcLinearSpeed(){
     static double lastSpeed = 0;
+
     int dir = 1;
 
     double changeSpeed = (dir*getError(POLAR)*linearGain) - lastSpeed;
-    //std::cout << "POLAR: " << getError(POLAR) << " | Speed: " << changeSpeed << std::endl;
+    std::cout << "POLAR: " << getError(POLAR) << " | Speed: " << changeSpeed << std::endl;
 
     if(getError(GRID) < linThreshold){
       changeSpeed = -lastSpeed;
@@ -168,7 +169,8 @@ public:
     maxRotSpeed=50;
     maxRotAcceleration=5000;
 
-    linearGain=3;
+    linearGain=2.2;
+    maxLinAcceleration = 2000;
   }
 
   double getError(MeasureType d){
@@ -210,7 +212,6 @@ public:
       if((lowT < curr) && (curr < highT)){
         return r;
       }else{
-        std::cout << lowT << ", " << curr << ", " << highT << std::endl;
         return -r;
       }
     }
@@ -282,12 +283,13 @@ public:
 
   //Moves in line until target is reached; dir is used to determine if should move straight or in reverse
   double* moveLin(bool angleAdj=true){
-    std::cout<< calcLinearSpeed() << std::endl;
+    //std::cout<< calcLinearSpeed() << std::endl;
+    double rotationReduceFactor = 0.5;
     speedTargets[0] = calcLinearSpeed();
     speedTargets[1] = speedTargets[0];
-    if(angleAdj){
-      speedTargets[0] += getSign(speedTargets[0])*calcRotationalSpeed()*robotRadius*-0.5;
-      speedTargets[1] += getSign(speedTargets[0])*calcRotationalSpeed()*robotRadius*0.5;
+    if(angleAdj && (abs(speedTargets[0]) > 0)){
+      speedTargets[0] += rotationReduceFactor*getError(HEAD)*robotRadius*-0.5;
+      speedTargets[1] += rotationReduceFactor*getError(HEAD)*robotRadius*0.5;
     }
     return speedTargets;
   }
