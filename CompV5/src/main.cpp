@@ -61,7 +61,7 @@ int main() {
   DONE! 1) Motors: Wiring, Speed, and Direction
   DONE! 2) Encoders: getEncoder returns positive in the fwd direction; getHeading returns the Heading of the robot correctly in radians
   DONE! 3) Grid: Encoders map correctly to the grid and positive is reflected accuratly; Error values should be verified as well
-  4) Rotational Motion: Gain is set; Robot can turn in the shortest direction, both directions, and accuratly arrive at target; Close values should have a low speed value for use in grid movement
+  DONE! 4) Rotational Motion: Gain is set; Robot can turn in the shortest direction, both directions, and accuratly arrive at target; Close values should have a low speed value for use in grid movement
   5) Linear Motion: Gain is tuned and direction, speed, acceleration are double checked or set
   6) Grid Move: A target is set on the grid and the robot must arrive accuratly and turn to and stay straight
 
@@ -72,7 +72,7 @@ int main() {
   //TODO: Set motor speed fwd and reverse; above and below max to test functions
 
   //Need to check encoders then heading
-  //setDPS(minSpeed+3, minSpeed+3);AAAAAAAAAAAAAAAAA
+  //setDPS(minSpeed+3, minSpeed+3);AAAAA
 
   motorLB.setBrake(brakeType::coast);
   motorLF.setBrake(brakeType::coast);
@@ -84,18 +84,18 @@ int main() {
   //TODO GET TURNING MIN AND MAX SPEED BASED ON LINEAR LIMITS
 
 
-  robot.setTHead(7*(PI/4));
+  robot.setTAbsolute(0, 36);
   
   Point p;
-
-  while(abs(robot.turnToHead()[0]) > 0){
+  while(abs(robot.moveLin()[0]) > 0){
     p = robot.getPos();
-    std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ", " << ")" << std::endl;
-    setDPS(robot.turnToHead());
+    //std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ", " << ")" << std::endl;
+    setDPS(robot.moveLin());
     wait(1000, msec);
   }
-  setDPS(robot.turnToHead());
+  //setDPS(robot.moveLin());
   wait(1000, msec);
-  //std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << 0 << ")" << std::endl;
+  std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << 0 << ")" << std::endl;
+
   return 0;
 }

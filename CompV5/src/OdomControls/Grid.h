@@ -57,9 +57,14 @@ private:
   double maxLinMoveSpeed; //Maximum allowed travel speed
   double maxLinMoveSpeedDefault; //Maximum speed able to be traveled 
   double minLinMoveSpeed; //Minimum target speed the robot starts moving at
-  double maxLinAcceleration = 0.5; //Greatest change of speed allowed
+  double maxLinAcceleration = 10; //Greatest change of speed allowed
   double linThreshold = 1; //How close the robot tries to get to the target point
   double angleThreshold = PI/180; //How close the robot tries to stay to the target heading; Default is 1 degree
+  double minRotSpeed; //Minimum rotation speed in rad
+  double maxRotSpeed; //Maximum rotation speed in rad
+  double maxRotAcceleration; //Maximum rotational acceleration in rad
+  double linearGain;
+  double roationalGain;
 
   double unitsToEncoders; // (Degrees/Units) used for conversion of distances
   double robotRadius; //Distance from center of robot to drive wheel base in units of motor degrees
@@ -70,12 +75,12 @@ private:
   bool isStopped = true;
 
   //Limited Proportinal Only control
-  double calcLinearSpeed(double gain=60){
+  double calcLinearSpeed(){
     static double lastSpeed = 0;
     int dir = 1;
 
-    double changeSpeed = (dir*getError(POLAR)*gain) - lastSpeed;
-
+    double changeSpeed = (dir*getError(POLAR)*linearGain) - lastSpeed;
+    //std::cout << "POLAR: " << getError(POLAR) << " | Speed: " << changeSpeed << std::endl;
 
     if(getError(GRID) < linThreshold){
       changeSpeed = -lastSpeed;
@@ -100,11 +105,9 @@ private:
     return lastSpeed*unitsToEncoders; //Encoders
   }
 
-  double calcRotationalSpeed(double minRotSpeed=0.3, double maxRotSpeed=100000, double maxRotAcceleration=50, double gain=1){
-    //If problems arise then consider doing while currentHead < currentHead+error to avoid problems with the 0-360 boundry
+  double calcRotationalSpeed(){
     double e = getError(HEAD);
 
-    //std::cout << "ORIGNAL ERROR: " << e << std::endl;
     if(abs(e) > PI){
       //Other path is shorter travel
       if(e < 0){
@@ -115,10 +118,9 @@ private:
         e = -((2*PI)-e);
       }
     }
-    //std::cout << "MOD ERROR: " << e << std::endl;
 
     static double lastSpeed = 0;
-    double changeSpeed = (e*gain) - lastSpeed;
+    double changeSpeed = (e*roationalGain) - lastSpeed;
     if(abs(e) < angleThreshold){
       changeSpeed = -lastSpeed;
     }
@@ -141,7 +143,6 @@ private:
       lastSpeed = 0;
     }
 
-    //std::cout << "RESULT: " << lastSpeed << std::endl;
     return lastSpeed; //Rad
   }
 
@@ -162,6 +163,12 @@ public:
     maxLinMoveSpeedDefault = maxLinMoveSpeed;
     robotRadius = width*0.5*unitsToEncoders;
 
+    roationalGain = 1.5;
+    minRotSpeed = 0.3;
+    maxRotSpeed=50;
+    maxRotAcceleration=5000;
+
+    linearGain=3;
   }
 
   double getError(MeasureType d){
@@ -170,7 +177,6 @@ public:
     }else if(d == Y){
       return tPos.y-pos.y;
     }else if(d == HEAD){
-      std::cout << "POSITIONS, " << getStandardAngle(tPos.head) << ", " << getStandardAngle(pos.head) << std::endl;
       return getStandardAngle(tPos.head)-getStandardAngle(pos.head);
       //Or using the motor encoders (rightEnc-leftEnc)/(2*radius) or the difference between the encoders divided by the distance between the drive wheels
     }else if(d == GRID){
@@ -193,10 +199,18 @@ public:
         lowT = getStandardAngle(lowT+PI);
         highT = getStandardAngle(highT+PI);
         curr = getStandardAngle(curr+PI);
+
+        //High is bounded by [180, 360]
+        if((0 <= highT) && (highT < PI)){
+          highT = 2*PI;
+          lowT = PI;
+        }
       }
+
       if((lowT < curr) && (curr < highT)){
         return r;
       }else{
+        std::cout << lowT << ", " << curr << ", " << highT << std::endl;
         return -r;
       }
     }
@@ -268,6 +282,7 @@ public:
 
   //Moves in line until target is reached; dir is used to determine if should move straight or in reverse
   double* moveLin(bool angleAdj=true){
+    std::cout<< calcLinearSpeed() << std::endl;
     speedTargets[0] = calcLinearSpeed();
     speedTargets[1] = speedTargets[0];
     if(angleAdj){
