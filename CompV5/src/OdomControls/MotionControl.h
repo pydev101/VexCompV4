@@ -4,7 +4,7 @@
 #include "vex.h"
 
 const double PI_T = 3.14159;
-double minSpeed = 25;
+double minSpeed = 30;
 double maxSpeed = 1100;
 
 double _MOTORABS(double x){

@@ -58,8 +58,8 @@ private:
   double maxLinMoveSpeedDefault; //Maximum speed able to be traveled 
   double minLinMoveSpeed; //Minimum target speed the robot starts moving at
   double maxLinAcceleration; //Greatest change of speed allowed
-  double linThreshold = 1; //How close the robot tries to get to the target point
-  double angleThreshold = PI/180; //How close the robot tries to stay to the target heading; Default is 1 degree
+  double linThreshold; //How close the robot tries to get to the target point
+  double angleThreshold; //How close the robot tries to stay to the target heading; Default is 1 degree
   double minRotSpeed; //Minimum rotation speed in rad
   double maxRotSpeed; //Maximum rotation speed in rad
   double maxRotAcceleration; //Maximum rotational acceleration in rad
@@ -77,15 +77,15 @@ private:
   //Limited Proportinal Only control
   double calcLinearSpeed(){
     static double lastSpeed = 0;
-
+    static double lastError = getError(GRID);
     int dir = 1;
 
     double changeSpeed = (dir*getError(POLAR)*linearGain) - lastSpeed;
-    std::cout << "POLAR: " << getError(POLAR) << " | Speed: " << changeSpeed << std::endl;
 
     if(getError(GRID) < linThreshold){
       changeSpeed = -lastSpeed;
     }
+    
     if(abs(changeSpeed) > maxLinAcceleration){
       changeSpeed = maxLinAcceleration*getSign(changeSpeed);
     }
@@ -103,6 +103,7 @@ private:
     if(abs(lastSpeed) < minLinMoveSpeed){
       lastSpeed = 0;
     }
+
     return lastSpeed*unitsToEncoders; //Encoders
   }
 
@@ -164,13 +165,16 @@ public:
     maxLinMoveSpeedDefault = maxLinMoveSpeed;
     robotRadius = width*0.5*unitsToEncoders;
 
-    roationalGain = 1.5;
+    roationalGain = 2;
     minRotSpeed = 0.3;
     maxRotSpeed=50;
     maxRotAcceleration=5000;
 
-    linearGain=2.2;
-    maxLinAcceleration = 2000;
+    linearGain=1.34;
+    maxLinAcceleration = 5000;
+
+    linThreshold = 1.5;
+    angleThreshold = PI/180;
   }
 
   double getError(MeasureType d){
@@ -234,7 +238,6 @@ public:
     tPos.y = y;
     double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
     if(ang<0){ang+=(2*PI);}
-    std::cout << getStandardAngle(ang) << std::endl;
     tPos.head = ang;
   }
 
@@ -287,7 +290,7 @@ public:
     double rotationReduceFactor = 0.5;
     speedTargets[0] = calcLinearSpeed();
     speedTargets[1] = speedTargets[0];
-    if(angleAdj && (abs(speedTargets[0]) > 0)){
+    if(angleAdj && (abs(speedTargets[0]) > 0.5*maxLinMoveSpeedDefault)){
       speedTargets[0] += rotationReduceFactor*getError(HEAD)*robotRadius*-0.5;
       speedTargets[1] += rotationReduceFactor*getError(HEAD)*robotRadius*0.5;
     }
