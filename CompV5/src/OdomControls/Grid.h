@@ -45,7 +45,7 @@ typedef struct{
 } Point;
 
 //Type of value getError(dirT) returns
-enum MeasureType {X, Y, HEAD, GRID, POLAR} dirT;
+enum MeasureType {X, Y, HEAD, SHORTANGLE, GRID, POLAR} dirT;
 enum GearRatio {GR18To1, GR36to1, GR6to1} motorRatios;
 //Primary control of robot
 class Robot{
@@ -78,9 +78,8 @@ private:
   double calcLinearSpeed(){
     static double lastSpeed = 0;
     static double lastError = getError(GRID);
-    int dir = 1;
 
-    double changeSpeed = (dir*getError(POLAR)*linearGain) - lastSpeed;
+    double changeSpeed = (getError(POLAR)*linearGain) - lastSpeed;
 
     if(getError(GRID) < linThreshold){
       changeSpeed = -lastSpeed;
@@ -122,7 +121,9 @@ private:
     }
 
     static double lastSpeed = 0;
+
     double changeSpeed = (e*roationalGain) - lastSpeed;
+    std::cout << e << std::endl;
     if(abs(e) < angleThreshold){
       changeSpeed = -lastSpeed;
     }
@@ -165,16 +166,18 @@ public:
     maxLinMoveSpeedDefault = maxLinMoveSpeed;
     robotRadius = width*0.5*unitsToEncoders;
 
-    roationalGain = 2;
-    minRotSpeed = 0.3;
-    maxRotSpeed=50;
+    roationalGain = 6;
+    //minRotSpeed = 0.3;
+    minRotSpeed = (2*minLinMoveSpeed)/(wheelDiameter/2);
+    //maxRotSpeed=50;
+    maxRotSpeed = (2*maxLinMoveSpeed)/(wheelDiameter/2);
     maxRotAcceleration=5000;
 
     linearGain=1.34;
     maxLinAcceleration = 5000;
 
     linThreshold = 1.5;
-    angleThreshold = PI/180;
+    angleThreshold = PI/90;
   }
 
   double getError(MeasureType d){
@@ -185,6 +188,10 @@ public:
     }else if(d == HEAD){
       return getStandardAngle(tPos.head)-getStandardAngle(pos.head);
       //Or using the motor encoders (rightEnc-leftEnc)/(2*radius) or the difference between the encoders divided by the distance between the drive wheels
+    }else if(d == SHORTANGLE){
+      double e = getError(HEAD);
+      if(e > PI){e = (2*PI)-e;}
+      return e;//FLAWED may not account for negitive angles returned from HEAD
     }else if(d == GRID){
       return sqrt((getError(X)*getError(X)) + (getError(Y)*getError(Y)));
     }else{
@@ -302,13 +309,19 @@ public:
     if(setShortV){
       setToShortestVector();
     }
-    if(abs(getError(HEAD)) > angleThreshold*2){
+    if(abs(getError(SHORTANGLE)) > angleThreshold*2){
       return turnToHead();
     }
     return moveLin();
   }
 
-
+  bool driving(){
+    if((abs(getError(SHORTANGLE)) > angleThreshold) || (getError(GRID) > linThreshold) || (abs(speedTargets[1]) > minLinMoveSpeed)){
+      return true;
+    }else{
+      return false;
+    }
+  }
 
   //TEST FUNCTIONS
   Point getPos(){

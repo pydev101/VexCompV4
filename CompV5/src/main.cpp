@@ -72,7 +72,7 @@ int main() {
   //TODO: Set motor speed fwd and reverse; above and below max to test functions
 
   //Need to check encoders then heading
-  //setDPS(minSpeed+3, minSpeed+3);AAAAAAAAAAAAAAAAA
+  //setDPS(minSpeed+3, minSpeed+3);AAAAAAAAAAAAAAAAAAAAAAA
 
   motorLB.setBrake(brakeType::coast);
   motorLF.setBrake(brakeType::coast);
@@ -84,14 +84,17 @@ int main() {
   //TODO GET TURNING MIN AND MAX SPEED BASED ON LINEAR LIMITS
 
 
-  robot.setTAbsolute(12, 12);
-  
+  //robot.setTAbsolute(24, 24);
+  robot.setTHead((5*PI)/4);
+
+  wait(1000, msec);
+
   Point p;
-  while(robot.getError(GRID) > 1){
+  while(robot.driving()){
     p = robot.getPos();
-    //std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ", " << ")" << std::endl;
-    setDPS(robot.move());
-    wait(15, msec);
+    std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ", " << ")" << std::endl;
+    setDPS(robot.turnToHead());
+    wait(20, msec);
   }
   setDPS(0,0);
   wait(1000, msec);

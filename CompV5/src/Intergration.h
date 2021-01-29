@@ -10,7 +10,7 @@ void updatePosition(){
   double Head = getHeading();
   resetEncoders();
   
-  double D = (E-L)/2;
+  double D = (E-L)/2;  //INCORRECT TODO RE WRITE
   //Dl = E-L; //BUG? Dl might be unesscary; Encoders don't reset
 
   double deltaF = E-D; //Delta X = change in position - change in position due to rotation divided by 2 (Rotation doesnt change XY because opposite sides cancel out)
