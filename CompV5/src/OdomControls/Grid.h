@@ -106,7 +106,7 @@ private:
     return lastSpeed*unitsToEncoders; //Encoders
   }
 
-  double calcRotationalSpeed(){
+  double calcRotationalSpeed(double overRideGain=0){
     double e = getError(HEAD);
 
     if(abs(e) > PI){
@@ -121,9 +121,13 @@ private:
     }
 
     static double lastSpeed = 0;
+    double changeSpeed;
+    if(overRideGain == 0){
+      changeSpeed = (e*roationalGain) - lastSpeed;
+    }else{
+      changeSpeed = (e*overRideGain) - lastSpeed;  
+    }
 
-    double changeSpeed = (e*roationalGain) - lastSpeed;
-    std::cout << e << std::endl;
     if(abs(e) < angleThreshold){
       changeSpeed = -lastSpeed;
     }
@@ -167,13 +171,11 @@ public:
     robotRadius = width*0.5*unitsToEncoders;
 
     roationalGain = 6;
-    //minRotSpeed = 0.3;
     minRotSpeed = (2*minLinMoveSpeed)/(wheelDiameter/2);
-    //maxRotSpeed=50;
     maxRotSpeed = (2*maxLinMoveSpeed)/(wheelDiameter/2);
     maxRotAcceleration=5000;
 
-    linearGain=1.34;
+    linearGain=1.5;
     maxLinAcceleration = 5000;
 
     linThreshold = 1.5;
@@ -294,12 +296,13 @@ public:
   //Moves in line until target is reached; dir is used to determine if should move straight or in reverse
   double* moveLin(bool angleAdj=true){
     //std::cout<< calcLinearSpeed() << std::endl;
-    double rotationReduceFactor = 0.5;
-    speedTargets[0] = calcLinearSpeed();
-    speedTargets[1] = speedTargets[0];
-    if(angleAdj && (abs(speedTargets[0]) > 0.5*maxLinMoveSpeedDefault)){
-      speedTargets[0] += rotationReduceFactor*getError(HEAD)*robotRadius*-0.5;
-      speedTargets[1] += rotationReduceFactor*getError(HEAD)*robotRadius*0.5;
+    double r = calcRotationalSpeed();
+    double s = calcLinearSpeed();
+    speedTargets[0] = s;
+    speedTargets[1] = s;
+    if(angleAdj){
+      speedTargets[0] += -r*robotRadius*0.5;
+      speedTargets[1] +=  r*robotRadius*0.5;
     }
     return speedTargets;
   }

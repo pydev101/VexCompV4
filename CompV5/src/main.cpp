@@ -84,8 +84,7 @@ int main() {
   //TODO GET TURNING MIN AND MAX SPEED BASED ON LINEAR LIMITS
 
 
-  //robot.setTAbsolute(24, 24);
-  robot.setTHead((5*PI)/4);
+  robot.setTAbsolute(0, 36*20);
 
   wait(1000, msec);
 
@@ -93,7 +92,7 @@ int main() {
   while(robot.driving()){
     p = robot.getPos();
     std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ", " << ")" << std::endl;
-    setDPS(robot.turnToHead());
+    setDPS(robot.moveLin());
     wait(20, msec);
   }
   setDPS(0,0);
