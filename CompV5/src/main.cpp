@@ -1,13 +1,12 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// motorLF              motor         13              
-// motorLB              motor         14              
-// motorRF              motor         11              
-// motorRB              motor         12              
-// ISensor              inertial      15              
+// motorLF              motor         8               
+// motorLB              motor         7               
+// motorRF              motor         9               
+// motorRB              motor         10              
+// ISensor              inertial      1               
 // ---- END VEXCODE CONFIGURED DEVICES ----
-
 
 /*----------------------------------------------------------------------------
     Module:       main.cpp                                                  
@@ -68,7 +67,7 @@ int main() {
   */
 
   //Need to check encoders then heading
-  //setDPS(minSpeed+3, minSpeed+3);AAAAAAAAAAAAAAAAAAAAAAA
+  //setDPS(minSpeed+3, minSpeed+3);AAAAAAAAAAAAAAAAAAAAAAAAAA
 
   motorLB.setBrake(brakeType::coast);
   motorLF.setBrake(brakeType::coast);
@@ -86,8 +85,8 @@ int main() {
   Point p;
   while(robot.driving()){
     p = robot.getPos();
-    std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ", " << ")" << std::endl;
-    setDPS(robot.moveLin());
+    std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ")" << std::endl;
+    setDPS(robot.move());
     wait(20, msec);
   }
   setDPS(0,0);

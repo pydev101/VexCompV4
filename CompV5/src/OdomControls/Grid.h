@@ -69,10 +69,10 @@ private:
   double unitsToEncoders; // (Degrees/Units) used for conversion of distances
   double robotRadius; //Distance from center of robot to drive wheel base in units of motor degrees
 
-  //WIP Worthless varibles
-  bool breakMode = false;
-  bool isRotating = false;
-  bool isStopped = true;
+  bool breakModeLin = false;
+  bool breakModeRot = false;
+  bool isLinStopped = true;
+  bool isRotStopped = true;
 
   //Limited Proportinal Only control
   double calcLinearSpeed(){
@@ -81,7 +81,7 @@ private:
 
     double changeSpeed = (getError(POLAR)*linearGain) - lastSpeed;
 
-    if(getError(GRID) < linThreshold){
+    if((getError(GRID) < linThreshold) || (breakModeLin)){
       changeSpeed = -lastSpeed;
     }
     
@@ -101,6 +101,9 @@ private:
 
     if(abs(lastSpeed) < minLinMoveSpeed){
       lastSpeed = 0;
+      isLinStopped = true;
+    }else{
+      isLinStopped = false;
     }
 
     return lastSpeed*unitsToEncoders; //Encoders
@@ -128,7 +131,7 @@ private:
       changeSpeed = (e*overRideGain) - lastSpeed;  
     }
 
-    if(abs(e) < angleThreshold){
+    if((abs(e) < angleThreshold) || (breakModeRot)){
       changeSpeed = -lastSpeed;
     }
 
@@ -148,6 +151,9 @@ private:
 
     if(abs(lastSpeed) < minRotSpeed){
       lastSpeed = 0;
+      isRotStopped = true;
+    }else{
+      isRotStopped = false;
     }
 
     return lastSpeed; //Rad
@@ -287,14 +293,13 @@ public:
     if(abs(getError(HEAD)) <= (PI/2)){
       return 1;
     }else{
-      tPos.head = getStandardAngle(tPos.head+180);
+      tPos.head = getStandardAngle(tPos.head+PI);
       return -1;
     }
   }
 
   //Moves in line until target is reached; dir is used to determine if should move straight or in reverse
   double* moveLin(bool angleAdj=true){
-    //std::cout<< calcLinearSpeed() << std::endl;
     double r = calcRotationalSpeed();
     double s = calcLinearSpeed();
     speedTargets[0] = s;
@@ -311,18 +316,23 @@ public:
     double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
     if(ang<0){ang+=(2*PI);}
     tPos.head = ang;
-
     if(setShortV){
       setToShortestVector();
     }
-    if(abs(getError(SHORTANGLE)) > angleThreshold*2){
-      return turnToHead();
+
+    if(abs(getError(HEAD)) > (PI/3)){
+      if(!isLinStopped){
+        breakModeLin = true;
+      }else{
+        breakModeLin = false;
+        return turnToHead();
+      }
     }
     return moveLin();
   }
 
   bool driving(){
-    if((abs(getError(SHORTANGLE)) > angleThreshold) || (getError(GRID) > linThreshold) || (abs(speedTargets[1]) > minLinMoveSpeed)){
+    if((abs(getError(HEAD)) > angleThreshold) || (getError(GRID) > linThreshold) || (!isLinStopped) || (!isRotStopped)){
       return true;
     }else{
       return false;
