@@ -78,7 +78,7 @@ int main() {
   //TODO SET GAIN AND MAX ACCEL FOR TURNING!!!
 
 
-  robot.setTAbsolute(0, 36*20);
+  robot.setTAbsolute(36*2, -36*2);
 
   wait(1000, msec);
 
