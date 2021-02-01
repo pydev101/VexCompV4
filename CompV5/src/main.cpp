@@ -9,14 +9,12 @@
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/*    Module:       main.cpp                                                  */
-/*    Author:       C:\Users\carson                                           */
-/*    Created:      Fri Dec 04 2020                                           */
-/*    Description:  V5 project                                                */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------
+    Module:       main.cpp                                                  
+    Author:       Carson E                                                  
+    Created:      Fri Dec 04 2020                                           
+    Description:  V5 project                                                                                                                       
+----------------------------------------------------------------------------*/
 
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // ---- END VEXCODE CONFIGURED DEVICES ----
@@ -69,8 +67,6 @@ int main() {
   -Self adjusting gain and max acceleration through gradient decsent
   */
 
-  //TODO: Set motor speed fwd and reverse; above and below max to test functions
-
   //Need to check encoders then heading
   //setDPS(minSpeed+3, minSpeed+3);AAAAAAAAAAAAAAAAAAAAAAA
 
@@ -81,7 +77,6 @@ int main() {
   setDPS(0,0);
 
   //TODO SET GAIN AND MAX ACCEL FOR TURNING!!!
-  //TODO GET TURNING MIN AND MAX SPEED BASED ON LINEAR LIMITS
 
 
   robot.setTAbsolute(0, 36*20);

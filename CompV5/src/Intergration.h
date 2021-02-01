@@ -7,15 +7,15 @@ void updatePosition(){
   double E = getRight();
   double L = getLeft();
   double H = getHor();
-  double Head = getHeading();
+  static double Head = getHeading();
   resetEncoders();
   
-  double D = (E-L)/2;  //INCORRECT TODO RE WRITE
-  //Dl = E-L; //BUG? Dl might be unesscary; Encoders don't reset
+  double D = (getHeading()-Head)*robot.getRadiusInEncoders(); //Calculate the change in motor encoder based on change of rotation
 
-  double deltaF = E-D; //Delta X = change in position - change in position due to rotation divided by 2 (Rotation doesnt change XY because opposite sides cancel out)
-  double deltaH = H; //TODO!!!!! If there is a rotation then if the wheel is not in the exact center then it might spin its circumfrance around the center as it rotates!!!! POSSIBLE
+  double deltaF = E-D; //Delta F is the change in the direction the robot is facing; rotation isn't fwd movement so we attempt to subtract it out
+  double deltaH = H; //If H is important then we may need to subtract the circumfrance it travels from the delta H
 
+  Head = getHeading();
   robot.updatePos(deltaF*cos(Head)+deltaH*cos(Head-(PI/2)), deltaF*sin(Head)+deltaH*sin(Head-(PI/2)), Head);
 }
 

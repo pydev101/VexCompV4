@@ -155,12 +155,6 @@ private:
 
 
 public:
-  /*TODO
-  -Calculate max rot speed using math and linear max speed
-  -Calculate min rot speed using min lin speed
-  
-  */
-
   //X in units, y in units, Head in Rads, minSpeeds in deg/s, maxSpeeds in deg/s, wheelDiamter in units, robot drive base width in units
   Robot(double x, double y, double Head, double minSpeeds, double maxSpeed, double wheelDiameter, double width){
     pos = {x,y, Head};
@@ -169,10 +163,10 @@ public:
     maxLinMoveSpeed = maxSpeed/unitsToEncoders;
     maxLinMoveSpeedDefault = maxLinMoveSpeed;
     robotRadius = width*0.5*unitsToEncoders;
-
-    roationalGain = 6;
     minRotSpeed = (2*minLinMoveSpeed)/(wheelDiameter/2);
     maxRotSpeed = (2*maxLinMoveSpeed)/(wheelDiameter/2);
+
+    roationalGain = 6;
     maxRotAcceleration=5000;
 
     linearGain=1.5;
@@ -193,7 +187,7 @@ public:
     }else if(d == SHORTANGLE){
       double e = getError(HEAD);
       if(e > PI){e = (2*PI)-e;}
-      return e;//FLAWED may not account for negitive angles returned from HEAD
+      return e;//FLAWED may not account for negitive angles returned from HEAD TODO
     }else if(d == GRID){
       return sqrt((getError(X)*getError(X)) + (getError(Y)*getError(Y)));
     }else{
@@ -234,6 +228,7 @@ public:
     pos = {(Xd/unitsToEncoders)+pos.x, (Yd/unitsToEncoders)+pos.y, h};
   }
 
+  //TODO This sets the target of where it is currently facing and not where it *should* be facing which could toss of coornates if set realitive to the robot position
   void setTRealitive(double fwd, double hor){
     tPos.x = tPos.x + fwd*cos(pos.head) + hor*cos(pos.head-(PI/2));
     tPos.y = tPos.y + fwd*sin(pos.head) + hor*sin(pos.head-(PI/2));
@@ -274,6 +269,10 @@ public:
     linThreshold = abs(thres);
   }
 
+  double getRadiusInEncoders(){
+    return robotRadius;
+  }
+
   //Turns to exact head value
   double* turnToHead(){
     double s = calcRotationalSpeed();
@@ -309,6 +308,10 @@ public:
 
   //Moves to target pos in quickest direction
   double* move(bool setShortV=true){
+    double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
+    if(ang<0){ang+=(2*PI);}
+    tPos.head = ang;
+
     if(setShortV){
       setToShortestVector();
     }
