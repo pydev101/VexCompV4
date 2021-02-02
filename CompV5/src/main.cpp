@@ -44,6 +44,19 @@ void pre_auton(void) {
   thread t = thread(threadTask);
 }
 
+
+void transfer(){
+  Point p;
+  while(robot.driving()){
+    p = robot.getPos();
+    //std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ")" << std::endl;
+    setDPS(robot.move());
+    wait(20, msec);
+  }
+  setDPS(0,0);
+  wait(1000, msec);
+  std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << 0 << ")" << std::endl;
+}
 competition Competition;
 int main() {
   //Run our setup
@@ -59,15 +72,12 @@ int main() {
   DONE! 2) Encoders: getEncoder returns positive in the fwd direction; getHeading returns the Heading of the robot correctly in radians
   DONE! 3) Grid: Encoders map correctly to the grid and positive is reflected accuratly; Error values should be verified as well
   DONE! 4) Rotational Motion: Gain is set; Robot can turn in the shortest direction, both directions, and accuratly arrive at target; Close values should have a low speed value for use in grid movement
-  5) Linear Motion: Gain is tuned and direction, speed, acceleration are double checked or set
-  6) Grid Move: A target is set on the grid and the robot must arrive accuratly and turn to and stay straight
+  DONE! 5) Linear Motion: Gain is tuned and direction, speed, acceleration are double checked or set
+  DONE! 6) Grid Move: A target is set on the grid and the robot must arrive accuratly and turn to and stay straight
 
   Future Features:
   -Self adjusting gain and max acceleration through gradient decsent
   */
-
-  //Need to check encoders then heading
-  //setDPS(minSpeed+3, minSpeed+3);AAAAAAAAAAAAAAAAAAAAAAAAAA
 
   motorLB.setBrake(brakeType::coast);
   motorLF.setBrake(brakeType::coast);
@@ -77,21 +87,14 @@ int main() {
 
   //TODO SET GAIN AND MAX ACCEL FOR TURNING!!!
 
-
-  robot.setTAbsolute(36*2, -36*2);
-
   wait(1000, msec);
 
-  Point p;
-  while(robot.driving()){
-    p = robot.getPos();
-    std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ")" << std::endl;
-    setDPS(robot.move());
-    wait(20, msec);
-  }
-  setDPS(0,0);
-  wait(1000, msec);
-  std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << 0 << ")" << std::endl;
-
+  robot.setTAbsolute(12*2, 0);
+  transfer();
+  robot.setTRealitive(0, -24);
+  transfer();
+  robot.setTAbsolute(0, 0);
+  transfer();
+//vexFileOpen();
   return 0;
 }

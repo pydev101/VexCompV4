@@ -65,7 +65,7 @@ private:
   double maxRotAcceleration; //Maximum rotational acceleration in rad
   double linearGain;
   double roationalGain;
-
+  double desiredTHead;
   double unitsToEncoders; // (Degrees/Units) used for conversion of distances
   double robotRadius; //Distance from center of robot to drive wheel base in units of motor degrees
 
@@ -162,8 +162,11 @@ private:
 
 public:
   //X in units, y in units, Head in Rads, minSpeeds in deg/s, maxSpeeds in deg/s, wheelDiamter in units, robot drive base width in units
-  Robot(double x, double y, double Head, double minSpeeds, double maxSpeed, double wheelDiameter, double width){
+  Robot(double x, double y, double Head, double minSpeeds, double maxSpeed, double wheelDiameter, double width,
+        double roationalGainA, double maxRotAccelerationA, double linearGainA, double maxLinAccelerationA,
+        double linThresholdA, double angleThresholdA){
     pos = {x,y, Head};
+    desiredTHead = Head;
     unitsToEncoders = 360/(PI*wheelDiameter);
     minLinMoveSpeed = minSpeeds/unitsToEncoders;
     maxLinMoveSpeed = maxSpeed/unitsToEncoders;
@@ -171,15 +174,12 @@ public:
     robotRadius = width*0.5*unitsToEncoders;
     minRotSpeed = (2*minLinMoveSpeed)/(wheelDiameter/2);
     maxRotSpeed = (2*maxLinMoveSpeed)/(wheelDiameter/2);
-
-    roationalGain = 6;
-    maxRotAcceleration=5000;
-
-    linearGain=1.5;
-    maxLinAcceleration = 5000;
-
-    linThreshold = 1.5;
-    angleThreshold = PI/90;
+    roationalGain = roationalGainA;
+    maxRotAcceleration = maxRotAccelerationA;
+    linearGain = linearGainA;
+    maxLinAcceleration = maxLinAccelerationA;
+    linThreshold = linThresholdA;
+    angleThreshold = angleThresholdA;
   }
 
   double getError(MeasureType d){
@@ -236,11 +236,12 @@ public:
 
   //TODO This sets the target of where it is currently facing and not where it *should* be facing which could toss of coornates if set realitive to the robot position
   void setTRealitive(double fwd, double hor){
-    tPos.x = tPos.x + fwd*cos(pos.head) + hor*cos(pos.head-(PI/2));
-    tPos.y = tPos.y + fwd*sin(pos.head) + hor*sin(pos.head-(PI/2));
+    tPos.x = tPos.x + fwd*cos(desiredTHead) + hor*cos(desiredTHead-(PI/2));
+    tPos.y = tPos.y + fwd*sin(desiredTHead) + hor*sin(desiredTHead-(PI/2));
     double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
     if(ang<0){ang+=(2*PI);}
     tPos.head = ang;
+    desiredTHead = ang;
   }
 
   void setTAbsolute(double x, double y){
@@ -249,6 +250,7 @@ public:
     double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
     if(ang<0){ang+=(2*PI);}
     tPos.head = ang;
+    desiredTHead = ang;
   }
 
   void setTHead(double head, bool inDegs=false){
@@ -258,6 +260,7 @@ public:
     if(inDegs){
       tPos.head = (head*PI)/180;
     }
+    desiredTHead = tPos.head;
   }
 
   void setMaxSpeed(double pct){
@@ -339,7 +342,6 @@ public:
     }
   }
 
-  //TEST FUNCTIONS
   Point getPos(){
     return pos;
   }
