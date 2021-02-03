@@ -8,6 +8,9 @@ extern motor motorLB;
 extern motor motorRF;
 extern motor motorRB;
 extern inertial ISensor;
+extern controller Controller1;
+extern motor topIntake;
+extern motor bottomIntake;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

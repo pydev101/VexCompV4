@@ -6,6 +6,39 @@
 // motorRF              motor         9               
 // motorRB              motor         10              
 // ISensor              inertial      1               
+// Controller1          controller                    
+// topIntake            motor         19              
+// bottomIntake         motor         20              
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// motorLF              motor         8               
+// motorLB              motor         7               
+// motorRF              motor         9               
+// motorRB              motor         10              
+// ISensor              inertial      1               
+// Controller1          controller                    
+// topIntake            motor         19              
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// motorLF              motor         8               
+// motorLB              motor         7               
+// motorRF              motor         9               
+// motorRB              motor         10              
+// ISensor              inertial      1               
+// Controller1          controller                    
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// motorLF              motor         8               
+// motorLB              motor         7               
+// motorRF              motor         9               
+// motorRB              motor         10              
+// ISensor              inertial      1               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 /*----------------------------------------------------------------------------
@@ -34,8 +67,8 @@ void pre_auton(void) {
   while(ISensor.isCalibrating()){wait(5, msec);}
   
   //Setup motors; Break type and activate breaks
-  initMotors();
-  setDPS(0,0); //Setting speed to 0 turns the breaks on
+  setBreaks(brakeType::coast);
+  setDPS(0,0);
 
   //Encoders start at 0 because we are starting at 0 displacement
   resetEncoders();
@@ -43,28 +76,6 @@ void pre_auton(void) {
   //Start tracking thread to log any movement of the robot onto the virtual grid
   thread t = thread(threadTask);
 }
-
-
-void transfer(){
-  Point p;
-  while(robot.driving()){
-    p = robot.getPos();
-    //std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ")" << std::endl;
-    setDPS(robot.move());
-    wait(20, msec);
-  }
-  setDPS(0,0);
-  wait(1000, msec);
-  std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << 0 << ")" << std::endl;
-}
-competition Competition;
-int main() {
-  //Run our setup
-  pre_auton();
-  //Activate Vex components to run auto and driver during compeition
-  /*Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
-  */
 
   /*
   Checklist:
@@ -79,14 +90,30 @@ int main() {
   -Self adjusting gain and max acceleration through gradient decsent
   */
 
-  motorLB.setBrake(brakeType::coast);
-  motorLF.setBrake(brakeType::coast);
-  motorRB.setBrake(brakeType::coast);
-  motorRF.setBrake(brakeType::coast);
+void transfer(){
+  Point p;
+  while(robot.driving()){
+    p = robot.getPos();
+    //std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ")" << std::endl;
+    setDPS(robot.move());
+    wait(20, msec);
+  }
   setDPS(0,0);
+  wait(1000, msec);
+  std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << 0 << ")" << std::endl;
+}
 
-  //TODO SET GAIN AND MAX ACCEL FOR TURNING!!!
+competition Competition;
+int main() {
+  //Run our setup
+  pre_auton();
+  //Activate Vex components to run auto and driver during compeition
+  //Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
+  
 
+  //TODO SET GAIN AND MAX ACCEL FOR TURNING!!!!
+/*
   wait(1000, msec);
 
   robot.setTAbsolute(12*2, 0);
@@ -95,6 +122,6 @@ int main() {
   transfer();
   robot.setTAbsolute(0, 0);
   transfer();
-//vexFileOpen();
+//vexFileOpen();*/
   return 0;
 }

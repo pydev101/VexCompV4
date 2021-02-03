@@ -17,15 +17,11 @@ int _MOTORSIGN(double x){
   return 1;
 }
 
-void initMotors(){
-  motorLF.setBrake(brakeType::hold);
-  motorLB.setBrake(brakeType::hold);
-  motorRF.setBrake(brakeType::hold);
-  motorRB.setBrake(brakeType::hold);
-  motorLF.stop();
-  motorLB.stop();
-  motorRF.stop();
-  motorRB.stop();
+void setBreaks(brakeType x){
+  motorLF.setBrake(x);
+  motorLB.setBrake(x);
+  motorRF.setBrake(x);
+  motorRB.setBrake(x);
 }
 
 void setLeft(double vel){
@@ -41,7 +37,7 @@ void setLeft(double vel){
     motorLF.stop();
     motorLB.stop();
     isStopped = true;
-  }else if(isStopped){
+  }else{
     motorLF.spin(fwd);
     motorLB.spin(fwd);
     isStopped = false;
@@ -62,7 +58,7 @@ void setRight(double vel){
     motorRF.stop();
     motorRB.stop();
     isStopped = true;
-  }else if(isStopped){
+  }else{
     motorRF.spin(fwd);
     motorRB.spin(fwd);
     isStopped = false;
