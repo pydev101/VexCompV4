@@ -15,7 +15,9 @@ motor motorRB = motor(PORT10, ratio18_1, true);
 inertial ISensor = inertial(PORT1);
 controller Controller1 = controller(primary);
 motor topIntake = motor(PORT19, ratio18_1, false);
-motor bottomIntake = motor(PORT20, ratio18_1, false);
+motor bottomIntake = motor(PORT18, ratio18_1, false);
+motor rightIntake = motor(PORT12, ratio18_1, true);
+motor leftIntake = motor(PORT13, ratio18_1, false);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

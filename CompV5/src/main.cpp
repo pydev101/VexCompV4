@@ -8,7 +8,9 @@
 // ISensor              inertial      1               
 // Controller1          controller                    
 // topIntake            motor         19              
-// bottomIntake         motor         20              
+// bottomIntake         motor         18              
+// rightIntake          motor         12              
+// leftIntake           motor         13              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
@@ -20,6 +22,9 @@
 // ISensor              inertial      1               
 // Controller1          controller                    
 // topIntake            motor         19              
+// bottomIntake         motor         18              
+// rightIntake          motor         12              
+// leftIntake           motor         13              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
@@ -30,6 +35,10 @@
 // motorRB              motor         10              
 // ISensor              inertial      1               
 // Controller1          controller                    
+// topIntake            motor         19              
+// bottomIntake         motor         18              
+// rightIntake          motor         12              
+// leftIntake           motor         13              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
@@ -39,6 +48,11 @@
 // motorRF              motor         9               
 // motorRB              motor         10              
 // ISensor              inertial      1               
+// Controller1          controller                    
+// topIntake            motor         19              
+// bottomIntake         motor         18              
+// rightIntake          motor         12              
+// leftIntake           motor         13              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 /*----------------------------------------------------------------------------
@@ -77,32 +91,6 @@ void pre_auton(void) {
   thread t = thread(threadTask);
 }
 
-  /*
-  Checklist:
-  DONE! 1) Motors: Wiring, Speed, and Direction
-  DONE! 2) Encoders: getEncoder returns positive in the fwd direction; getHeading returns the Heading of the robot correctly in radians
-  DONE! 3) Grid: Encoders map correctly to the grid and positive is reflected accuratly; Error values should be verified as well
-  DONE! 4) Rotational Motion: Gain is set; Robot can turn in the shortest direction, both directions, and accuratly arrive at target; Close values should have a low speed value for use in grid movement
-  DONE! 5) Linear Motion: Gain is tuned and direction, speed, acceleration are double checked or set
-  DONE! 6) Grid Move: A target is set on the grid and the robot must arrive accuratly and turn to and stay straight
-
-  Future Features:
-  -Self adjusting gain and max acceleration through gradient decsent
-  */
-
-void transfer(){
-  Point p;
-  while(robot.driving()){
-    p = robot.getPos();
-    //std::cout << "(" << p.x << ", " << p.y << ", " << getStandardAngle(p.head) << ")" << std::endl;
-    setDPS(robot.move());
-    wait(20, msec);
-  }
-  setDPS(0,0);
-  wait(1000, msec);
-  std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << 0 << ")" << std::endl;
-}
-
 competition Competition;
 int main() {
   //Run our setup
@@ -110,18 +98,6 @@ int main() {
   //Activate Vex components to run auto and driver during compeition
   //Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-  
 
-  //TODO SET GAIN AND MAX ACCEL FOR TURNING!!!!
-/*
-  wait(1000, msec);
-
-  robot.setTAbsolute(12*2, 0);
-  transfer();
-  robot.setTRealitive(0, -24);
-  transfer();
-  robot.setTAbsolute(0, 0);
-  transfer();
-//vexFileOpen();*/
   return 0;
 }

@@ -19,6 +19,19 @@ void updatePosition(){
   robot.updatePos(deltaF*cos(Head)+deltaH*cos(Head-(PI/2)), deltaF*sin(Head)+deltaH*sin(Head-(PI/2)), Head);
 }
 
+void transfer(){
+  Point p;
+  while(robot.driving()){
+    //p = robot.getPos();
+    setDPS(robot.move());
+    wait(20, msec);
+  }
+  setDPS(0,0);
+  wait(1000, msec);
+  //std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << 0 << ")" << std::endl;
+}
+
+
 void threadTask(){
   while(true){
     updatePosition();

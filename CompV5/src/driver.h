@@ -18,17 +18,30 @@ void usercontrol(void) {
     }else{
       setDPS((leftSide/100)*driverMaxSpeed, (rightSide/100)*driverMaxSpeed);
     }
-/*
-    if(Controller1.ButtonR2.pressing()){
-      liftT.spin(fwd);
-      liftT.setVelocity(100, pct);
-    }else if(Controller1.ButtonX.pressing()){
-      liftT.spin(fwd);
-      liftT.setVelocity(-100, pct);
+
+    if(Controller1.ButtonR1.pressing()){
+      setTop(1);
+    }else if(Controller1.ButtonUp.pressing()){
+      setTop(-1);
     }else{
-      liftT.setVelocity(0, pct);
-      liftT.stop();
-    }*/
+      setTop(0);
+    }
+
+    if(Controller1.ButtonR2.pressing()){
+      setBottom(1);
+    }else if(Controller1.ButtonX.pressing()){
+      setBottom(-1);
+    }else{
+      setBottom(0);
+    }
+
+    if(Controller1.ButtonL1.pressing()){
+      setIntake(1);
+    }else if(Controller1.ButtonDown.pressing()){
+      setIntake(-1);
+    }else{
+      setIntake(0);
+    }
 
     wait(20, msec);
   }
