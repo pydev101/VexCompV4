@@ -7,6 +7,9 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 //
+#ifndef __VEX_H__
+#define __VEX_H__
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,3 +28,4 @@
 
 #define repeat(iterations)                                                     \
   for (int iterator = 0; iterator < iterations; iterator++)
+#endif
