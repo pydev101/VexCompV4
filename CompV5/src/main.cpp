@@ -12,48 +12,7 @@
 // rightIntake          motor         12              
 // leftIntake           motor         13              
 // ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// motorLF              motor         8               
-// motorLB              motor         7               
-// motorRF              motor         9               
-// motorRB              motor         10              
-// ISensor              inertial      1               
-// Controller1          controller                    
-// topIntake            motor         19              
-// bottomIntake         motor         18              
-// rightIntake          motor         12              
-// leftIntake           motor         13              
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// motorLF              motor         8               
-// motorLB              motor         7               
-// motorRF              motor         9               
-// motorRB              motor         10              
-// ISensor              inertial      1               
-// Controller1          controller                    
-// topIntake            motor         19              
-// bottomIntake         motor         18              
-// rightIntake          motor         12              
-// leftIntake           motor         13              
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// motorLF              motor         8               
-// motorLB              motor         7               
-// motorRF              motor         9               
-// motorRB              motor         10              
-// ISensor              inertial      1               
-// Controller1          controller                    
-// topIntake            motor         19              
-// bottomIntake         motor         18              
-// rightIntake          motor         12              
-// leftIntake           motor         13              
-// ---- END VEXCODE CONFIGURED DEVICES ----
+
 
 /*----------------------------------------------------------------------------
     Module:       main.cpp                                                  
@@ -68,6 +27,7 @@
 //Include Math libaries
 #include "programs.h"
 #include "driver.h"
+#include "Recorder.h"
 
 using namespace vex;
 
@@ -89,6 +49,7 @@ void pre_auton(void) {
 
   //Start tracking thread to log any movement of the robot onto the virtual grid
   thread t = thread(threadTask);
+  BrainGUIProgram();
 }
 
 competition Competition;
@@ -96,7 +57,7 @@ int main() {
   //Run our setup
   pre_auton();
   //Activate Vex components to run auto and driver during compeition
-  //Competition.autonomous(autonomous);
+  Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
 
   return 0;
