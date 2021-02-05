@@ -1,5 +1,6 @@
 #include "OdomControls/Grid.h"
 #include "OdomControls/MotionControl.h"
+#include "Learning.h"
 
 Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4.25, 12.5, 7, 5000, 1.5, 5000, 1.5, PI/2);
 

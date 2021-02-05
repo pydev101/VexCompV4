@@ -27,7 +27,6 @@
 //Include Math libaries
 #include "programs.h"
 #include "driver.h"
-#include "Recorder.h"
 
 using namespace vex;
 
@@ -56,7 +55,7 @@ competition Competition;
 int main() {
   //Run our setup
   pre_auton();
-  //Activate Vex components to run auto and driver during compeition
+  //Activate Vex components to run auto and driver during compeitionAAA
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
 

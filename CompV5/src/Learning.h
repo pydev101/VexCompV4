@@ -1,6 +1,7 @@
 //#include "vex.h"
-#include <fstream>
+#include <stdio.h>
 #include "math.h"
+#include <iostream>
 
 //using namespace vex;
 
@@ -26,9 +27,11 @@ double calculateCost(Trial n){
 
 //char mode = 'w';
 //FIL* x = vexFileOpen("Hello", &mode); test if other doesn't work
-std::ofstream myfile;
 void test(){
-  myfile.open("/usd/example.txt", std::ios::out);
-  myfile << "Hello World" << std::endl;
-  myfile.close();
+  //WORKS!
+  vexFileMountSD();
+  FIL* t = vexFileOpenCreate("Testing.txt");
+  char b[] = {'H','e','l','l','o','\0'};
+  vexFileWrite(b, sizeof(b), 1, t);
+  vexFileClose(t);
 }
