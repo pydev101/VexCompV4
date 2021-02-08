@@ -10,7 +10,9 @@ typedef struct {
 } autoEntry;
 
 void oneMinute(int mod){
-  
+  move(10, 0);
+  turnToHead(200);
+  move(5, 0);
 }
 
 autoEntry entries[] = {

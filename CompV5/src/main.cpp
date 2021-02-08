@@ -48,16 +48,18 @@ void pre_auton(void) {
 
   //Start tracking thread to log any movement of the robot onto the virtual grid
   thread t = thread(threadTask);
-  BrainGUIProgram();
+  //BrainGUIProgram();
 }
 
 competition Competition;
 int main() {
   //Run our setup
   pre_auton();
-  //Activate Vex components to run auto and driver during compeitionAAA
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
+  //Activate Vex components to run auto and driver during compeitionAAAAA
+  //Competition.autonomous(autonomous);
+  //Competition.drivercontrol(usercontrol);
+
+  autonomous();
 
   return 0;
 }
