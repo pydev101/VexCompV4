@@ -315,27 +315,26 @@ public:
   }
 
   //Moves to target pos in quickest direction
-  double* move(bool setShortV=true){
+  double* move(bool setShortV){
     double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
     if(ang<0){ang+=(2*PI);}
     tPos.head = ang;
     if(setShortV){
       setToShortestVector();
     }
-
-    if(abs(getError(HEAD)) > (PI/3)){
-      if(!isLinStopped){
-        breakModeLin = true;
-      }else{
-        breakModeLin = false;
-        return turnToHead();
-      }
-    }
     return moveLin();
   }
 
   bool driving(){
-    if((abs(getError(HEAD)) > angleThreshold) || (getError(GRID) > linThreshold) || (!isLinStopped) || (!isRotStopped)){
+    if((getError(GRID) > linThreshold) || (!isLinStopped) || (!isRotStopped)){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  bool turning(){
+    if((abs(getError(HEAD)) > angleThreshold) || (!isRotStopped)){
       return true;
     }else{
       return false;

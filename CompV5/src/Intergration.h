@@ -19,20 +19,6 @@ void updatePosition(){
   Head = getHeading();
   robot.updatePos(deltaF*cos(Head)+deltaH*cos(Head-(PI/2)), deltaF*sin(Head)+deltaH*sin(Head-(PI/2)), Head);
 }
-
-void transfer(){
-  Point p;
-  while(robot.driving()){
-    //p = robot.getPos();
-    setDPS(robot.move());
-    wait(20, msec);
-  }
-  setDPS(0,0);
-  wait(1000, msec);
-  //std::cout << "(" << p.x << ", " << p.y << ", " << p.head << ", " << 0 << ")" << std::endl;
-}
-
-
 void threadTask(){
   while(true){
     updatePosition();
@@ -40,3 +26,54 @@ void threadTask(){
   }
 }
 
+/*
+TODO:
+-Intergrate learning behavior
+--Likely will need to write a function that sets the double roationalGainA, double maxRotAccelerationA, double linearGainA, double maxLinAccelerationA only; 
+--Leave the other contructors varibles alone because tehy are constants or handled by other parts of the program
+--Timing and learning components can be intergated into the high level move functions should be defined here and not in the class itself
+*/
+
+void turnHelp(){
+  while(robot.turning()){
+    robot.turnToHead();
+    wait(20, msec);
+  }
+  setDPS(0,0);
+  wait(200, msec);
+}
+
+void moveHelp(bool useShortestVector){
+  while(robot.driving()){
+    setDPS(robot.move(useShortestVector));
+    wait(20, msec);
+  }
+  setDPS(0,0);
+  wait(200, msec);
+}
+
+void turnToHead(double head, bool inDeg=true){
+  if(inDeg){
+    head = head*(PI/180);
+  }
+  robot.setTHead(head);
+  turnHelp();
+}
+
+void move(double fwd, double hor, bool useShortestVector=true){
+  robot.setTRealitive(fwd, hor);
+  if(useShortestVector){
+    robot.setToShortestVector();
+  }
+  turnHelp();
+  moveHelp(useShortestVector);
+}
+
+void moveAbs(double X, double Y, bool useShortestVector=true){
+  robot.setTAbsolute(X, Y);
+  if(useShortestVector){
+    robot.setToShortestVector();
+  }
+  turnHelp();
+  moveHelp(useShortestVector);
+}
