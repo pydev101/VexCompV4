@@ -254,13 +254,11 @@ public:
   }
 
   void setTHead(double head, bool inDegs=false){
-    tPos.x = pos.x;
-    tPos.y = pos.y;
-    tPos.head = head;
     if(inDegs){
-      tPos.head = (head*PI)/180;
+      head = (head*PI)/180;
     }
-    desiredTHead = tPos.head;
+    tPos.head = head;
+    desiredTHead = head;
   }
 
   void setMaxSpeed(double pct){

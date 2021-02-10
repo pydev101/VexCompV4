@@ -2,7 +2,7 @@
 #include "OdomControls/MotionControl.h"
 #include "Learning.h"
 
-Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4.25, 12.5, 7, 5000, 1.5, 5000, 1.5, PI/2);
+Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4.25, 12.5, 7.5, 5000, 1.5, 5000, 1.5, (2*PI)/180);
 
 void updatePosition(){
   double E = getRight();
@@ -36,7 +36,7 @@ TODO:
 
 void turnHelp(){
   while(robot.turning()){
-    robot.turnToHead();
+    setDPS(robot.turnToHead());
     wait(20, msec);
   }
   setDPS(0,0);
@@ -53,10 +53,7 @@ void moveHelp(bool useShortestVector){
 }
 
 void turnToHead(double head, bool inDeg=true){
-  if(inDeg){
-    head = head*(PI/180);
-  }
-  robot.setTHead(head);
+  robot.setTHead(head, inDeg);
   turnHelp();
 }
 
