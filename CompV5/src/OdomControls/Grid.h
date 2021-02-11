@@ -234,6 +234,10 @@ public:
     pos = {(Xd/unitsToEncoders)+pos.x, (Yd/unitsToEncoders)+pos.y, h};
   }
 
+  void resetPos(double x, double y, double h){
+    pos = {x, y, h};
+  }
+
   void setTRealitive(double fwd, double hor){
     tPos.x = tPos.x + fwd*cos(desiredTHead) + hor*cos(desiredTHead-(PI/2));
     tPos.y = tPos.y + fwd*sin(desiredTHead) + hor*sin(desiredTHead-(PI/2));

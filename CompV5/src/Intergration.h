@@ -36,7 +36,8 @@ TODO:
 */
 
 void turnHelp(){
-  while(robot.turning()){
+  double ti = Brain.timer(timeUnits::sec);
+  while(robot.turning() && ((Brain.timer(timeUnits::sec)- ti) < 5)){
     setDPS(robot.turnToHead());
     wait(20, msec);
   }
@@ -45,7 +46,8 @@ void turnHelp(){
 }
 
 void moveHelp(bool useShortestVector){
-  while(robot.driving()){
+  double ti = Brain.timer(timeUnits::sec);
+  while(robot.driving() && ((Brain.timer(timeUnits::sec)- ti) < 5)){
     setDPS(robot.move(useShortestVector));
     wait(20, msec);
   }
@@ -74,4 +76,10 @@ void moveAbs(double X, double Y, bool useShortestVector=true){
   }
   turnHelp();
   moveHelp(useShortestVector);
+}
+
+void fullReset(double x, double y, double h){
+  resetEncoders();
+  getHeading(true, h*(180/PI));
+  robot.resetPos(x, y, h);
 }

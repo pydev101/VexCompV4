@@ -112,11 +112,14 @@ void setBottom(int d, int pct=100){
 }
 
 //RETURN MUST BE UNBOUNDED
-double getHeading(bool inDeg=false){
+double getHeading(bool inDeg=false, double reset=360){
   static double Heading = 90;
   double r = ISensor.rotation();
   Heading -= r;
   ISensor.resetRotation();
+  if(!(reset==360)){
+    Heading = reset;
+  }
 
   if(inDeg){
     return Heading;

@@ -51,30 +51,34 @@ void pre_auton(void) {
   //BrainGUIProgram();
 }
 
-//competition Competition;
+competition Competition;
 int main() {
   //Run our setup
   pre_auton();
-  //Activate Vex components to run auto and driver during compeitionAAAAA
-  //Competition.autonomous(autonomous);
-  //Competition.drivercontrol(usercontrol);
+  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAA
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
 
   //autonomous();
 
+/*
   setBottom(1);
   setIntake(1);
   robot.setMaxSpeed(25);
-  move(25,0);
+  move(23,0);
 
+  robot.setMaxSpeed(100);
   turnToHead(225);
-  move(28,0);
+  move(14,0);
+  turnToHead(220);
+  move(13.5,0);
 
   setTop(1);
   setBottom(1);
   wait(1000, msec);
   setTop(0);
   setBottom(0);
-  move(-30,0);
+  move(-30,0);*/
   
 
   return 0;
