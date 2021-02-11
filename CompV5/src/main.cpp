@@ -70,6 +70,9 @@ int main() {
   setBottom(0);
   move(32,0);
   setTop(1);
+  wait(1000, msec);
+  setTop(0);
+  move(-32,0);
   
 
   return 0;

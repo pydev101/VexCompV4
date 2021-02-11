@@ -9,11 +9,12 @@ void updatePosition(){
   double L = getLeft();
   double H = getHor();
   static double Head = getHeading();
+
   resetEncoders();
   
-  double D = (getHeading()-Head)*robot.getRadiusInEncoders(); //Calculate the change in motor encoder based on change of rotation
+  //double D = (getHeading()-Head)*robot.getRadiusInEncoders(); //Calculate the change in motor encoder based on change of rotation
 
-  double deltaF = E-D; //Delta F is the change in the direction the robot is facing; rotation isn't fwd movement so we attempt to subtract it out
+  double deltaF = (E+L)/2; //Delta F is the change in the direction the robot is facing; rotation isn't fwd movement so we attempt to remove it via the average
   double deltaH = H; //If H is important then we may need to subtract the circumfrance it travels from the delta H
 
   Head = getHeading();
