@@ -71,7 +71,7 @@ int main() {
   //move(12,0);
   
   setDPS(200,200);
-  wait(200, seconds);
+  wait(2000, msec);
   setDPS(0,0);
 
   setTop(1);
