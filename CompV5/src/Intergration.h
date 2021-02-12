@@ -2,7 +2,7 @@
 #include "OdomControls/MotionControl.h"
 #include "Learning.h"
 
-Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4.25, 12.5, 7.55, 5000, 1.52, 5000, 1.5, (2.5*PI)/180);
+Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4.25, 12.5, 7.7, 5000, 1.52, 5000, 1.5, (2.5*PI)/180);
 
 void updatePosition(){
   double E = getRight();
@@ -37,7 +37,7 @@ TODO:
 
 void turnHelp(){
   double ti = Brain.timer(timeUnits::sec);
-  while(robot.turning() && ((Brain.timer(timeUnits::sec)- ti) < 5)){
+  while(robot.turning() && ((Brain.timer(timeUnits::sec)- ti) < 3)){
     setDPS(robot.turnToHead());
     wait(20, msec);
   }

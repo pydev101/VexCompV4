@@ -110,18 +110,7 @@ private:
   }
 
   double calcRotationalSpeed(double overRideGain=0){
-    double e = getError(HEAD);
-
-    if(abs(e) > PI){
-      //Other path is shorter travel
-      if(e < 0){
-        //If E is CW then faster path is CCW
-        e = (2*PI)+e;
-      }else{
-        //If E is CCW; faster path is CW
-        e = -((2*PI)-e);
-      }
-    }
+    double e = getError(SHORTANGLE);
 
     static double lastSpeed = 0;
     double changeSpeed;
@@ -192,8 +181,17 @@ public:
       //Or using the motor encoders (rightEnc-leftEnc)/(2*radius) or the difference between the encoders divided by the distance between the drive wheels
     }else if(d == SHORTANGLE){
       double e = getError(HEAD);
-      if(e > PI){e = (2*PI)-e;}
-      return e;//FLAWED may not account for negitive angles returned from HEAD TODO
+      if(abs(e) > PI){
+        //Other path is shorter travel
+        if(e < 0){
+          //If E is CW then faster path is CCW
+          e = (2*PI)+e;
+        }else{
+          //If E is CCW; faster path is CW
+          e = -((2*PI)-e);
+        }
+      }
+      return e;
     }else if(d == GRID){
       return sqrt((getError(X)*getError(X)) + (getError(Y)*getError(Y)));
     }else{
@@ -335,7 +333,8 @@ public:
   }
 
   bool turning(){
-    if((abs(getError(HEAD)) > angleThreshold) || (!isRotStopped)){
+    std::cout << (abs(getError(SHORTANGLE)) > angleThreshold) <<" | "<< (!isRotStopped) << std::endl;
+    if((abs(getError(SHORTANGLE)) > angleThreshold) || (!isRotStopped)){
       return true;
     }else{
       return false;
