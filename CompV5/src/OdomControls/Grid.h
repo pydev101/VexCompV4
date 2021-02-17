@@ -333,8 +333,7 @@ public:
   }
 
   bool turning(){
-    std::cout << (abs(getError(SHORTANGLE)) > angleThreshold) <<" | "<< (!isRotStopped) << std::endl;
-    if((abs(getError(SHORTANGLE)) > angleThreshold) || (!isRotStopped)){
+    if((abs(getError(HEAD)) > angleThreshold) || (!isRotStopped)){
       return true;
     }else{
       return false;
