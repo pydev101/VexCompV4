@@ -167,37 +167,38 @@ void autonomous(void){
   //entries[indexAuto].function(entries[indexAuto].mod);
   setBottom(1);
   setIntake(1);
-  robot.setMaxSpeed(25);
-  move(25,0);
+  robot.setMaxSpeed(12);
+  move(33,0);
 
   robot.setMaxSpeed(100);
   turnToHead(200);
   
   setDPS(400,400);
-  wait(1650, msec);
+  wait(2100, msec);
   setDPS(0,0);
 
   setTop(1);
-  wait(2000, msec);
+  wait(1600, msec);
   setTop(0);
 
-  move(-29,0);
+  turnToHead(185);
+  move(-38,0);
   setIntake(-1);
   setBottom(-1);
   wait(1500, msec);
   setIntake(0);
   setBottom(0);
 
-  move(12,0);
   turnToHead(120);
 
   setIntake(-1);
-  for(int i=0; i<3; i++){
+  for(int i=0; i<4; i++){
     setDPS(400,400);
-    wait(1650, msec);
+    wait(1300, msec);
     setDPS(-400,-400);
-    wait(1650, msec);
+    wait(1300, msec);
   }
+  setDPS(0,0);
   setIntake(0);
 }
 
