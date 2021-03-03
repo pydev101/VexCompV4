@@ -2,7 +2,8 @@
 #include "OdomControls/MotionControl.h"
 #include "Learning.h"
 
-Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4.25, 12.5, 7.7, 5000, 1.52, 5000, 1.5, (2.5*PI)/180);
+//Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4.25, 12.5, 7.7, 5000, 1.52, 5000, 1.5, (2.5*PI)/180);
+Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4, 13.75, 7.7, 5000, 1.52, 5000, 1.5, (2.5*PI)/180);
 
 void updatePosition(){
   double E = getRight();
@@ -35,7 +36,7 @@ TODO:
 --Timing and learning components can be intergated into the high level move functions should be defined here and not in the class itself
 */
 
-void turnHelp(){
+void turnHelp(int i=0){
   double ti = Brain.timer(timeUnits::sec);
   while(robot.turning() && ((Brain.timer(timeUnits::sec)- ti) < 3)){
     setDPS(robot.turnToHead());
@@ -43,6 +44,11 @@ void turnHelp(){
   }
   setDPS(0,0);
   wait(200, msec);
+  if(robot.turning()){
+    if(i<1){
+      turnHelp(i+1);
+    }
+  }
 }
 
 void moveHelp(bool useShortestVector){
