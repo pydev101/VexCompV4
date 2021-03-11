@@ -5,6 +5,15 @@
 //Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4.25, 12.5, 7.7, 5000, 1.52, 5000, 1.5, (2.5*PI)/180);
 Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4, 13.75, 7.7, 5000, 1.52, 5000, 1.5, (2.5*PI)/180);
 
+const int DataLength = 10000;
+double graphR[DataLength];
+double graphL[DataLength];
+double graphH[DataLength];
+double graphX[DataLength];
+double graphY[DataLength];
+
+int indexOfGraph = 0;
+
 void updatePosition(){
   double E = getRight();
   double L = getLeft();
@@ -18,11 +27,22 @@ void updatePosition(){
   double deltaF = (E+L)/2; //Delta F is the change in the direction the robot is facing; rotation isn't fwd movement so we attempt to remove it via the average
   double deltaH = H; //If H is important then we may need to subtract the circumfrance it travels from the delta H
 
+  if(indexOfGraph<DataLength){
+    graphR[indexOfGraph] = E;
+    graphL[indexOfGraph] = L;
+    graphH[indexOfGraph] = Head;
+    graphX[indexOfGraph] = deltaF*cos(Head)+deltaH*cos(Head-(PI/2));
+    graphY[indexOfGraph] = deltaF*sin(Head)+deltaH*sin(Head-(PI/2));
+    indexOfGraph++;
+  }
+
   Head = getHeading();
   robot.updatePos(deltaF*cos(Head)+deltaH*cos(Head-(PI/2)), deltaF*sin(Head)+deltaH*sin(Head-(PI/2)), Head);
 }
+
+bool keepRecordThreadRunning = true;
 void threadTask(){
-  while(true){
+  while(keepRecordThreadRunning){
     updatePosition();
     wait(15, msec);
   }
