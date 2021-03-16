@@ -115,19 +115,19 @@ void pre_auton(void) {
 int main() {
   //Run our setup
   pre_auton();
-  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAA
+  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAAA
   //Competition.autonomous(autonomous);
   //Competition.drivercontrol(usercontrol);
 
   //autonomous();
   setIntake(1);
   setDPS(600,600);
-  wait(1500, msec);
+  wait(1700, msec);
   setDPS(-400,400);
   wait(1200, msec);
 
   setDPS(400,400);
-  wait(2350, msec);
+  wait(2600, msec);
   setDPS(0,0);
 
   setBottom(1);
@@ -149,11 +149,20 @@ int main() {
 
   setDPS(400,-400);
   wait(400, msec);
-  setDPS(-400, -400);
-  wait(1700, msec);
+  setDPS(-600, -600);
+  wait(1800, msec);
   setDPS(400, -400);
   wait(700, msec);
   setDPS(0,0);
+
+  setDPS(400, 400);
+  wait(700, msec);
+  for(int i=0; i<3; i++){
+    setDPS(-400, -400);
+    wait(300, msec);
+    setDPS(400,400);
+    wait(300, msec);
+  }
 
 
 
