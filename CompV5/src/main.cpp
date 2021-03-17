@@ -127,7 +127,7 @@ int main() {
   wait(1200, msec);
 
   setDPS(400,400);
-  wait(2600, msec);
+  wait(2700, msec);
   setDPS(0,0);
 
   setBottom(1);
@@ -149,22 +149,24 @@ int main() {
 
   setDPS(400,-400);
   wait(400, msec);
-  setDPS(-600, -600);
-  wait(1800, msec);
+  setDPS(-1000, -1000);
+  wait(2000, msec);
+  for(int i=-1000; i<-400; i+=20){
+    setDPS(i, i);  
+    wait(5,msec);
+  }
   setDPS(400, -400);
   wait(700, msec);
   setDPS(0,0);
+  setDPS(600, 600);
+  wait(3200, msec);
+  setDPS(0,0);
 
-  setDPS(400, 400);
-  wait(700, msec);
-  for(int i=0; i<3; i++){
-    setDPS(-400, -400);
-    wait(300, msec);
-    setDPS(400,400);
-    wait(300, msec);
-  }
-
-
+  setDPS(400,-400);
+  wait(600, msec);
+  setDPS(400,400);
+  wait(2700, msec);
+  setDPS(0,0);
 
   keepRecordThreadRunning = false;
   std::cout << "Right Enc,Left Enc,Head,X,Y" << std::endl;
