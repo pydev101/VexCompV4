@@ -165,41 +165,85 @@ void BrainGUIProgram(){
 void autonomous(void){
   //GUIActivate = false;
   //entries[indexAuto].function(entries[indexAuto].mod);
-  setBottom(1);
   setIntake(1);
-  robot.setMaxSpeed(12);
-  move(33,0);
+  setDPS(600,600);
+  wait(1700, msec);
+  setDPS(-400,400);
+  wait(1200, msec);
 
-  robot.setMaxSpeed(100);
-  turnToHead(200);
-  
   setDPS(400,400);
-  wait(2100, msec);
+  wait(2700, msec);
   setDPS(0,0);
 
+  setBottom(1);
   setTop(1);
   wait(1600, msec);
   setTop(0);
+  setBottom(0);
+  setIntake(0);
 
-  turnToHead(185);
-  move(-38,0);
-  setIntake(-1);
+  setDPS(-800,-800);
+  wait(500, msec);
   setBottom(-1);
-  wait(1500, msec);
+  setIntake(-1);
+  wait(500, msec);
+  setDPS(0,0);
+  wait(500, msec);
+  setBottom(0);
+  setIntake(0);
+
+  setDPS(400,-400);
+  wait(400, msec);
+  setDPS(-1000, -1000);
+  wait(2000, msec);
+  for(int i=-1000; i<-400; i+=20){
+    setDPS(i, i);  
+    wait(5,msec);
+  }
+  setDPS(400, -400);
+  wait(600, msec);
+  setDPS(0,0);
+  setDPS(700, 700);
+  wait(3015, msec);
+  setDPS(0,0);
+
+  setDPS(400,-400);
+  wait(450, msec);
+  setDPS(400,400);
+  setIntake(1);
+  setBottom(1);
+  wait(1900, msec);
+
+  setDPS(0,0);
+  wait(4000, msec);
   setIntake(0);
   setBottom(0);
 
-  turnToHead(120);
+  setDPS(-600,-600);
+  wait(1300, msec);
+  setDPS(0,0);
 
-  setIntake(-1);
+  setDPS(400,-400);
+  wait(400, msec);
+  
+  setDPS(-600,-600);
+  wait(2000, msec);
+  setDPS(0,0);
+
+  setDPS(400, -400);
+  wait(600, msec);
+  setDPS(0,0);
+
+  setDPS(600, 600);
+  wait(1400, msec);
+
   for(int i=0; i<4; i++){
-    setDPS(400,400);
-    wait(1300, msec);
-    setDPS(-400,-400);
-    wait(1300, msec);
+    setDPS(-400, -400);
+    wait(700, msec);
+    setDPS(400, 400);
+    wait(700, msec);
   }
   setDPS(0,0);
-  setIntake(0);
 }
 
 //Brain.SDcard.isInserted();

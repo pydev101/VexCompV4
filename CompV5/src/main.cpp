@@ -111,69 +111,15 @@ void pre_auton(void) {
   //BrainGUIProgram();
 }
 
-//competition Competition;
+competition Competition;
 int main() {
   //Run our setup
   pre_auton();
-  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAAA
-  //Competition.autonomous(autonomous);
-  //Competition.drivercontrol(usercontrol);
+  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAAAAAAAAAA
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
 
   //autonomous();
-  setIntake(1);
-  setDPS(600,600);
-  wait(1700, msec);
-  setDPS(-400,400);
-  wait(1200, msec);
-
-  setDPS(400,400);
-  wait(2700, msec);
-  setDPS(0,0);
-
-  setBottom(1);
-  setTop(1);
-  wait(1600, msec);
-  setTop(0);
-  setBottom(0);
-  setIntake(0);
-
-  setDPS(-800,-800);
-  wait(500, msec);
-  setBottom(-1);
-  setIntake(-1);
-  wait(500, msec);
-  setDPS(0,0);
-  wait(500, msec);
-  setBottom(0);
-  setIntake(0);
-
-  setDPS(400,-400);
-  wait(400, msec);
-  setDPS(-1000, -1000);
-  wait(2000, msec);
-  for(int i=-1000; i<-400; i+=20){
-    setDPS(i, i);  
-    wait(5,msec);
-  }
-  setDPS(400, -400);
-  wait(700, msec);
-  setDPS(0,0);
-  setDPS(600, 600);
-  wait(3200, msec);
-  setDPS(0,0);
-
-  setDPS(400,-400);
-  wait(600, msec);
-  setDPS(400,400);
-  wait(2700, msec);
-  setDPS(0,0);
-
-  keepRecordThreadRunning = false;
-  std::cout << "Right Enc,Left Enc,Head,X,Y" << std::endl;
-  for(int i=0; i<indexOfGraph; i++){
-    std::cout << graphR[i] << "," << graphL[i] << "," << graphH[i] << "," << graphX[i] << "," << graphY[i] << std::endl;
-    wait(30, msec);
-  }
 
   return 0;
 }
