@@ -28,51 +28,6 @@
 // leftIntake           motor         13              
 // VisionS              vision        6               
 // ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// motorLF              motor         8               
-// motorLB              motor         7               
-// motorRF              motor         5               
-// motorRB              motor         10              
-// ISensor              inertial      1               
-// Controller1          controller                    
-// topIntake            motor         19              
-// bottomIntake         motor         18              
-// rightIntake          motor         12              
-// leftIntake           motor         13              
-// VisionS              vision        6               
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// motorLF              motor         8               
-// motorLB              motor         7               
-// motorRF              motor         5               
-// motorRB              motor         10              
-// ISensor              inertial      1               
-// Controller1          controller                    
-// topIntake            motor         19              
-// bottomIntake         motor         18              
-// rightIntake          motor         12              
-// leftIntake           motor         13              
-// VisionS              vision        6               
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// motorLF              motor         8               
-// motorLB              motor         7               
-// motorRF              motor         5               
-// motorRB              motor         10              
-// ISensor              inertial      1               
-// Controller1          controller                    
-// topIntake            motor         19              
-// bottomIntake         motor         18              
-// rightIntake          motor         12              
-// leftIntake           motor         13              
-// VisionS              vision        6               
-// ---- END VEXCODE CONFIGURED DEVICES ----
 
 /*----------------------------------------------------------------------------
     Module:       main.cpp                                                  
@@ -111,15 +66,19 @@ void pre_auton(void) {
   //BrainGUIProgram();
 }
 
-competition Competition;
+//competition Competition;
 int main() {
   //Run our setup
   pre_auton();
-  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAAAAAAAAAA
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
+  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAAA
+  //Competition.autonomous(autonomous);
+  //Competition.drivercontrol(usercontrol);
 
-  //autonomous();
+  turnToHead(0);
+  turnToHead(270);
+  turnToHead(290);
+  turnToHead(180);
+  turnToHead(90);
 
   return 0;
 }

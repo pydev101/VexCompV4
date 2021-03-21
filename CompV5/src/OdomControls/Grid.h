@@ -44,6 +44,15 @@ typedef struct{
   double head;
 } Point;
 
+typedef struct{
+  double primaryGain;
+  double adjGain;
+  double stopThreshold;
+  double slowThreshold;
+  double stopPCTofMin;
+  double maxAccel;
+} PIDVarible;
+
 //Type of value getError(dirT) returns
 enum MeasureType {X, Y, HEAD, SHORTANGLE, GRID, POLAR} dirT;
 enum GearRatio {GR18To1, GR36to1, GR6to1} motorRatios;
@@ -57,14 +66,12 @@ private:
   double maxLinMoveSpeed; //Maximum allowed travel speed
   double maxLinMoveSpeedDefault; //Maximum speed able to be traveled 
   double minLinMoveSpeed; //Minimum target speed the robot starts moving at
-  double maxLinAcceleration; //Greatest change of speed allowed
-  double linThreshold; //How close the robot tries to get to the target point
-  double angleThreshold; //How close the robot tries to stay to the target heading; Default is 1 degree
   double minRotSpeed; //Minimum rotation speed in rad
   double maxRotSpeed; //Maximum rotation speed in rad
-  double maxRotAcceleration; //Maximum rotational acceleration in rad
-  double linearGain;
-  double roationalGain;
+
+  PIDVarible linearPID;
+  PIDVarible anglePID;
+
   double desiredTHead;
   double unitsToEncoders; // (Degrees/Units) used for conversion of distances
   double robotRadius; //Distance from center of robot to drive wheel base in units of motor degrees
@@ -77,25 +84,33 @@ private:
   //Limited Proportinal Only control
   double calcLinearSpeed(){
     static double lastSpeed = 0;
-    static double lastError = getError(GRID);
+    double e = getError(POLAR);
 
-    double changeSpeed = (getError(POLAR)*linearGain) - lastSpeed;
+    double min = minLinMoveSpeed*linearPID.stopPCTofMin;
+    double adjSpeed = (linearPID.adjGain*linearPID.slowThreshold)+min;
+    double changeSpeed;
 
-    if((getError(GRID) < linThreshold) || (breakModeLin)){
+    if(abs(e) <= linearPID.slowThreshold){
+      changeSpeed = (e*linearPID.adjGain) + (min*getSign(e)) - lastSpeed;
+    }else{
+      changeSpeed = ((((abs(e)-linearPID.slowThreshold)*linearPID.primaryGain) + adjSpeed)*getSign(e)) - lastSpeed;
+    }
+
+    if(breakModeLin){
       changeSpeed = -lastSpeed;
     }
-    
-    if(abs(changeSpeed) > maxLinAcceleration){
-      changeSpeed = maxLinAcceleration*getSign(changeSpeed);
+
+    if(abs(changeSpeed) > linearPID.maxAccel){
+      changeSpeed = linearPID.maxAccel*getSign(changeSpeed);
     }
     lastSpeed = lastSpeed + changeSpeed; //NewSpeed to set
 
     //Handle max speed
     if(abs(lastSpeed) > maxLinMoveSpeed){
-      if(abs(abs(lastSpeed) - maxLinMoveSpeed) < maxLinAcceleration){
+      if(abs(abs(lastSpeed) - maxLinMoveSpeed) < linearPID.maxAccel){
         lastSpeed = maxLinMoveSpeed*getSign(lastSpeed);
       }else{
-        lastSpeed = abs(abs(lastSpeed)-maxLinAcceleration)*getSign(lastSpeed);
+        lastSpeed = abs(abs(lastSpeed)-linearPID.maxAccel)*getSign(lastSpeed);
       }
     }
 
@@ -109,32 +124,34 @@ private:
     return lastSpeed*unitsToEncoders; //Encoders
   }
 
-  double calcRotationalSpeed(double overRideGain=0){
+  double calcRotationalSpeed(){
     double e = getError(SHORTANGLE);
+    double min = minRotSpeed*anglePID.stopPCTofMin;
+    double adjSpeed = (anglePID.adjGain*anglePID.slowThreshold)+min;
+    double changeSpeed;
 
     static double lastSpeed = 0;
-    double changeSpeed;
-    if(overRideGain == 0){
-      changeSpeed = (e*roationalGain) - lastSpeed;
+    if(abs(e) <= anglePID.slowThreshold){
+      changeSpeed = (e*anglePID.adjGain) + (min*getSign(e)) - lastSpeed;
     }else{
-      changeSpeed = (e*overRideGain) - lastSpeed;  
+      changeSpeed = ((((abs(e)-anglePID.slowThreshold)*anglePID.primaryGain) + adjSpeed)*getSign(e)) - lastSpeed;
     }
 
-    if((abs(e) < angleThreshold) || (breakModeRot)){
+    if(breakModeRot){
       changeSpeed = -lastSpeed;
     }
 
-    if(abs(changeSpeed) > maxRotAcceleration){
-      changeSpeed = maxRotAcceleration*getSign(changeSpeed);
+    if(abs(changeSpeed) > anglePID.maxAccel){
+      changeSpeed = anglePID.maxAccel*getSign(changeSpeed);
     }
     lastSpeed = lastSpeed + changeSpeed; //NewSpeed to set
 
     //Handle max speed
     if(abs(lastSpeed) > maxRotSpeed){
-      if(abs(abs(lastSpeed) - maxRotSpeed) < maxRotAcceleration){
+      if(abs(abs(lastSpeed) - maxRotSpeed) < anglePID.maxAccel){
         lastSpeed = maxRotSpeed*getSign(lastSpeed);
       }else{
-        lastSpeed = abs(abs(lastSpeed)-maxRotAcceleration)*getSign(lastSpeed);
+        lastSpeed = abs(abs(lastSpeed)-anglePID.maxAccel)*getSign(lastSpeed);
       }
     }
 
@@ -152,8 +169,7 @@ private:
 public:
   //X in units, y in units, Head in Rads, minSpeeds in deg/s, maxSpeeds in deg/s, wheelDiamter in units, robot drive base width in units
   Robot(double x, double y, double Head, double minSpeeds, double maxSpeed, double wheelDiameter, double width,
-        double roationalGainA, double maxRotAccelerationA, double linearGainA, double maxLinAccelerationA,
-        double linThresholdA, double angleThresholdA){
+        PIDVarible rotPIDVars, PIDVarible linPIDVars){
     pos = {x,y, Head};
     desiredTHead = Head;
     unitsToEncoders = 360/(PI*wheelDiameter);
@@ -161,14 +177,11 @@ public:
     maxLinMoveSpeed = maxSpeed/unitsToEncoders;
     maxLinMoveSpeedDefault = maxLinMoveSpeed;
     robotRadius = width*0.5*unitsToEncoders;
-    minRotSpeed = (2*minLinMoveSpeed)/(wheelDiameter/2);
+    minRotSpeed = (2*minLinMoveSpeed)/(wheelDiameter/2); //Might be better if set directly by programmer TODO
     maxRotSpeed = (2*maxLinMoveSpeed)/(wheelDiameter/2);
-    roationalGain = roationalGainA;
-    maxRotAcceleration = maxRotAccelerationA;
-    linearGain = linearGainA;
-    maxLinAcceleration = maxLinAccelerationA;
-    linThreshold = linThresholdA;
-    angleThreshold = angleThresholdA;
+
+    linearPID = linPIDVars;
+    anglePID = rotPIDVars;
   }
 
   double getError(MeasureType d){
@@ -266,15 +279,7 @@ public:
     maxLinMoveSpeed = abs(pct)*maxLinMoveSpeedDefault;
   }
   void setMaxAcceleration(double a){
-    maxLinAcceleration = abs(a);
-  }
-
-  void setAngleThres(double thres){
-    angleThreshold = abs(thres);
-  }
-
-  void setLinThres(double thres){
-    linThreshold = abs(thres);
+    linearPID.maxAccel = abs(a);
   }
 
   double getRadiusInEncoders(){
@@ -325,7 +330,7 @@ public:
   }
 
   bool driving(){
-    if((getError(GRID) > linThreshold) || (!isLinStopped) || (!isRotStopped)){
+    if((getError(GRID) > linearPID.stopThreshold) || (!isLinStopped) || (!isRotStopped)){
       return true;
     }else{
       return false;
@@ -333,9 +338,10 @@ public:
   }
 
   bool turning(){
-    if((abs(getError(HEAD)) > angleThreshold) || (!isRotStopped)){
+    if((abs(getError(HEAD)) > anglePID.stopThreshold) || (!isRotStopped)){
       return true;
     }else{
+      std::cout << getError(HEAD) << std::endl;
       return false;
     }
   }
