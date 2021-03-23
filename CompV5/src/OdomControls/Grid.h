@@ -126,6 +126,7 @@ private:
 
   double calcRotationalSpeed(){
     double e = getError(SHORTANGLE);
+    static double lastError = e;
     double min = minRotSpeed*anglePID.stopPCTofMin;
     double adjSpeed = (anglePID.adjGain*anglePID.slowThreshold)+min;
     double changeSpeed;
@@ -155,6 +156,7 @@ private:
       }
     }
 
+
     if(abs(lastSpeed) < minRotSpeed){
       lastSpeed = 0;
       isRotStopped = true;
@@ -162,6 +164,8 @@ private:
       isRotStopped = false;
     }
 
+    std::cout << lastSpeed << ", " << getError(SHORTANGLE) << ", " << abs(abs(e) - abs(lastError)) << std::endl;
+    lastError = e;
     return lastSpeed; //Rad
   }
 
@@ -271,6 +275,7 @@ public:
     if(inDegs){
       head = (head*PI)/180;
     }
+    head = getStandardAngle(head);
     tPos.head = head;
     desiredTHead = head;
   }
@@ -319,10 +324,12 @@ public:
   }
 
   //Moves to target pos in quickest direction
-  double* move(bool setShortV){
-    double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
-    if(ang<0){ang+=(2*PI);}
-    tPos.head = ang;
+  double* move(bool setShortV=true){
+    if(getError(GRID) > linearPID.slowThreshold){
+      double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
+      if(ang<0){ang+=(2*PI);}
+      tPos.head = ang;
+    }
     if(setShortV){
       setToShortestVector();
     }
@@ -330,7 +337,7 @@ public:
   }
 
   bool driving(){
-    if((getError(GRID) > linearPID.stopThreshold) || (!isLinStopped) || (!isRotStopped)){
+     if((getError(GRID) > linearPID.stopThreshold) || (!isLinStopped) || (!isRotStopped)){
       return true;
     }else{
       return false;
@@ -338,10 +345,11 @@ public:
   }
 
   bool turning(){
+    //Use for debugging if turn holds too long; likely the adjGain is too low and the speed is zero before theashold is met
+    //std::cout << abs(getError(HEAD)) << ", " << speedTargets[0] << ", " << ((abs(getError(HEAD)) > anglePID.stopThreshold) || (!isRotStopped)) << std::endl;
     if((abs(getError(HEAD)) > anglePID.stopThreshold) || (!isRotStopped)){
       return true;
     }else{
-      std::cout << getError(HEAD) << std::endl;
       return false;
     }
   }

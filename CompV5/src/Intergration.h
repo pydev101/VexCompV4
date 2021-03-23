@@ -13,8 +13,8 @@ typedef struct{
 } PIDVarible;
 */
 
-PIDVarible rotForTest = {7.7, 0.8, (1.5*PI)/180, (10*PI)/180, 0.95, 5000};
-PIDVarible linForTest = {1.52, 0.6, 1, 5, 0.95, 5000};
+PIDVarible rotForTest = {7.7, 1.6, (1.5*PI)/180, (10*PI)/180, 0.96, 5000};
+PIDVarible linForTest = {1.52, 1, 1, 5, 0.95, 5000};
 Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4.25, 12.5, rotForTest, linForTest);
 //Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4, 13.75, 7.7, 5000, 1.52, 5000, 1.5, (2.5*PI)/180);
 
