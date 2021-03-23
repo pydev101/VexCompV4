@@ -44,6 +44,8 @@ typedef struct{
   double head;
 } Point;
 
+#ifndef __PIDVarible_H__
+#define __PIDVarible_H__
 typedef struct{
   double primaryGain;
   double adjGain;
@@ -52,6 +54,7 @@ typedef struct{
   double stopPCTofMin;
   double maxAccel;
 } PIDVarible;
+#endif
 
 //Type of value getError(dirT) returns
 enum MeasureType {X, Y, HEAD, SHORTANGLE, GRID, POLAR} dirT;
