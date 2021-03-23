@@ -56,6 +56,17 @@ typedef struct{
 } PIDVarible;
 #endif
 
+
+typedef struct{
+  double x;
+  double y;
+  double Head;
+  double minSpeeds;
+  double maxSpeed;
+  double wheelDiameter;
+  double width;
+} RobotProfile;
+
 //Type of value getError(dirT) returns
 enum MeasureType {X, Y, HEAD, SHORTANGLE, GRID, POLAR} dirT;
 enum GearRatio {GR18To1, GR36to1, GR6to1} motorRatios;
@@ -167,7 +178,7 @@ private:
       isRotStopped = false;
     }
 
-    std::cout << lastSpeed << ", " << getError(SHORTANGLE) << ", " << abs(abs(e) - abs(lastError)) << std::endl;
+    //std::cout << lastSpeed << ", " << getError(SHORTANGLE) << ", " << abs(abs(e) - abs(lastError)) << std::endl;
     lastError = e;
     return lastSpeed; //Rad
   }
@@ -175,17 +186,16 @@ private:
 
 public:
   //X in units, y in units, Head in Rads, minSpeeds in deg/s, maxSpeeds in deg/s, wheelDiamter in units, robot drive base width in units
-  Robot(double x, double y, double Head, double minSpeeds, double maxSpeed, double wheelDiameter, double width,
-        PIDVarible rotPIDVars, PIDVarible linPIDVars){
-    pos = {x,y, Head};
-    desiredTHead = Head;
-    unitsToEncoders = 360/(PI*wheelDiameter);
-    minLinMoveSpeed = minSpeeds/unitsToEncoders;
-    maxLinMoveSpeed = maxSpeed/unitsToEncoders;
+  Robot(RobotProfile profile, PIDVarible rotPIDVars, PIDVarible linPIDVars){
+    pos = {profile.x, profile.y, profile.Head};
+    desiredTHead = profile.Head;
+    unitsToEncoders = 360/(PI*profile.wheelDiameter);
+    minLinMoveSpeed = profile.minSpeeds/unitsToEncoders;
+    maxLinMoveSpeed = profile.maxSpeed/unitsToEncoders;
     maxLinMoveSpeedDefault = maxLinMoveSpeed;
-    robotRadius = width*0.5*unitsToEncoders;
-    minRotSpeed = (2*minLinMoveSpeed)/(wheelDiameter/2); //Might be better if set directly by programmer TODO
-    maxRotSpeed = (2*maxLinMoveSpeed)/(wheelDiameter/2);
+    robotRadius = profile.width*0.5*unitsToEncoders;
+    minRotSpeed = (2*minLinMoveSpeed)/(profile.wheelDiameter/2); //Might be better if set directly by programmer TODO
+    maxRotSpeed = (2*maxLinMoveSpeed)/(profile.wheelDiameter/2);
 
     linearPID = linPIDVars;
     anglePID = rotPIDVars;
