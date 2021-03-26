@@ -47,12 +47,11 @@ typedef struct{
 #ifndef __PIDVarible_H__
 #define __PIDVarible_H__
 typedef struct{
-  double primaryGain;
-  double adjGain;
-  double stopThreshold;
-  double slowThreshold;
-  double stopPCTofMin;
-  double maxAccel;
+  double primaryGain; //P gain
+  double adjGain; //I gain
+  double stopThreshold; //Final threashold
+  double slowThreshold; //Determiens if change in position is a stop
+  double maxAccel; //Max Acceleration
 } PIDVarible;
 #endif
 
@@ -68,8 +67,6 @@ private:
   double speedTargets[2] = {0.0, 0.0}; //Left and Right target speed values
   double maxLinMoveSpeed; //Maximum allowed travel speed
   double maxLinMoveSpeedDefault; //Maximum speed able to be traveled 
-  double minLinMoveSpeed; //Minimum target speed the robot starts moving at
-  double minRotSpeed; //Minimum rotation speed in rad
   double maxRotSpeed; //Maximum rotation speed in rad
 
   PIDVarible linearPID;
@@ -85,19 +82,23 @@ private:
   bool isRotStopped = true;
 
   //Limited Proportinal Only control
-  double calcLinearSpeed(){
-    static double lastSpeed = 0;
+  double calcLinearSpeed(bool reset=false){
     double e = getError(POLAR);
+    static double lastError = e;
+    static double lastSpeed = 0;
+    static double resetValue = 0;
 
-    double min = minLinMoveSpeed*linearPID.stopPCTofMin;
-    double adjSpeed = (linearPID.adjGain*linearPID.slowThreshold)+min;
+    if(reset){
+      lastError = e;
+      lastSpeed = 0;
+      resetValue = 0;
+      return 0;
+    }
+
     double changeSpeed;
 
-    if(abs(e) <= linearPID.slowThreshold){
-      changeSpeed = (e*linearPID.adjGain) + (min*getSign(e)) - lastSpeed;
-    }else{
-      changeSpeed = ((((abs(e)-linearPID.slowThreshold)*linearPID.primaryGain) + adjSpeed)*getSign(e)) - lastSpeed;
-    }
+    changeSpeed = linearPID.primaryGain*e + resetValue;
+    changeSpeed = changeSpeed - lastSpeed;
 
     if(breakModeLin){
       changeSpeed = -lastSpeed;
@@ -117,34 +118,41 @@ private:
       }
     }
 
-    if(abs(lastSpeed) < minLinMoveSpeed){
-      lastSpeed = 0;
+    if(abs(abs(e)-abs(lastError)) < linearPID.slowThreshold){
       isLinStopped = true;
     }else{
       isLinStopped = false;
     }
 
+    resetValue += linearPID.adjGain*e;
+    lastError = e;
     return lastSpeed*unitsToEncoders; //Encoders
   }
 
-  double calcRotationalSpeed(){
+  double calcRotationalSpeed(bool reset=false){
     double e = getError(SHORTANGLE);
     static double lastError = e;
-    double min = minRotSpeed*anglePID.stopPCTofMin;
-    double adjSpeed = (anglePID.adjGain*anglePID.slowThreshold)+min;
-    double changeSpeed;
-
     static double lastSpeed = 0;
-    if(abs(e) <= anglePID.slowThreshold){
-      changeSpeed = (e*anglePID.adjGain) + (min*getSign(e)) - lastSpeed;
-    }else{
-      changeSpeed = ((((abs(e)-anglePID.slowThreshold)*anglePID.primaryGain) + adjSpeed)*getSign(e)) - lastSpeed;
+    static double resetValue = 0;
+
+    if(reset){
+      lastError = e;
+      lastSpeed = 0;
+      resetValue = 0;
+      return 0;
     }
 
+    double changeSpeed;
+
+    changeSpeed = anglePID.primaryGain*e + resetValue;
+    changeSpeed = changeSpeed - lastSpeed;
+
+    //Break mode
     if(breakModeRot){
       changeSpeed = -lastSpeed;
     }
 
+    //Handle max chage of speed
     if(abs(changeSpeed) > anglePID.maxAccel){
       changeSpeed = anglePID.maxAccel*getSign(changeSpeed);
     }
@@ -159,19 +167,16 @@ private:
       }
     }
 
-
-    if(abs(lastSpeed) < minRotSpeed){
-      lastSpeed = 0;
+    if(abs(abs(e)-abs(lastError)) < anglePID.slowThreshold){
       isRotStopped = true;
     }else{
       isRotStopped = false;
     }
 
-    std::cout << lastSpeed << ", " << getError(SHORTANGLE) << ", " << abs(abs(e) - abs(lastError)) << std::endl;
+    resetValue += anglePID.adjGain*e;
     lastError = e;
     return lastSpeed; //Rad
   }
-
 
 public:
   //X in units, y in units, Head in Rads, minSpeeds in deg/s, maxSpeeds in deg/s, wheelDiamter in units, robot drive base width in units
@@ -180,11 +185,9 @@ public:
     pos = {x,y, Head};
     desiredTHead = Head;
     unitsToEncoders = 360/(PI*wheelDiameter);
-    minLinMoveSpeed = minSpeeds/unitsToEncoders;
     maxLinMoveSpeed = maxSpeed/unitsToEncoders;
     maxLinMoveSpeedDefault = maxLinMoveSpeed;
     robotRadius = width*0.5*unitsToEncoders;
-    minRotSpeed = (2*minLinMoveSpeed)/(wheelDiameter/2); //Might be better if set directly by programmer TODO
     maxRotSpeed = (2*maxLinMoveSpeed)/(wheelDiameter/2);
 
     linearPID = linPIDVars;
@@ -263,6 +266,8 @@ public:
     if(ang<0){ang+=(2*PI);}
     tPos.head = ang;
     desiredTHead = ang;
+    calcRotationalSpeed(true);
+    calcLinearSpeed(true);
   }
 
   void setTAbsolute(double x, double y){
@@ -272,6 +277,8 @@ public:
     if(ang<0){ang+=(2*PI);}
     tPos.head = ang;
     desiredTHead = ang;
+    calcRotationalSpeed(true);
+    calcLinearSpeed(true);
   }
 
   void setTHead(double head, bool inDegs=false){
@@ -281,6 +288,7 @@ public:
     head = getStandardAngle(head);
     tPos.head = head;
     desiredTHead = head;
+    calcRotationalSpeed(true);
   }
 
   void setMaxSpeed(double pct){
@@ -350,7 +358,7 @@ public:
   bool turning(){
     //Use for debugging if turn holds too long; likely the adjGain is too low and the speed is zero before theashold is met
     //std::cout << abs(getError(HEAD)) << ", " << speedTargets[0] << ", " << ((abs(getError(HEAD)) > anglePID.stopThreshold) || (!isRotStopped)) << std::endl;
-    if((abs(getError(HEAD)) > anglePID.stopThreshold) || (!isRotStopped)){
+    if((abs(getError(SHORTANGLE)) > anglePID.stopThreshold) || (!isRotStopped)){
       return true;
     }else{
       return false;

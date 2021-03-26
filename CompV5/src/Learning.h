@@ -28,7 +28,6 @@ typedef struct{
   double adjGain;
   double stopThreshold;
   double slowThreshold;
-  double stopPCTofMin;
   double maxAccel;
 } PIDVarible;
 #endif
@@ -50,8 +49,6 @@ double* getDeltas(Trial currentTrial, Trial oldTrial){
   double deltaCost = (currentTrial.sumOfCost/currentTrial.numberOfRuns)-(oldTrial.sumOfCost/oldTrial.numberOfRuns);
   arr[0] = (currentTrial.vars.primaryGain-oldTrial.vars.primaryGain)/deltaCost;
   arr[1] = (currentTrial.vars.adjGain-oldTrial.vars.adjGain)/deltaCost;
-  arr[2] = (currentTrial.vars.slowThreshold-oldTrial.vars.slowThreshold)/deltaCost;
-  arr[3] = (currentTrial.vars.stopPCTofMin-oldTrial.vars.stopPCTofMin)/deltaCost;
   return arr;
 }
 
@@ -59,8 +56,6 @@ Trial optimize(Trial currentTrial, Trial oldTrial){
   double* deltas = getDeltas(currentTrial, oldTrial);
   currentTrial.vars.primaryGain = currentTrial.vars.primaryGain - (alpha * (*(deltas + 0)));
   currentTrial.vars.adjGain = currentTrial.vars.adjGain - (alpha * (*(deltas + 1)));
-  currentTrial.vars.slowThreshold = currentTrial.vars.slowThreshold - (alpha * (*(deltas + 2)));
-  currentTrial.vars.stopPCTofMin = currentTrial.vars.stopPCTofMin - (alpha * (*(deltas + 3)));
   return currentTrial;
 }
 

@@ -70,15 +70,15 @@ void pre_auton(void) {
 int main() {
   //Run our setup
   pre_auton();
-  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   //Competition.autonomous(autonomous);
   //Competition.drivercontrol(usercontrol);
 
-  robot.setTHead(180, true);
-  while(true){
-    setDPS(robot.turnToHead());
-    wait(20, msec);
-  }
+  move(30, 0);
+  move(0, 30);
+  move(0, 30);
+  move(0, 30);
+
   /*moveAbs(0, 20, false);
   moveAbs(20, 20, false);
   moveAbs(20, 0, false);
