@@ -43,7 +43,7 @@ double calcCost(double error, double t){
   return (error*error)*t;
 }
 
-const double alpha = 0.001;
+double alpha = 0.1;
 
 double* getDeltas(Trial currentTrial, Trial oldTrial){
   static double arr[4];
@@ -64,32 +64,3 @@ Trial optimize(Trial currentTrial, Trial oldTrial){
   return currentTrial;
 }
 
-Trial oldRotTrial;
-Trial oldLinTrial;
-
-Trial currRotTrial;
-Trial currLinTrial;
-
-PIDVarible train(double error, double t, bool isRot){
-  if(isRot){
-    currRotTrial.sumOfCost += calcCost(error, t);
-    currRotTrial.numberOfRuns += 1;
-
-    if(currRotTrial.numberOfRuns >= 3){
-      Trial placeholder = optimize(currRotTrial, oldRotTrial);
-      oldRotTrial = currRotTrial;
-      currRotTrial = placeholder;
-    }
-    return currRotTrial.vars;
-  }else{
-    currLinTrial.sumOfCost += calcCost(error, t);
-    currLinTrial.numberOfRuns += 1;
-
-    if(currLinTrial.numberOfRuns >= 3){
-      Trial placeholder = optimize(currLinTrial, oldRotTrial);
-      oldRotTrial = currLinTrial;
-      currLinTrial = placeholder;
-    }
-    return currLinTrial.vars;
-  }
-}

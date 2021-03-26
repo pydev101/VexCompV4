@@ -15,9 +15,7 @@ typedef struct{
 
 PIDVarible rotForTest = {7.7, 1.6, (1.5*PI)/180, (10*PI)/180, 0.96, 5000};
 PIDVarible linForTest = {1.52, 1, 1, 5, 0.95, 5000};
-RobotProfile testBot = {0, 0, PI/2, minSpeed, maxSpeed, 4.25, 12.5};
-
-Robot robot = Robot(testBot, rotForTest, linForTest);
+Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4.25, 12.5, rotForTest, linForTest);
 //Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4, 13.75, 7.7, 5000, 1.52, 5000, 1.5, (2.5*PI)/180);
 
 const int DataLength = 0;
@@ -123,49 +121,4 @@ void fullReset(double x, double y, double h){
   resetEncoders();
   getHeading(true, h*(180/PI));
   robot.resetPos(x, y, h);
-}
-
-
-void trainRun(bool rotTest){
-  robot = Robot(testBot, currRotTrial.vars, currLinTrial.vars);
-  fullReset(0,0,3.14159/2);
-
-  double e = 0;
-  double ti = Brain.timer(timeUnits::sec);
-  if(rotTest){
-    turnToHead(270);
-    e = abs(robot.getError(SHORTANGLE));
-  }else{
-    move(36,0,false);
-    e = robot.getError(GRID);
-  }
-  ti = Brain.timer(timeUnits::sec) - ti;
-
-  std::cout << calcCost(e, ti) << ", " << e << ", " << ti << std::endl;
-
-  train(e, ti, rotTest);
-}
-
-bool initLearningRot(double adjValue=0.01){
-  static Trial initalTrial = {rotForTest, 0, 0.0};
-
-  robot = Robot(testBot, rotForTest, linForTest);
-  fullReset(0,0,3.14159/2);
-
-  double ti = Brain.timer(timeUnits::sec);
-  turnToHead(270);
-  double e = abs(robot.getError(SHORTANGLE));
-  ti = Brain.timer(timeUnits::sec) - ti;
-
-  initalTrial.numberOfRuns += 1;
-  initalTrial.sumOfCost += calcCost(e, ti);
-  
-
-  if(initalTrial.numberOfRuns < 3){
-    return true;
-  }else{
-    oldRotTrial = initalTrial;
-    currRotTrial = {{rotForTest.primaryGain-adjValue, rotForTest.adjGain-adjValue, rotForTest.stopThreshold, rotForTest.slowThreshold-adjValue, rotForTest.stopPCTofMin-adjValue, rotForTest.maxAccel}, 0, 0.0};
-    return false;
-  }
 }
