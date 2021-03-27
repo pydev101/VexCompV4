@@ -2,6 +2,16 @@
 #include <iostream>
 const double PI = 3.14159;
 
+/*
+TODO:
+1) Rename Varibles to make them more readable
+2) Add comments
+4) Add ML to fine tune PID varibles; Add a D component and fine tune
+5) Look at Max Speed system and ensure functionality
+
+*/
+
+
 //Absolute value for double type varibles
 double abs(double x){
   if(x < 0){x=x*-1;}
@@ -47,8 +57,8 @@ typedef struct{
 #ifndef __PIDVarible_H__
 #define __PIDVarible_H__
 typedef struct{
-  double primaryGain; //P gain
-  double adjGain; //I gain
+  double primaryGain; //Proportional coefficent
+  double adjGain; //Intergal coefficent
   double stopThreshold; //Final threashold
   double slowThreshold; //Determiens if change in position is a stop
   double maxAccel; //Max Acceleration
@@ -57,7 +67,7 @@ typedef struct{
 
 //Type of value getError(dirT) returns
 enum MeasureType {X, Y, HEAD, SHORTANGLE, GRID, POLAR} dirT;
-enum GearRatio {GR18To1, GR36to1, GR6to1} motorRatios;
+
 //Primary control of robot
 class Robot{
 private:
@@ -126,7 +136,7 @@ private:
 
     resetValue += linearPID.adjGain*e;
     lastError = e;
-    return lastSpeed*unitsToEncoders; //Encoders
+    return lastSpeed;
   }
 
   double calcRotationalSpeed(bool reset=false){
@@ -179,17 +189,20 @@ private:
   }
 
 public:
-  //X in units, y in units, Head in Rads, minSpeeds in deg/s, maxSpeeds in deg/s, wheelDiamter in units, robot drive base width in units
-  Robot(double x, double y, double Head, double minSpeeds, double maxSpeed, double wheelDiameter, double width,
+  //X in units, y in units, Head in Rads, maxSpeeds in deg/s, wheelDiamter in units, robot drive base width in units
+  Robot(double x, double y, double Head, double maxSpeed, double wheelDiameter, double width,
         PIDVarible rotPIDVars, PIDVarible linPIDVars){
-    pos = {x,y, Head};
     desiredTHead = Head;
     unitsToEncoders = 360/(PI*wheelDiameter);
-    maxLinMoveSpeed = maxSpeed/unitsToEncoders;
+    pos = {x*unitsToEncoders,y*unitsToEncoders, Head};
+    
+    maxLinMoveSpeed = maxSpeed;
     maxLinMoveSpeedDefault = maxLinMoveSpeed;
     robotRadius = width*0.5*unitsToEncoders;
     maxRotSpeed = (2*maxLinMoveSpeed)/(wheelDiameter/2);
 
+    linPIDVars.stopThreshold = linPIDVars.stopThreshold*unitsToEncoders;
+    linPIDVars.slowThreshold = linPIDVars.slowThreshold*unitsToEncoders;
     linearPID = linPIDVars;
     anglePID = rotPIDVars;
   }
@@ -252,14 +265,17 @@ public:
   }
 
   void updatePos(double Xd, double Yd, double h){
-    pos = {(Xd/unitsToEncoders)+pos.x, (Yd/unitsToEncoders)+pos.y, h};
+    pos = {Xd+pos.x, Yd+pos.y, h};
   }
 
   void resetPos(double x, double y, double h){
-    pos = {x, y, h};
+    pos = {x*unitsToEncoders, y*unitsToEncoders, h};
   }
 
   void setTRealitive(double fwd, double hor){
+    fwd = fwd*unitsToEncoders;
+    hor = hor*unitsToEncoders;
+
     tPos.x = tPos.x + fwd*cos(desiredTHead) + hor*cos(desiredTHead-(PI/2));
     tPos.y = tPos.y + fwd*sin(desiredTHead) + hor*sin(desiredTHead-(PI/2));
     double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
@@ -271,6 +287,9 @@ public:
   }
 
   void setTAbsolute(double x, double y){
+    x = x*unitsToEncoders;
+    y = y*unitsToEncoders;
+
     tPos.x = x;
     tPos.y = y;
     double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
@@ -348,6 +367,7 @@ public:
   }
 
   bool driving(){
+    std::cout << linearPID.stopThreshold << ", " << getError(GRID) << std::endl; 
      if((getError(GRID) > linearPID.stopThreshold) || (!isLinStopped) || (!isRotStopped)){
       return true;
     }else{
@@ -366,10 +386,17 @@ public:
   }
 
   Point getPos(){
-    return pos;
+    Point p;
+    p = pos;
+    p.x = p.x/unitsToEncoders;
+    p.y = p.x/unitsToEncoders;
+    return p;
   }
 
   Point getTPOS(){
-    return tPos;
+    Point p = tPos;
+    p.x = p.x/unitsToEncoders;
+    p.y = p.x/unitsToEncoders;
+    return p;
   }
 };
