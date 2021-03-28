@@ -57,13 +57,23 @@ typedef struct{
 #ifndef __PIDVarible_H__
 #define __PIDVarible_H__
 typedef struct{
-  double primaryGain; //Proportional coefficent
-  double adjGain; //Intergal coefficent
+  double PGain; //Proportional coefficent
+  double IGain; //Intergal coefficent
+  double DGain; //Derivitive coefficent
   double stopThreshold; //Final threashold
   double slowThreshold; //Determiens if change in position is a stop
   double maxAccel; //Max Acceleration
 } PIDVarible;
 #endif
+
+typedef struct{
+  double x;
+  double y;
+  double Head;
+  double maxSpeed;
+  double wheelDiameter;
+  double width;
+} RobotProfile;
 
 //Type of value getError(dirT) returns
 enum MeasureType {X, Y, HEAD, SHORTANGLE, GRID, POLAR} dirT;
@@ -94,9 +104,9 @@ private:
   //Limited Proportinal Only control
   double calcLinearSpeed(bool reset=false){
     double e = getError(POLAR);
-    static double lastError = e;
     static double lastSpeed = 0;
     static double resetValue = 0;
+    static double lastError = e;
 
     if(reset){
       lastError = e;
@@ -107,7 +117,7 @@ private:
 
     double changeSpeed;
 
-    changeSpeed = linearPID.primaryGain*e + resetValue;
+    changeSpeed = linearPID.PGain*e + resetValue - linearPID.DGain*abs(e-lastError);
     changeSpeed = changeSpeed - lastSpeed;
 
     if(breakModeLin){
@@ -128,13 +138,13 @@ private:
       }
     }
 
-    if(abs(abs(e)-abs(lastError)) < linearPID.slowThreshold){
+    if(abs(e-lastError) < linearPID.slowThreshold){
       isLinStopped = true;
     }else{
       isLinStopped = false;
     }
 
-    resetValue += linearPID.adjGain*e;
+    resetValue += linearPID.IGain*e;
     lastError = e;
     return lastSpeed;
   }
@@ -154,7 +164,7 @@ private:
 
     double changeSpeed;
 
-    changeSpeed = anglePID.primaryGain*e + resetValue;
+    changeSpeed = anglePID.PGain*e + resetValue + anglePID.DGain*(e-lastError);
     changeSpeed = changeSpeed - lastSpeed;
 
     //Break mode
@@ -177,29 +187,28 @@ private:
       }
     }
 
-    if(abs(abs(e)-abs(lastError)) < anglePID.slowThreshold){
+    if(abs(e-lastError) < anglePID.slowThreshold){
       isRotStopped = true;
     }else{
       isRotStopped = false;
     }
 
-    resetValue += anglePID.adjGain*e;
+    resetValue += anglePID.IGain*e;
     lastError = e;
     return lastSpeed; //Rad
   }
 
 public:
   //X in units, y in units, Head in Rads, maxSpeeds in deg/s, wheelDiamter in units, robot drive base width in units
-  Robot(double x, double y, double Head, double maxSpeed, double wheelDiameter, double width,
-        PIDVarible rotPIDVars, PIDVarible linPIDVars){
-    desiredTHead = Head;
-    unitsToEncoders = 360/(PI*wheelDiameter);
-    pos = {x*unitsToEncoders,y*unitsToEncoders, Head};
+  Robot(RobotProfile profile, PIDVarible rotPIDVars, PIDVarible linPIDVars){
+    desiredTHead = profile.Head;
+    unitsToEncoders = 360/(PI*profile.wheelDiameter);
+    pos = {profile.x*unitsToEncoders,profile.y*unitsToEncoders, profile.Head};
     
-    maxLinMoveSpeed = maxSpeed;
+    maxLinMoveSpeed = profile.maxSpeed;
     maxLinMoveSpeedDefault = maxLinMoveSpeed;
-    robotRadius = width*0.5*unitsToEncoders;
-    maxRotSpeed = (2*maxLinMoveSpeed)/(wheelDiameter/2);
+    robotRadius = profile.width*0.5*unitsToEncoders;
+    maxRotSpeed = (2*maxLinMoveSpeed)/(profile.wheelDiameter/2);
 
     linPIDVars.stopThreshold = linPIDVars.stopThreshold*unitsToEncoders;
     linPIDVars.slowThreshold = linPIDVars.slowThreshold*unitsToEncoders;
@@ -346,7 +355,7 @@ public:
     double s = calcLinearSpeed();
     speedTargets[0] = s;
     speedTargets[1] = s;
-    if(angleAdj){
+    if(angleAdj && (getError(GRID) > robotRadius)){
       speedTargets[0] += -r*robotRadius*0.5;
       speedTargets[1] +=  r*robotRadius*0.5;
     }
@@ -367,7 +376,7 @@ public:
   }
 
   bool driving(){
-    std::cout << linearPID.stopThreshold << ", " << getError(GRID) << std::endl; 
+    //std::cout << linearPID.stopThreshold << ", " << getError(GRID) << ", " <<  getError(GRID)/unitsToEncoders << std::endl; 
      if((getError(GRID) > linearPID.stopThreshold) || (!isLinStopped) || (!isRotStopped)){
       return true;
     }else{
@@ -377,7 +386,9 @@ public:
 
   bool turning(){
     //Use for debugging if turn holds too long; likely the adjGain is too low and the speed is zero before theashold is met
-    //std::cout << abs(getError(HEAD)) << ", " << speedTargets[0] << ", " << ((abs(getError(HEAD)) > anglePID.stopThreshold) || (!isRotStopped)) << std::endl;
+    static int cycle = 0;
+    std::cout << cycle << ", " << getError(SHORTANGLE) << ", " << speedTargets[0]/(-0.5*robotRadius) << std::endl;
+    cycle++;
     if((abs(getError(SHORTANGLE)) > anglePID.stopThreshold) || (!isRotStopped)){
       return true;
     }else{

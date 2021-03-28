@@ -4,17 +4,22 @@
 
 /*
 typedef struct{
-  double primaryGain;
-  double adjGain;
-  double stopThreshold;
-  double slowThreshold;
-  double maxAccel;
+  double PGain; //Proportional coefficent
+  double IGain; //Intergal coefficent
+  double DGain; //Derivitive coefficent
+  double stopThreshold; //Final threashold
+  double slowThreshold; //Determiens if change in position is a stop
+  double maxAccel; //Max Acceleration
 } PIDVarible;
 */
 
-PIDVarible rotForTest = {7.7, 0.1, (1.5*PI)/180, 0.001, 5000};
-PIDVarible linForTest = {1.4, 0.01, 1, 0.001, 5000};
-Robot robot = Robot(0, 0, PI/2, maxSpeed, 4.25, 12.5, rotForTest, linForTest);
+/* Instructions for setting PID values: https://pidexplained.com/how-to-tune-a-pid-controller/
+*/
+
+RobotProfile testBot = {0, 0, PI/2, maxSpeed, 4.0, 12.5};
+PIDVarible rotForTest = {3, 0.002, 0, (1.5*PI)/180, 0.001, 5000};
+PIDVarible linForTest = {2.5, 0.05, 5, 1, 0.001, 5000};
+Robot robot = Robot(testBot, rotForTest, linForTest);
 //Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4, 13.75, 7.7, 5000, 1.52, 5000, 1.5, (2.5*PI)/180);
 
 const int DataLength = 0;
@@ -60,17 +65,9 @@ void threadTask(){
   }
 }
 
-/*
-TODO:
--Intergrate learning behavior
---Likely will need to write a function that sets the double roationalGainA, double maxRotAccelerationA, double linearGainA, double maxLinAccelerationA only; 
---Leave the other contructors varibles alone because tehy are constants or handled by other parts of the program
---Timing and learning components can be intergated into the high level move functions should be defined here and not in the class itself
-*/
-
 void turnHelp(int i=0){
   double ti = Brain.timer(timeUnits::sec);
-  while(robot.turning() && ((Brain.timer(timeUnits::sec)- ti) < 20)){
+  while(robot.turning() && ((Brain.timer(timeUnits::sec)- ti) < 5)){
     setDPS(robot.turnToHead());
     wait(20, msec);
   }
@@ -85,7 +82,7 @@ void turnHelp(int i=0){
 
 void moveHelp(bool useShortestVector){
   double ti = Brain.timer(timeUnits::sec);
-  while(robot.driving() && ((Brain.timer(timeUnits::sec)- ti) < 5)){
+  while(robot.driving() && ((Brain.timer(timeUnits::sec)- ti) < 20)){
     setDPS(robot.move(useShortestVector));
     wait(20, msec);
   }
@@ -120,4 +117,49 @@ void fullReset(double x, double y, double h){
   resetEncoders();
   getHeading(true, h*(180/PI));
   robot.resetPos(x, y, h);
+}
+
+
+void trainRun(bool rotTest){
+  robot = Robot(testBot, currRotTrial.vars, currLinTrial.vars);
+  fullReset(0,0,3.14159/2);
+
+  double e = 0;
+  double ti = Brain.timer(timeUnits::sec);
+  if(rotTest){
+    turnToHead(270);
+    e = abs(robot.getError(SHORTANGLE));
+  }else{
+    move(36,0,false);
+    e = robot.getError(GRID);
+  }
+  ti = Brain.timer(timeUnits::sec) - ti;
+
+  std::cout << calcCost(e, ti) << ", " << e << ", " << ti << std::endl;
+
+  train(e, ti, rotTest);
+}
+
+bool initLearningRot(double adjValue=0.99){
+  static Trial initalTrial = {rotForTest, 0, 0.0};
+
+  robot = Robot(testBot, rotForTest, linForTest);
+  fullReset(0,0,3.14159/2);
+
+  double ti = Brain.timer(timeUnits::sec);
+  turnToHead(270);
+  double e = abs(robot.getError(SHORTANGLE));
+  ti = Brain.timer(timeUnits::sec) - ti;
+
+  initalTrial.numberOfRuns += 1;
+  initalTrial.sumOfCost += calcCost(e, ti);
+  
+
+  if(initalTrial.numberOfRuns < 3){
+    return true;
+  }else{
+    oldRotTrial = initalTrial;
+    currRotTrial = {{rotForTest.PGain*adjValue, rotForTest.IGain*adjValue, rotForTest.DGain*adjValue, rotForTest.stopThreshold, rotForTest.slowThreshold, rotForTest.maxAccel}, 0, 0.0};
+    return false;
+  }
 }
