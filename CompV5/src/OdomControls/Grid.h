@@ -193,6 +193,10 @@ private:
       isRotStopped = false;
     }
 
+    static int cycle = 0;
+    std::cout << cycle << ", " << e << ", " << anglePID.PGain*e << ", " << resetValue << ", " << anglePID.DGain*(e-lastError) << ", " << (e-lastError) << std::endl;
+    cycle++;
+
     resetValue += anglePID.IGain*e;
     lastError = e;
     return lastSpeed; //Rad
@@ -386,9 +390,6 @@ public:
 
   bool turning(){
     //Use for debugging if turn holds too long; likely the adjGain is too low and the speed is zero before theashold is met
-    static int cycle = 0;
-    std::cout << cycle << ", " << getError(SHORTANGLE) << ", " << speedTargets[0]/(-0.5*robotRadius) << std::endl;
-    cycle++;
     if((abs(getError(SHORTANGLE)) > anglePID.stopThreshold) || (!isRotStopped)){
       return true;
     }else{

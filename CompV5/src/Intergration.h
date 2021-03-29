@@ -17,7 +17,7 @@ typedef struct{
 */
 
 RobotProfile testBot = {0, 0, PI/2, maxSpeed, 4.0, 12.5};
-PIDVarible rotForTest = {3, 0.002, 0, (1.5*PI)/180, 0.001, 5000};
+PIDVarible rotForTest = {10, 0.002, 0, (1.5*PI)/180, 0.001, 5000};
 PIDVarible linForTest = {2.5, 0.05, 5, 1, 0.001, 5000};
 Robot robot = Robot(testBot, rotForTest, linForTest);
 //Robot robot = Robot(0, 0, PI/2, minSpeed, maxSpeed, 4, 13.75, 7.7, 5000, 1.52, 5000, 1.5, (2.5*PI)/180);
