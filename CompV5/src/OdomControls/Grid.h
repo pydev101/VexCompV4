@@ -193,9 +193,9 @@ private:
       isRotStopped = false;
     }
 
-    static int cycle = 0;
-    std::cout << cycle << ", " << e << ", " << anglePID.PGain*e << ", " << resetValue << ", " << anglePID.DGain*(e-lastError) << ", " << (e-lastError) << std::endl;
-    cycle++;
+    //static int cycle = 0;
+    //std::cout << cycle << ", " << e << ", " << anglePID.PGain*e << ", " << resetValue << ", " << anglePID.DGain*(e-lastError) << ", " << (e-lastError) << std::endl;
+    //cycle++;
 
     resetValue += anglePID.IGain*e;
     lastError = e;
@@ -380,7 +380,7 @@ public:
   }
 
   bool driving(){
-    //std::cout << linearPID.stopThreshold << ", " << getError(GRID) << ", " <<  getError(GRID)/unitsToEncoders << std::endl; 
+    //std::cout << linearPID.stopThreshold << ", " << getError(POLAR) << ", " <<  getError(GRID)/unitsToEncoders << std::endl; 
      if((getError(GRID) > linearPID.stopThreshold) || (!isLinStopped) || (!isRotStopped)){
       return true;
     }else{

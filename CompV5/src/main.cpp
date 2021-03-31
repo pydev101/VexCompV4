@@ -70,12 +70,15 @@ void pre_auton(void) {
 int main() {
   //Run our setup
   pre_auton();
-  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   //Competition.autonomous(autonomous);
   //Competition.drivercontrol(usercontrol);
 
-  std::cout << "Cycle, Error, P, I, D, DeltaE"  << std::endl;
-  turnToHead(270);
+  while(true){
+    wait(20, msec);
+  }
+  //std::cout << "Cycle, Error, P, I, D, DeltaE"  << std::endl;
+  //moveAbs(0, 360);
 
   /*moveAbs(0, 20, false);
   moveAbs(20, 20, false);
