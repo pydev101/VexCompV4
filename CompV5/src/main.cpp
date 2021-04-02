@@ -66,24 +66,24 @@ void pre_auton(void) {
   //BrainGUIProgram();
 }
 
-//competition Competition;
+competition Competition;
 int main() {
   //Run our setup
   pre_auton();
   //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-  //Competition.autonomous(autonomous);
-  //Competition.drivercontrol(usercontrol);
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
 
   
   //std::cout << "Cycle, Error, P, I, D, DeltaE" << std::endl;
   //move(3, 0);
 
-  robot.setMaxAcceleration(200);
+  /*robot.setMaxAcceleration(200);
   move(90, 0);
   move(0,70);
   move(0,60);
   move(0,70);
-  turnToHead(90);
+  turnToHead(90);*/
 
   /*moveAbs(0, 20, false);
   moveAbs(20, 20, false);
