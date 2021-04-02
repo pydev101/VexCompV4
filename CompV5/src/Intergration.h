@@ -23,7 +23,7 @@ PIDVarible linForTest = {2.5, 0.05, 5, 1, 0.001, 5000};
 
 RobotProfile mainBot = {0, 0, PI/2, maxSpeed, 4.0, 12.75};
 PIDVarible rotForMain = {13, 0.002, 50, (1.5*PI)/180, 0.001, 5000};
-PIDVarible linForMain = {2.5, 0.05, 5, 1, 0.001, 5000};
+PIDVarible linForMain = {2.5, 0.0, 0, 1, 0.001, 5000};
 Robot robot = Robot(mainBot, rotForMain, linForMain);
 
 const int DataLength = 0;
@@ -99,7 +99,13 @@ void turnToHead(double head, bool inDeg=true){
   turnHelp();
 }
 
-void move(double fwd, double hor, bool useShortestVector=true){
+void reset(double x, double y){
+  resetEncoders();
+  robot.resetOdomData(x, y, getHeading());
+}
+
+void move(double fwd, double hor, bool useShortestVector=false){
+  reset(0,0);
   robot.setTRealitive(fwd, hor);
   if(useShortestVector){
     robot.setToShortestVector();
@@ -108,7 +114,7 @@ void move(double fwd, double hor, bool useShortestVector=true){
   moveHelp(useShortestVector);
 }
 
-void moveAbs(double X, double Y, bool useShortestVector=true){
+void moveAbs(double X, double Y, bool useShortestVector=false){
   robot.setTAbsolute(X, Y);
   if(useShortestVector){
     robot.setToShortestVector();
@@ -117,16 +123,9 @@ void moveAbs(double X, double Y, bool useShortestVector=true){
   moveHelp(useShortestVector);
 }
 
-void fullReset(double x, double y, double h){
-  resetEncoders();
-  getHeading(true, h*(180/PI));
-  robot.resetPos(x, y, h);
-}
-
-
 void trainRun(bool rotTest){
   robot = Robot(testBot, currRotTrial.vars, currLinTrial.vars);
-  fullReset(0,0,3.14159/2);
+  //fullReset(0,0,3.14159/2);
 
   double e = 0;
   double ti = Brain.timer(timeUnits::sec);
@@ -148,7 +147,7 @@ bool initLearningRot(double adjValue=0.99){
   static Trial initalTrial = {rotForTest, 0, 0.0};
 
   robot = Robot(testBot, rotForTest, linForTest);
-  fullReset(0,0,3.14159/2);
+  //fullReset(0,0,3.14159/2);
 
   double ti = Brain.timer(timeUnits::sec);
   turnToHead(270);

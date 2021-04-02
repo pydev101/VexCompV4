@@ -144,6 +144,10 @@ private:
       isLinStopped = false;
     }
 
+    static int cycle = 0;
+    std::cout << cycle << ", " << e << ", " << linearPID.PGain*e << ", " << resetValue << ", " << linearPID.DGain*(e-lastError) << ", " << (e-lastError) << std::endl;
+    cycle++;
+
     resetValue += linearPID.IGain*e;
     lastError = e;
     return lastSpeed;
@@ -281,8 +285,10 @@ public:
     pos = {Xd+pos.x, Yd+pos.y, h};
   }
 
-  void resetPos(double x, double y, double h){
+  void resetOdomData(double x, double y, double h){
     pos = {x*unitsToEncoders, y*unitsToEncoders, h};
+    tPos = pos;
+    desiredTHead = h;
   }
 
   void setTRealitive(double fwd, double hor){
@@ -291,6 +297,7 @@ public:
 
     tPos.x = tPos.x + fwd*cos(desiredTHead) + hor*cos(desiredTHead-(PI/2));
     tPos.y = tPos.y + fwd*sin(desiredTHead) + hor*sin(desiredTHead-(PI/2));
+
     double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
     if(ang<0){ang+=(2*PI);}
     tPos.head = ang;
@@ -368,10 +375,12 @@ public:
 
   //Moves to target pos in quickest direction
   double* move(bool setShortV=true){
-    if(getError(GRID) > linearPID.slowThreshold){
+    if(getError(GRID) > robotRadius){
       double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
       if(ang<0){ang+=(2*PI);}
       tPos.head = ang;
+    }else{
+      tPos.head = desiredTHead;
     }
     if(setShortV){
       setToShortestVector();
