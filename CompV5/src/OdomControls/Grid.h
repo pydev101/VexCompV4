@@ -286,8 +286,8 @@ public:
   }
 
   void resetOdomData(double x, double y, double h){
-    pos = {x*unitsToEncoders, y*unitsToEncoders, h};
-    tPos = pos;
+    tPos = {x*unitsToEncoders, y*unitsToEncoders, h};
+    pos = tPos;
     desiredTHead = h;
   }
 
@@ -374,7 +374,7 @@ public:
   }
 
   //Moves to target pos in quickest direction
-  double* move(bool setShortV=true){
+  double* move(bool setShortV=true, bool angleAdj=true){
     if(getError(GRID) > robotRadius){
       double ang = atan2((tPos.y - pos.y), (tPos.x-pos.x));
       if(ang<0){ang+=(2*PI);}
@@ -385,7 +385,7 @@ public:
     if(setShortV){
       setToShortestVector();
     }
-    return moveLin();
+    return moveLin(angleAdj);
   }
 
   bool driving(){
