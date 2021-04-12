@@ -63,77 +63,19 @@ void pre_auton(void) {
 
   //Start tracking thread to log any movement of the robot onto the virtual grid
   thread t = thread(threadTask);
-  //BrainGUIProgram();
+  BrainGUIProgram();
 }
 
-//competition Competition;
+competition Competition;
 int main() {
   //Run our setup
   pre_auton();
-  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-  //Competition.autonomous(autonomous);
-  //Competition.drivercontrol(usercontrol);
+  //Activate Vex components to run auto and driver during compeitionAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
 
-  
   //std::cout << "Cycle, Error, P, I, D, DeltaE" << std::endl;
   //move(24, 24);
-
-  setIntake(1);
-  setBottom(1);
-  setDPS(800,800);
-  wait(1000, msec);
-  setIntake(0);
-  turnToHead(223);
-
-  setDPS(500,500);
-  wait(2300, msec);
-  setDPS(0,0);
-
-  setBottom(0);
-  setTop(1);
-  wait(800, msec);
-  setTop(0);
-
-  setDPS(-800,-800);
-  wait(300, msec);
-  //setIntake(-1);
-  setDPS(0,0);
-  turnToHead(180);
-  setBottom(0);
-  setIntake(0);
-
-  setDPS(-1000, -1000);
-  wait(1400, msec);
-  for(int i=-980; i<-30; i+=20){
-    setDPS(i, i);  
-    wait(5,msec);
-  }
-  setDPS(0, 0);
-
-
-  turnToHead(270);
-  setDPS(600, 600);
-  wait(400, msec);
-  setBottom(1);
-  setTop(1);
-  setDPS(500, 500);
-  wait(200, msec);
-  setDPS(0, 0);
-
-
-/*
-  robot.setMaxAcceleration(200);
-  move(90, 0);
-  move(-78,0);
-  turnToHead(90);
-*/
-  /*moveAbs(0, 20, false);
-  moveAbs(20, 20, false);
-  moveAbs(20, 0, false);
-  moveAbs(0, 0, false);
-  moveAbs(20, 20, false);
-  moveAbs(0, 36, false);
-  turnToHead(90);*/
 
   return 0;
 }
