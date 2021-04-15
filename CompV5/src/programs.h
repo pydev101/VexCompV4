@@ -9,16 +9,59 @@ typedef struct {
 
 } autoEntry;
 
-void redRight(int mod){
+void blueLeft(int mod){
+  setBottom(1);
+  setDPS(800,800);
+  wait(1000, msec);
+  turnToHead(223);
+  setIntake(1);
+
+  setDPS(500,500);
+  wait(2300, msec);
+  setDPS(0,0);
+
+  setIntake(0);
+  setBottom(1);
+  setTop(1);
+  wait(400, msec);
+  setTop(0);
+
+  setDPS(-800,-800);
+  wait(300, msec);
+  //setIntake(-1);
+  setDPS(0,0);
+  turnToHead(180);
+  setBottom(0);
+  setIntake(0);
+
+  setDPS(-1000, -1000);
+  wait(1400, msec);
+  for(int i=-980; i<-30; i+=20){
+    setDPS(i, i);  
+    wait(5,msec);
+  }
+  setDPS(0, 0);
+
+
+  turnToHead(270);
+  setDPS(600, 600);
+  wait(300, msec);
+  setBottom(1);
+  setTop(1);
+  wait(400, msec);
+  setDPS(0, 0);  
+}
+
+void blueRight(int mod){
   setIntake(1);
   setBottom(1);
   setDPS(800,800);
   wait(1000, msec);
   setIntake(0);
-  turnToHead(223);
+  turnToHead(300);
 
   setDPS(500,500);
-  wait(2300, msec);
+  wait(2100, msec);
   setDPS(0,0);
 
   setBottom(0);
@@ -30,7 +73,7 @@ void redRight(int mod){
   wait(300, msec);
   //setIntake(-1);
   setDPS(0,0);
-  turnToHead(180);
+  turnToHead(335);
   setBottom(0);
   setIntake(0);
 
@@ -53,8 +96,12 @@ void redRight(int mod){
 }
 
 autoEntry entries[] = {
-  {"Red Right", redRight}
+  {"Blue Left", blueLeft},
+  {"Blue Right", blueRight},
+  {"Red Right", blueRight},
+  {"Red Left", blueLeft}
 };
+int indexAuto = 0;
 
 
 //START OF GUI------------------------------------------------------------------------
@@ -94,7 +141,6 @@ class ButtonGUI {
     }
 };
 
-int indexAuto = 0;
 void increaseIndex(){
   indexAuto += 1;
   if(indexAuto > (sizeof(entries)/sizeof(entries[0]))-1){
@@ -197,6 +243,11 @@ void BrainGUIProgram(){
     Brain.Screen.render();
     wait(50, msec);
   }
+
+  Brain.Screen.clearScreen();
+  Brain.Screen.setCursor(1, 1);
+  std::string out = entries[indexAuto].name;
+  Brain.Screen.print("Selected: %s", out.c_str());
 }
 
 void autonomous(void){
