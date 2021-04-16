@@ -53,17 +53,17 @@ void blueLeft(int mod){
 }
 
 void blueRight(int mod){
-  setIntake(1);
   setBottom(1);
   setDPS(800,800);
   wait(1000, msec);
-  setIntake(0);
+  setIntake(1);
   turnToHead(300);
 
   setDPS(500,500);
   wait(2100, msec);
   setDPS(0,0);
 
+  setIntake(0);
   setBottom(0);
   setTop(1);
   wait(800, msec);
