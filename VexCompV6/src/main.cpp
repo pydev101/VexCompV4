@@ -11,11 +11,12 @@
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
+#include "odom/robotmath.h"
 
 using namespace vex;
 
 int main() {
-  // Initializing Robot Configuration. DO NOT REMOVE!
+  // Initializing Robot Configuration. DO NOT REMOVE!!
   vexcodeInit();
   
 }
