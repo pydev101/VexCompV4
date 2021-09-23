@@ -1,3 +1,50 @@
+#include "robotmath.h"
+
+class Robot{
+  private:
+    double widthInUnit;
+    double lengthInUnit;
+    double measurementWheelDiameterInUnit;
+    double motionWheelDiameterInUnit;
+
+    Point pos;
+    double head;
+
+  public:
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
 int test(){
     return 42;

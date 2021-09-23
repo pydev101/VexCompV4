@@ -11,7 +11,7 @@
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
-#include "odom/robotmath.h"
+#include "odom/robot.h"
 
 using namespace vex;
 

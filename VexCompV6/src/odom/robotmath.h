@@ -59,10 +59,18 @@ double normalizeAngle(double theta, bool inRadians=true){
 }
 
 //Vector
-typedef struct{
-  double x;
-  double y;
-} Point;
+class Vector;
+
+class Point{
+  public:
+    double x;
+    double y;
+    Point(double X, double Y){
+      x = X;
+      y = Y;
+    }
+};
+
 
 class Vector{
   private:
@@ -77,7 +85,7 @@ class Vector{
     }
     Vector(Point start, Point end){
       deltaX = end.x - start.x;
-      deltaX = end.y - start.y;
+      deltaY = end.y - start.y;
     }
     Vector(double magnitude, double theta, bool inDegrees){
       if(inDegrees){
@@ -99,33 +107,26 @@ class Vector{
     }
     double getTheta(bool inDegrees=false){
       double result = atan2(deltaY, deltaX);
+      if(result < 0){
+          result += 2*PI;
+      }
       if(inDegrees){
         return radToDeg(result);
       }
       return result;
     }
     Vector getUnitVector(){
+      if(getMagnitude() == 0){
+        return Vector(0, 0);
+      }
       return Vector(deltaX/getMagnitude(), deltaY/getMagnitude());
     }
 
     //Magic operators
-    Point operator + (const Point& other) {
-      Point result;
-      result.x = other.x + deltaX;
-      result.y = other.y + deltaY;
-      return result;
-    }
     Vector operator + (const Vector& other) {
-      return Vector(other.deltaX + deltaX, other.deltaY + deltaY);
+      return Vector(deltaX + other.deltaX, deltaY + other.deltaY);
     }
 
-    //TODO Make sure the vector is on the right of the operator
-    Point operator - (const Point& other) {
-      Point result;
-      result.x = other.x - deltaX;
-      result.y = other.y - deltaY;
-      return result;
-    }
     Vector operator - (const Vector& other) {
       return Vector(deltaX - other.deltaX, deltaY - other.deltaY);
     }
@@ -137,5 +138,13 @@ class Vector{
       return Vector(deltaX*scalar, deltaY*scalar);
     }
 };
+
+
+Point operator+(Point &p, Vector &v){
+    return Point(p.x + v.getX(), p.y + v.getY());
+}
+Point operator-(Point &p, Vector &v){
+    return Point(p.x - v.getX(), p.y - v.getY());
+}
 #endif
 
