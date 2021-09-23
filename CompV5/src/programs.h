@@ -10,96 +10,12 @@ typedef struct {
 } autoEntry;
 
 void blueLeft(int mod){
-  setBottom(1);
-  setDPS(800,800);
-  wait(1000, msec);
-  turnToHead(223);
-  setIntake(1);
-
-  setDPS(500,500);
-  wait(2300, msec);
-  setDPS(0,0);
-
-  setIntake(0);
-  setBottom(1);
-  setTop(1);
-  wait(400, msec);
-  setTop(0);
-
-  setDPS(-800,-800);
-  wait(300, msec);
-  //setIntake(-1);
-  setDPS(0,0);
-  turnToHead(180);
-  setBottom(0);
-  setIntake(0);
-
-  setDPS(-1000, -1000);
-  wait(1400, msec);
-  for(int i=-980; i<-30; i+=20){
-    setDPS(i, i);  
-    wait(5,msec);
-  }
-  setDPS(0, 0);
-
-
-  turnToHead(270);
-  setDPS(600, 600);
-  wait(300, msec);
-  setBottom(1);
-  setTop(1);
-  wait(400, msec);
-  setDPS(0, 0);  
+  
 }
 
-void blueRight(int mod){
-  setBottom(1);
-  setDPS(800,800);
-  wait(1000, msec);
-  setIntake(1);
-  turnToHead(300);
-
-  setDPS(500,500);
-  wait(2100, msec);
-  setDPS(0,0);
-
-  setIntake(0);
-  setBottom(0);
-  setTop(1);
-  wait(800, msec);
-  setTop(0);
-
-  setDPS(-800,-800);
-  wait(300, msec);
-  //setIntake(-1);
-  setDPS(0,0);
-  turnToHead(335);
-  setBottom(0);
-  setIntake(0);
-
-  setDPS(-1000, -1000);
-  wait(1450, msec);
-  for(int i=-980; i<-30; i+=20){
-    setDPS(i, i);  
-    wait(5,msec);
-  }
-  setDPS(0, 0);
-
-
-  turnToHead(270);
-  setDPS(600, 600);
-  wait(300, msec);
-  setBottom(1);
-  setTop(1);
-  wait(400, msec);
-  setDPS(0, 0);  
-}
 
 autoEntry entries[] = {
   {"Blue Left", blueLeft},
-  {"Blue Right", blueRight},
-  {"Red Right", blueRight},
-  {"Red Left", blueLeft}
 };
 int indexAuto = 0;
 

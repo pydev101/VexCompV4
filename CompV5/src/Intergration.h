@@ -16,17 +16,17 @@ typedef struct{
 /* Instructions for setting PID values: https://pidexplained.com/how-to-tune-a-pid-controller/
 */
 
-RobotProfile testBot = {0, 0, PI/2, maxSpeed, 4.0, 12.5};
+RobotProfile testBot = {0, 0, PI/2, maxSpeed, 4.0, 13.8};
 PIDVarible rotForTest = {10, 0.002, 0, (1.5*PI)/180, 0.001, 5000};
 PIDVarible linForTest = {2.5, 0.05, 5, 1, 0.001, 5000};
-//Robot robot = Robot(testBot, rotForTest, linForTest);
+Robot robot = Robot(testBot, rotForTest, linForTest);
 
 RobotProfile mainBot = {0, 0, PI/2, maxSpeed, 4.0, 12.75};
 PIDVarible rotForMain = {13, 0.002, 50, (1.5*PI)/180, 0.001, 5000};
 PIDVarible linForMain = {2.3, 0.01, 80, 1, 0.02, 5000};
-Robot robot = Robot(mainBot, rotForMain, linForMain);
+//Robot robot = Robot(mainBot, rotForMain, linForMain);
 
-const int DataLength = 0;
+const int DataLength = 1000;
 double graphR[DataLength];
 double graphL[DataLength];
 double graphH[DataLength];
@@ -104,7 +104,7 @@ void reset(double x, double y){
   robot.resetOdomData(x, y, getHeading());
 }
 
-void move(double fwd, double hor, bool useShortestVector=true, bool adjAng=true){
+void move(double fwd, double hor, bool useShortestVector=true, bool adjAng=true, int i=0){
   reset(0,0);
   robot.setTRealitive(fwd, hor);
   if(useShortestVector){
@@ -112,6 +112,9 @@ void move(double fwd, double hor, bool useShortestVector=true, bool adjAng=true)
   }
   turnHelp();
   moveHelp(useShortestVector, adjAng);
+  if(i<2){
+    move(fwd, hor, useShortestVector, adjAng, i+1);
+  }
 }
 
 void moveAbs(double X, double Y, bool useShortestVector=true, bool adjAng=true){

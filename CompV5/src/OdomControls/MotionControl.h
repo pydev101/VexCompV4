@@ -74,42 +74,6 @@ void setDPS(double speeds[2]){
   setDPS(speeds[0], speeds[1]);
 }
 
-void setIntake(int d, int pct=100){
-  rightIntake.setVelocity(pct, percentUnits::pct);
-  leftIntake.setVelocity(pct, percentUnits::pct);
-  if(d == 1){
-    rightIntake.spin(directionType::fwd);
-    leftIntake.spin(directionType::fwd);
-  }else if(d == -1){
-    rightIntake.spin(directionType::rev);
-    leftIntake.spin(directionType::rev);
-  }else{
-    rightIntake.stop();
-    leftIntake.stop();
-  }
-}
-
-void setTop(int d, int pct=100){
-  topIntake.setVelocity(pct, percentUnits::pct);
-  if(d == 1){
-    topIntake.spin(directionType::fwd);
-  }else if(d == -1){
-    topIntake.spin(directionType::rev);
-  }else{
-    topIntake.stop();
-  }
-}
-
-void setBottom(int d, int pct=100){
-  bottomIntake.setVelocity(pct, percentUnits::pct);
-  if(d == 1){
-    bottomIntake.spin(directionType::fwd);
-  }else if(d == -1){
-    bottomIntake.spin(directionType::rev);
-  }else{
-    bottomIntake.stop();
-  }
-}
 
 //RETURN MUST BE UNBOUNDED
 double getHeading(bool inDeg=false, double reset=360){
