@@ -38,7 +38,7 @@ double sign(double x){
 
 //Algorithms
 typedef struct{
-  double p;
+  double p; //% change in output over % change in error
   double i;
   double d;
 } PIDGains;
@@ -51,14 +51,21 @@ typedef struct{
 
 //Initalize
 PIDOutput PID(double error, PIDGains gains){
-  return {gains.p*error, 0, error};
+  double p = gains.p*error;
+  double i = gains.i*error;
+  return {p+i, i, error};
 }
 
 //Recursive
 PIDOutput PID(double error, PIDGains gains, PIDOutput previous){
-  double output = gains.p*error + gains.i*previous.reset + gains.d*(error - previous.lastError);
-  return {output, previous.reset+error, error};
+  double p = gains.p*error;
+  double i = previous.reset + gains.i*error;
+  double d = gains.d*(error - previous.lastError);
+  return {p+i+d, i, error};
 }
+
+//TODO Have D term be change in position not change in error so that a change in error is not considered a change in position; Or could just reset PID algoritm each use
+//TODO Diminsional analysis so that the output is the unitOfError/unitOfSecond
 
 //Angle
 
