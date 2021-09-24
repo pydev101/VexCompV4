@@ -61,6 +61,7 @@ double normalizeAngle(double theta, bool inRadians=true){
 }
 
 //Get shortest delta theta to heading
+//TODO Ensure this function actually works
 double shortestArcToTarget(double currentHeading, double targetHeading, bool inDeg=false){
   if(inDeg){
     currentHeading = degToRad(currentHeading);
@@ -81,6 +82,23 @@ double shortestArcToTarget(double currentHeading, double targetHeading, bool inD
   return deltaTheta;
 }
 
+//Get shortest delta theta to heading line (secent line between target heading and opposite end of circle)
+//TODO Ensure function actually works
+double shortestArcToLine(double currentHeading, double targetHeading, bool inDeg=false){
+  if(inDeg){
+    currentHeading = degToRad(currentHeading);
+    targetHeading = degToRad(targetHeading);
+  }
+  currentHeading = normalizeAngle(currentHeading);
+  targetHeading = normalizeAngle(targetHeading);
+  double deltaTheta = targetHeading - currentHeading;
+  if(abs(deltaTheta) <= PI/2){
+    return shortestArcToTarget(currentHeading, targetHeading);
+  }else{
+    return shortestArcToTarget(currentHeading, targetHeading+PI);
+  }
+}
+
 //Vector
 class Point{
   public:
@@ -89,6 +107,14 @@ class Point{
     Point(double X, double Y){
       x = X;
       y = Y;
+    }
+
+    //TODO Test collision
+    bool collision(double otherX, double otherY, double r){
+      return (((x-otherX)*(x-otherX))+((y-otherY)*(y-otherY))) <= (r*r);
+    }
+    bool collision(Point other, double r){
+      return (((x-other.x)*(x-other.x))+((y-other.y)*(y-other.y))) <= (r*r);
     }
 };
 
