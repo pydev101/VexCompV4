@@ -48,72 +48,72 @@ class Robot{
 
     //Setter/Getters
     //TODO Define motion in terms of units not encoders
-    void setTargetHead(double theta, bool inDeg){
-      if(inDeg){
-        theta = degToRad(theta);
+      void setTargetHead(double theta, bool inDeg){
+        if(inDeg){
+          theta = degToRad(theta);
+        }
+        targetHeading = theta;
       }
-      targetHeading = theta;
-    }
-    void setTargetAbs(double x, double y, bool inUnits=true){
-      if(inUnits){
-        x = x*EncodersPerUnit;
-        y = y*EncodersPerUnit;
+      void setTargetAbs(double x, double y, bool inUnits=true){
+        if(inUnits){
+          x = x*EncodersPerUnit;
+          y = y*EncodersPerUnit;
+        }
+        targetPos = Point(x, y);
+        targetHeading = Vector(pos, targetPos).getTheta();
       }
-      targetPos = Point(x, y);
-      targetHeading = Vector(pos, targetPos).getTheta();
-    }
-    void setTargetAbs(Point p, bool inUnits=true){
-      if(inUnits){
-        p = Point(p.x*EncodersPerUnit, p.y*EncodersPerUnit);
+      void setTargetAbs(Point p, bool inUnits=true){
+        if(inUnits){
+          p = Point(p.x*EncodersPerUnit, p.y*EncodersPerUnit);
+        }
+        targetPos = p;
+        targetHeading = Vector(pos, targetPos).getTheta();
       }
-      targetPos = p;
-      targetHeading = Vector(pos, targetPos).getTheta();
-    }
-    void setTarget(double deltaX, double deltaY, bool inUnits=true){
-      Vector t = Vector(deltaX, deltaY);
-      if(inUnits){
+      void setTarget(double deltaX, double deltaY, bool inUnits=true){
+        Vector t = Vector(deltaX, deltaY);
+        if(inUnits){
+          t = t*EncodersPerUnit;
+        }
+        targetPos = targetPos + t;
+        targetHeading = t.getTheta();
+      }
+      void setTarget(double magnitude, double theta, bool inDeg, bool inUnits){
+        if(inUnits){
+          magnitude = magnitude*EncodersPerUnit;
+        }
+        Vector t = Vector(magnitude, theta, inDeg);
+        targetPos = targetPos + t;
+        targetHeading = t.getTheta();
+      }
+      void setTarget(Vector t){
         t = t*EncodersPerUnit;
+        targetPos = targetPos + t;
+        targetHeading = t.getTheta();
       }
-      targetPos = targetPos + t;
-      targetHeading = t.getTheta();
-    }
-    void setTarget(double magnitude, double theta, bool inDeg, bool inUnits){
-      if(inUnits){
-        magnitude = magnitude*EncodersPerUnit;
-      }
-      Vector t = Vector(magnitude, theta, inDeg);
-      targetPos = targetPos + t;
-      targetHeading = t.getTheta();
-    }
-    void setTarget(Vector t){
-      t = t*EncodersPerUnit;
-      targetPos = targetPos + t;
-      targetHeading = t.getTheta();
-    }
 
     //All new positions must be given in terms of encoders and radians
-    void setPos(double x, double y, double newHead){
-      pos = Point(x, y);
-      head = newHead;
-    }
-    void setPos(Point p, double newHead){
-      pos = p;
-      head = newHead;
-    }
-    void updatePos(double deltaX, double deltaY, double newHead){
-      Vector t = Vector(deltaX, deltaY);
-      pos = targetPos + t;
-      head = newHead;
-    }
-    void updatePos(double magnitude, double theta, bool inDeg, double newHead){
-      Vector t = Vector(magnitude, theta, inDeg);
-      pos = targetPos + t;
-      head = newHead;
-    }
-    void updatePos(Vector t, double newHead){
-      pos = targetPos + t;
-      head = newHead;
-    }
+      void setPos(double x, double y, double newHead){
+        pos = Point(x, y);
+        head = newHead;
+      }
+      void setPos(Point p, double newHead){
+        pos = p;
+        head = newHead;
+      }
+      void updatePos(double deltaX, double deltaY, double newHead){
+        Vector t = Vector(deltaX, deltaY);
+        pos = targetPos + t;
+        head = newHead;
+      }
+      void updatePos(double magnitude, double theta, bool inDeg, double newHead){
+        Vector t = Vector(magnitude, theta, inDeg);
+        pos = targetPos + t;
+        head = newHead;
+      }
+      void updatePos(Vector t, double newHead){
+        pos = targetPos + t;
+        head = newHead;
+      }
 
     //Helper
     Vector getTargetVector(){
