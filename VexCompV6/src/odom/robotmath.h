@@ -3,6 +3,8 @@
 #include "math.h"
 
 const double PI = 3.14159265;
+class Vector;
+class Point;
 
 //Basic
 
@@ -58,9 +60,28 @@ double normalizeAngle(double theta, bool inRadians=true){
   }
 }
 
-//Vector
-class Vector;
+//Get shortest delta theta to heading
+double shortestArcToTarget(double currentHeading, double targetHeading, bool inDeg=false){
+  if(inDeg){
+    currentHeading = degToRad(currentHeading);
+    targetHeading = degToRad(targetHeading);
+  }
+  currentHeading = normalizeAngle(currentHeading);
+  targetHeading = normalizeAngle(targetHeading);
+  double deltaTheta = targetHeading - currentHeading;
+  if(abs(deltaTheta) > PI){
+    if(deltaTheta < 0){
+      //If E is CW then faster path is CCW
+      deltaTheta = (2*PI)+deltaTheta;
+    }else{
+      //If E is CCW; faster path is CW
+      deltaTheta = -((2*PI)-deltaTheta);
+    }
+  }
+  return deltaTheta;
+}
 
+//Vector
 class Point{
   public:
     double x;
@@ -115,13 +136,25 @@ class Vector{
       }
       return result;
     }
+    
+    int sameDirection(double targetHead, bool inDeg=false){
+      if(inDeg){
+        targetHead = degToRad(targetHead);
+      }
+      double theta = shortestArcToTarget(getTheta(), targetHead);
+      if (abs(theta) <= PI/2) {
+        return 1;
+      }else{
+        return -1;
+      }
+    }
     Vector getUnitVector(){
       if(getMagnitude() == 0){
         return Vector(0, 0);
       }
       return Vector(deltaX/getMagnitude(), deltaY/getMagnitude());
     }
-
+    
     //Magic operators
     Vector operator + (const Vector& other) {
       return Vector(deltaX + other.deltaX, deltaY + other.deltaY);
@@ -140,11 +173,12 @@ class Vector{
 };
 
 
-Point operator+(Point &p, Vector &v){
+Point operator + (Point &p, Vector &v){
     return Point(p.x + v.getX(), p.y + v.getY());
 }
-Point operator-(Point &p, Vector &v){
+Point operator - (Point &p, Vector &v){
     return Point(p.x - v.getX(), p.y - v.getY());
 }
+
 #endif
 
