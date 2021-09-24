@@ -36,6 +36,30 @@ double sign(double x){
   return 1;
 }
 
+//Algorithms
+typedef struct{
+  double p;
+  double i;
+  double d;
+} PIDGains;
+
+typedef struct{
+  double output;
+  double reset;
+  double lastError;
+} PIDOutput;
+
+//Initalize
+PIDOutput PID(double error, PIDGains gains){
+  return {gains.p*error, 0, error};
+}
+
+//Recursive
+PIDOutput PID(double error, PIDGains gains, PIDOutput previous){
+  double output = gains.p*error + gains.i*previous.reset + gains.d*(error - previous.lastError);
+  return {output, previous.reset+error, error};
+}
+
 //Angle
 
 double degToRad(double degrees){
