@@ -50,10 +50,8 @@ typedef struct{
 } PIDOutput;
 
 //Initalize
-PIDOutput PID(double error, PIDGains gains){
-  double p = gains.p*error;
-  double i = gains.i*error;
-  return {p+i, i, error};
+PIDOutput initPID(double error, PIDGains gains){
+  return {0, 0, error};
 }
 
 //Recursive
