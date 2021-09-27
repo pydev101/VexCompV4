@@ -10,7 +10,6 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
-#include "vex.h"
 #include "odom/robotcontrol.h"
 
 using namespace vex;
@@ -18,6 +17,6 @@ using namespace vex;
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!!
   vexcodeInit();
-  Brain.Timer.value();
+  
   
 }

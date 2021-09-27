@@ -1,5 +1,6 @@
 #ifndef __ROBOTCONTROL_H__
 #define __ROBOTCONTROL_H__
+#include "vex.h"
 #include "odometry.h"
 
 //Defines in terms of units
@@ -29,9 +30,8 @@ class Robot{
     double EncodersPerRotation;
     RobotProfile profile;
     MotorProfile motors;
-    double leftVelocity = 0; //Encoders per sec
-    double rightVelocity = 0; //Encoders per sec
-    double headingVelocity = 0; //Radians per sec
+    double linearVelocity = 0; //Units per sec
+    double angularVelocity = 0; //Radians per sec
     
     void track(){
       static double lastTime = 0;
@@ -45,37 +45,22 @@ class Robot{
       double t = Brain.Timer.value();
 
       double deltaT = t - lastTime; //TODO Ensure units are actually in msec
-      deltaT = deltaT * 1000; //Convert msec to sec
       double deltaL = L - lastLeftEncoder;
       double deltaR = R - lastRightEncoder;
       double deltaTheta = tempHead - lastHead;
 
-      leftVelocity = deltaL/deltaT;
-      rightVelocity = deltaR/deltaT;
-      headingVelocity = deltaTheta/deltaT;
+      double deltaF = 0.5*(deltaL + deltaR)/EncodersPerUnit;
+      deltaT = deltaT * 1000; //Convert msec to sec
+      linearVelocity = deltaF/deltaT;
+      angularVelocity = deltaTheta/deltaT;
 
       grid.setCurrentHead(tempHead, false);
-      grid.shiftPos(0.5*(deltaL + deltaR), tempHead, false);
+      grid.shiftPos(deltaF, tempHead, false);
 
       lastTime = t;
       lastLeftEncoder = L;
       lastRightEncoder = R;
       lastHead = tempHead;
-    }
-
-    void controlLoop(){
-      //Return true once a motion motion has finished
-      bool result = false;
-      track();
-      if(mode == 1){
-        result = straightMotionLoop();
-      }else if(mode == 2){
-        result = rotateMotionLoop();
-      }
-      if(result){
-        mode = 0; //
-      }
-      wait(delayInMilliSec, msec);
     }
 
 
@@ -88,6 +73,7 @@ class Robot{
       profile = robotProfile;
       motors = motorProfile;
       grid = OdomGrid(Point(startX, startY), startHeading, startHeadingInDegrees);
+      
       linearGains = linearPIDGains;
       rotationalGains = rotationalPIDGains;
 
@@ -99,13 +85,29 @@ class Robot{
       motors.resetHeading(startHeading, startHeadingInDegrees);
     }
 
+    //Needs to be on its own thread so it can constantly update position
+    bool controlLoop(){
+      bool result = false;
+      track();
+      if(mode == 1){
+        result = straightMotionLoop();
+      }else if(mode == 2){
+        result = rotateMotionLoop();
+      }
+      if(result){
+        mode = 0; //
+      }
+      wait(delayInMilliSec, msec);
+      return result;
+    }
+
     void move(){
-      //Set target
+      //Goes to grid target position
       mode = 1;
       while(mode == 1){wait(delayInMilliSec, msec);}
     }
     void rotate(){
-      //Set target
+      //Roates to grid target heading
       mode = 2;
       while(mode == 2){wait(delayInMilliSec, msec);}
     }

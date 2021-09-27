@@ -1,6 +1,6 @@
 #ifndef __ROBOTMATH_H__
 #define __ROBOTMATH_H__
-#include "vex.h"
+#include "math.h"
 
 const double PI = 3.14159265;
 class Vector;
