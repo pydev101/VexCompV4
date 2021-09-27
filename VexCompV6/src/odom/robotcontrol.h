@@ -24,6 +24,7 @@ typedef struct{
 class Robot{
   private:
     int mode = 0; //0 is tracking; 1 is linear motion; 2 is stationary rotation
+    const int delayInMilliSec = 15;
     double EncodersPerUnit;
     double EncodersPerRotation;
     RobotProfile profile;
@@ -62,6 +63,21 @@ class Robot{
       lastHead = tempHead;
     }
 
+    void controlLoop(){
+      //Return true once a motion motion has finished
+      bool result = false;
+      track();
+      if(mode == 1){
+        result = straightMotionLoop();
+      }else if(mode == 2){
+        result = rotateMotionLoop();
+      }
+      if(result){
+        mode = 0; //
+      }
+      wait(delayInMilliSec, msec);
+    }
+
 
   public:
     OdomGrid grid = OdomGrid(Point(0,0), PI/2, false);
@@ -83,21 +99,17 @@ class Robot{
       motors.resetHeading(startHeading, startHeadingInDegrees);
     }
 
-    bool controlLoop(){
-      //Return true once a motion motion has finished
-      bool result = false;
-      if(mode == 0){
-        track();
-      }else if(mode == 1){
-        result = straightMotion();
-      }else if(mode == 2){
-        result = rotateMotion();
-      }
-      if(result){
-        mode = 0; //
-      }
-      return result;
+    void move(){
+      //Set target
+      mode = 1;
+      while(mode == 1){wait(delayInMilliSec, msec);}
     }
+    void rotate(){
+      //Set target
+      mode = 2;
+      while(mode == 2){wait(delayInMilliSec, msec);}
+    }
+
     //Need continous tracking mode
     //Straight line motion mode
     //Stationary rotation mode
