@@ -1,6 +1,6 @@
 #ifndef __ROBOTMATH_H__
 #define __ROBOTMATH_H__
-#include "math.h"
+#include "vex.h"
 
 const double PI = 3.14159265;
 class Vector;
@@ -40,7 +40,7 @@ double sign(double x){
 typedef struct{
   double p; //% change in output over % change in error
   double i;
-  double d;
+  double d; //Recommendation Have D term be change in position not change in error so that a change in error is not considered a change in position; Or could just reset PID algoritm each use
 } PIDGains;
 
 typedef struct{
@@ -61,9 +61,6 @@ PIDOutput PID(double error, PIDGains gains, PIDOutput previous){
   double d = gains.d*(error - previous.lastError);
   return {p+i+d, i, error};
 }
-
-//TODO Have D term be change in position not change in error so that a change in error is not considered a change in position; Or could just reset PID algoritm each use
-//TODO Diminsional analysis so that the output is the unitOfError/unitOfSecond
 
 //Angle
 
@@ -225,15 +222,13 @@ class Vector{
     Vector operator * (double scalar) {
       return Vector(deltaX*scalar, deltaY*scalar);
     }
+    Point operator + (Point &p){
+      return Point(p.x + getX(), p.y + getY());
+    }
+    Point operator - (Point &p){
+      return Point(p.x - getX(), p.y - getY());
+    }
 };
-
-
-Point operator + (Point &p, Vector &v){
-    return Point(p.x + v.getX(), p.y + v.getY());
-}
-Point operator - (Point &p, Vector &v){
-    return Point(p.x - v.getX(), p.y - v.getY());
-}
 
 #endif
 
