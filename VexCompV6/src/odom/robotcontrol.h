@@ -30,6 +30,8 @@ class Robot{
     double EncodersPerRotation;
     RobotProfile profile;
     MotorProfile motors;
+    PIDOutput linearOutput;
+    PIDOutput rotationalOutput;
     double linearVelocity = 0; //Units per sec
     double angularVelocity = 0; //Radians per sec
     
@@ -63,6 +65,26 @@ class Robot{
       lastHead = tempHead;
     }
 
+    void calcDeltaThetaOverTime(bool alignWithSecent){
+      rotationalOutput = PID(grid.thetaError(alignWithSecent), rotationalGains, rotationalOutput);
+    }
+
+    //TODO
+    //Control motor speed based on error; finish with stopped motors and a return of true when complete
+    bool straightMotionLoop(){
+      //Find linear output, adjust rotational output based on drift
+      grid.updateTargetVector();
+      calcDeltaThetaOverTime(true);
+      linearOutput = PID(grid.linearError(), linearGains, linearOutput);
+
+      //Calculate motor speed with account to theta drift
+      //If within parameters set motors to 0 and return true; else set motor speed
+    }
+
+    bool rotateMotionLoop(){
+      calcDeltaThetaOverTime(false);
+      //If within parameters set motors to 0 and return true; else set motor speed
+    }
 
   public:
     OdomGrid grid = OdomGrid(Point(0,0), PI/2, false);
@@ -103,11 +125,14 @@ class Robot{
 
     void move(){
       //Goes to grid target position
+      linearOutput = initPID(grid.linearError(), linearGains);
+      rotationalOutput = initPID(grid.thetaError(true), rotationalGains);
       mode = 1;
       while(mode == 1){wait(delayInMilliSec, msec);}
     }
     void rotate(){
       //Roates to grid target heading
+      rotationalOutput = initPID(grid.thetaError(false), linearGains);
       mode = 2;
       while(mode == 2){wait(delayInMilliSec, msec);}
     }
