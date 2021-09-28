@@ -65,24 +65,28 @@ class Robot{
       lastHead = tempHead;
     }
 
-    void calcDeltaThetaOverTime(bool alignWithSecent){
-      rotationalOutput = PID(grid.thetaError(alignWithSecent), rotationalGains, rotationalOutput);
-    }
-
     //TODO
     //Control motor speed based on error; finish with stopped motors and a return of true when complete
     bool straightMotionLoop(){
       //Find linear output, adjust rotational output based on drift
       grid.updateTargetVector();
-      calcDeltaThetaOverTime(true);
+      rotationalOutput = PID(grid.thetaError(true), rotationalGains, rotationalOutput);
       linearOutput = PID(grid.linearError(), linearGains, linearOutput);
-
+      double left = linearOutput.output - rotationalOutput.output*profile.width*0.5;
+      double right = linearOutput.output + rotationalOutput.output*profile.width*0.5;
+      left = left*EncodersPerUnit; //TODO Convert to output wheel not based on measurement wheel
+      right = right*EncodersPerUnit; 
+      if(WITHINTARGET){
+        if(WITHINSTOPPED){
+          STOP
+        }
+      }
       //Calculate motor speed with account to theta drift
       //If within parameters set motors to 0 and return true; else set motor speed
     }
 
     bool rotateMotionLoop(){
-      calcDeltaThetaOverTime(false);
+      rotationalOutput = PID(grid.thetaError(false), rotationalGains, rotationalOutput);
       //If within parameters set motors to 0 and return true; else set motor speed
     }
 
