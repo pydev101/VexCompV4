@@ -43,10 +43,14 @@ class OdomGrid{
         updateTargetVector();
       }
       void setTarget(double deltaX, double deltaY){
-        setTarget(Vector(deltaX, deltaY) + pos);
+        setTarget(Vector(deltaX, deltaY) + targetPos);
       }
+      //Theta is realitive to target
       void setTarget(double magnitude, double theta, bool inDeg){
-        setTarget(Vector(magnitude, theta, inDeg) + pos);
+        if(inDeg){
+          theta = degToRad(theta);
+        }
+        setTarget(Vector(magnitude, theta+targetHeading, false) + targetPos);
       }
       void setTargetAbs(double x, double y){
         setTarget(Point(x, y));
@@ -90,6 +94,7 @@ class OdomGrid{
       void shiftPos(double deltaX, double deltaY){
         setPos(Vector(deltaX, deltaY) + pos);
       }
+      //Theta is absolute not realitive
       void shiftPos(double magnitude, double theta, bool inDeg){
         setPos(Vector(magnitude, theta, inDeg) + pos);
       }
