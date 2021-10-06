@@ -189,6 +189,7 @@ class Vector{
       return result;
     }
     
+    //TODO See if there is a linear algerbra way to do this iwht a dot product
     int sameDirection(double targetHead, bool inDeg=false){
       if(inDeg){
         targetHead = degToRad(targetHead);
