@@ -14,6 +14,7 @@ extern motor intakeM;
 extern motor leftC;
 extern motor rightC;
 extern inertial Inertial;
+extern digital_out pne;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

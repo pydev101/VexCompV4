@@ -12,6 +12,22 @@
 // leftC                motor         8               
 // rightC               motor         9               
 // Inertial             inertial      10              
+// pne                  digital_out   A               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// Controller1          controller                    
+// leftA                motor         1               
+// leftB                motor         2               
+// rightA               motor         3               
+// rightB               motor         4               
+// arm3M                motor         5               
+// arm4M                motor         6               
+// intakeM              motor         7               
+// leftC                motor         8               
+// rightC               motor         9               
+// Inertial             inertial      10              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 /*----------------------------------------------------------------------------*/
@@ -56,11 +72,14 @@ void setIntake(int speed){
 }
 
 
+
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
   arm4M.setStopping(hold);
   arm3M.setStopping(hold);
+
+  //pne.set(true);
 
   while(true){
     setLeft(Controller1.Axis3.position(percent));

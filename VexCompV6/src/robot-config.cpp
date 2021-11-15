@@ -19,6 +19,7 @@ motor intakeM = motor(PORT7, ratio18_1, false);
 motor leftC = motor(PORT8, ratio18_1, false);
 motor rightC = motor(PORT9, ratio18_1, false);
 inertial Inertial = inertial(PORT10);
+digital_out pne = digital_out(Brain.ThreeWirePort.A);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable
