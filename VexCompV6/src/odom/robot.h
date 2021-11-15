@@ -23,8 +23,8 @@ class Robot{
       return output;
     }
 
-    double * getLinearSpeed(bool shortestArcToLineV=true){
-      double o = location.getLinearError(shortestArcToLineV)*linearP;
+    double * getLinearSpeed(){
+      double o = location.getLinearError()*linearP;
       double static output[2] = {o, o};
       return output;
     }

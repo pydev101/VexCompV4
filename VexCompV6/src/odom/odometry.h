@@ -60,12 +60,10 @@ class OdomGrid{
     void setTarget(Vector v){
       targetPos = v + targetPos; //TODO Ensure the math/operator works here
       targetVec = Vector(pos, targetPos);
-      setTargetHead(Vector(1, 0).getAngle(targetVec));
     }
     void setAbsTarget(double x, double y){
       targetPos = Point(x, y);
       targetVec = Vector(pos, targetPos);
-      setTargetHead(Vector(1, 0).getAngle(targetVec));
     }
     void setTargetHead(double ang, bool headingInDegrees=false){
       if(headingInDegrees){
@@ -74,8 +72,12 @@ class OdomGrid{
       targetHeading = normalizeAngle(targetHeading);
       targetHeading = ang;
     }
+    void updateTargetHead(){
+      setTargetHead(Vector(1, 0).getAngle(targetVec));
+    }
 
-    double getLinearError(bool shortestArcToLineV=false){
+    double getLinearError(bool shortestArcToLineV=true){
+      updateTargetHead();
       double a = getThetaError(shortestArcToLineV);
       if(cos(a) >= 0){
         return targetVec.getMagnitude();
