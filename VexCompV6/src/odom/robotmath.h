@@ -36,6 +36,10 @@ double sign(double x){
   return 1;
 }
 
+int floorInt(double x){
+  return (int)floor(x);
+}
+
 //Algorithms
 typedef struct{
   double p; //% change in output over % change in error
@@ -86,6 +90,7 @@ double normalizeAngle(double theta, bool inRadians=true){
   }
 }
 
+
 //Get shortest delta theta to heading
 //TODO Ensure this function actually works
 double shortestArcToTarget(double currentHeading, double targetHeading, bool inDeg=false){
@@ -108,6 +113,7 @@ double shortestArcToTarget(double currentHeading, double targetHeading, bool inD
   return deltaTheta;
 }
 
+
 //Get shortest delta theta to heading line (secent line between target heading and opposite end of circle)
 //TODO Ensure function actually works
 double shortestArcToLine(double currentHeading, double targetHeading, bool inDeg=false){
@@ -125,7 +131,7 @@ double shortestArcToLine(double currentHeading, double targetHeading, bool inDeg
   }
 }
 
-//Vector
+//Vector Math
 class Point{
   public:
     double x;
@@ -178,34 +184,47 @@ class Vector{
     double getMagnitude(){
       return sqrt(deltaX*deltaX + deltaY*deltaY);
     }
-    double getTheta(bool inDegrees=false){
-      double result = atan2(deltaY, deltaX);
-      if(result < 0){
-          result += 2*PI;
-      }
-      if(inDegrees){
-        return radToDeg(result);
-      }
-      return result;
+    double dot(Vector otherV){
+      return deltaX*otherV.deltaX + deltaY*otherV.deltaY;
     }
-    
-    //TODO See if there is a linear algerbra way to do this iwht a dot product
-    int sameDirection(double targetHead, bool inDeg=false){
-      if(inDeg){
-        targetHead = degToRad(targetHead);
+    //TODO Test (Maybe worked in JS?)
+    double getAngle(Vector vecB) {
+      if((getMagnitude() == 0) || (vecB.getMagnitude() == 0)){
+        return 2*PI; // Its bound between 0-PI so 2PI is error indication
       }
-      double theta = shortestArcToTarget(getTheta(), targetHead);
-      if (abs(theta) <= PI/2) {
-        return 1;
-      }else{
-        return -1;
+      double theta = acos(dot(vecB) / (getMagnitude() * vecB.getMagnitude()));
+      double dotZ = deltaX * -vecB.deltaY + deltaY * vecB.deltaX;
+      if (dotZ > 0) {
+        //B right of A
+        return -theta;
+      } else if (dotZ < 0) {
+        //B left of A
+        return theta;
+      } else {
+        //Paraell
+        return theta;
       }
+    }
+    Vector scale(double s){
+      return Vector(deltaX*s, deltaY*s);
     }
     Vector getUnitVector(){
       if(getMagnitude() == 0){
         return Vector(0, 0);
       }
       return Vector(deltaX/getMagnitude(), deltaY/getMagnitude());
+    }
+    //TODO Test Math (Works in JS)
+    Vector getRotatedVector(double theta, bool inDegrees=false){
+      if(inDegrees){
+        theta = degToRad(theta);
+      }
+      return Vector(deltaX * cos(theta) - deltaY * sin(theta), deltaX * sin(theta) + deltaY * cos(theta));
+    }
+
+    Vector project(Vector vec){
+      //Projects this on to vec
+      return vec.scale(dot(vec) / (vec.getMagnitude() * vec.getMagnitude()));
     }
     
     //Magic operators

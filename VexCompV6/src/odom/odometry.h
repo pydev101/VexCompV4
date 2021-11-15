@@ -7,119 +7,100 @@
 class OdomGrid{
   private:
     Point pos = Point(0, 0); //Units given by user
-    double head = 0; //Radians
+    double currentHeading = 0; //Radians
+
+    Vector vel = Vector(0, 0);
+    Vector accel = Vector(0, 0);
+
+    double angularVelocity = 0;
+    double angularAcceleration = 0;
 
     Point targetPos = Point(0, 0); //Units given by user
     double targetHeading = 0; //Radians
+    Vector targetVec = Vector(0, 0);
 
   public:
     //Constructors
-    OdomGrid (Point Pos, double currentHeading, bool headingGivenInDegrees){
+    OdomGrid(Point Pos, double CurrentHeading, bool headingGivenInDegrees){
       if(headingGivenInDegrees){
-        currentHeading = degToRad(currentHeading);
+        CurrentHeading = degToRad(CurrentHeading);
       }
-      head = currentHeading;
       pos = Pos;
+      currentHeading = CurrentHeading;
       targetPos = Pos;
+      targetHeading = currentHeading;
     }
 
     //Setter/Getters
     //Set target heading and position
-      Vector updateTargetVector(){
-        Vector t = getTargetVector();
-        setTargetHead(t.getTheta(), false);
-        return t;
-      }
-      void setTargetHead(double theta, bool inDeg){
-        if(inDeg){
-          theta = degToRad(theta);
-        }
-        targetHeading = theta;
+    void updatePosition(Vector deltaPos, double deltaHeading, double deltaT, bool headingInDegrees=false){
+      if(headingInDegrees){
+        deltaHeading = degToRad(deltaHeading);
       }
 
+      pos = deltaPos + pos;
+      Vector newVel = deltaPos.scale(1/deltaT);
+      accel = newVel + vel.scale(-1);
+      vel = newVel;
 
-      void setTarget(Point t){
-        targetPos = t;
-        updateTargetVector();
-      }
-      void setTarget(double deltaX, double deltaY){
-        setTarget(Vector(deltaX, deltaY) + targetPos);
-      }
-      //Theta is realitive to target
-      void setTarget(double magnitude, double theta, bool inDeg){
-        if(inDeg){
-          theta = degToRad(theta);
-        }
-        setTarget(Vector(magnitude, theta+targetHeading, false) + targetPos);
-      }
-      void setTargetAbs(double x, double y){
-        setTarget(Point(x, y));
-      }
-      Point getTarget(){
-        return pos;
-      }
-      double getTargetHeading(bool inDeg){
-        if(inDeg){
-          return radToDeg(targetHeading);
-        }
-        return targetHeading;
-      }
+      currentHeading = currentHeading + deltaHeading;
+      double newAngularVelocity = deltaHeading / deltaT;
+      angularAcceleration = newAngularVelocity - angularVelocity;
+      angularVelocity = newAngularVelocity;
 
-
-
-      //Set current heading and position
-      void setCurrentHead(double currentHeading, bool inDeg){
-        if(inDeg){
-          currentHeading = degToRad(currentHeading);
-        }
-        head = currentHeading;
-      }
-      void shiftCurrentHead(double theta, bool inDeg){
-        if(inDeg){
-          theta = degToRad(theta);
-        }
-        head += theta;
-      }
-      double getHeading(bool inDeg){
-        if(inDeg){
-          return radToDeg(head);
-        }
-        return head;
-      }
-
-
-      void setPos(Point t){
-          pos = t;
-      }
-      void shiftPos(double deltaX, double deltaY){
-        setPos(Vector(deltaX, deltaY) + pos);
-      }
-      //Theta is absolute not realitive
-      void shiftPos(double magnitude, double theta, bool inDeg){
-        setPos(Vector(magnitude, theta, inDeg) + pos);
-      }
-      void setPosAbs(double x, double y){
-        setPos(Point(x, y));
-      }
-      Point getPos(){
-        return pos;
-      }
-
-
-    //Helper
-    Vector getTargetVector(){
-      return Vector(pos, targetPos);
+      targetVec = Vector(pos, targetPos);
     }
-    double linearError(){
-      Vector v = getTargetVector();
-      return v.getMagnitude() * v.sameDirection(head);
+
+    void setPos(double x, double y){
+      pos = Point(x, y);
+      targetVec = Vector(pos, targetPos);
     }
-    double thetaError(bool alignWithSecent){
-      if(alignWithSecent){
-        return shortestArcToLine(head, targetHeading);
+
+
+    void setTarget(Vector v){
+      targetPos = v + targetPos; //TODO Ensure the math/operator works here
+      targetVec = Vector(pos, targetPos);
+      setTargetHead(Vector(1, 0).getAngle(targetVec));
+    }
+    void setAbsTarget(double x, double y){
+      targetPos = Point(x, y);
+      targetVec = Vector(pos, targetPos);
+      setTargetHead(Vector(1, 0).getAngle(targetVec));
+    }
+    void setTargetHead(double ang, bool headingInDegrees=false){
+      if(headingInDegrees){
+        ang = degToRad(ang);
+      }
+      targetHeading = normalizeAngle(targetHeading);
+      targetHeading = ang;
+    }
+
+    double getLinearError(bool shortestArcToLineV=false){
+      double a = getThetaError(shortestArcToLineV);
+      if(cos(a) >= 0){
+        return targetVec.getMagnitude();
       }else{
-        return shortestArcToTarget(head, targetHeading);
+        return -targetVec.getMagnitude();
       }
+    }
+    double getThetaError(bool shortestArcToLineV=false){
+      if(shortestArcToLineV){
+        return shortestArcToLine(currentHeading, targetHeading);
+      }
+      return shortestArcToTarget(currentHeading, targetHeading);
+    }
+    
+    Vector getVel(){
+      return vel;
+    }
+    Vector getAccel(){
+      return accel;
+    }
+    double getAngularVel(){
+      return angularVelocity;
+    }
+    double getAngularAccel(){
+      return angularAcceleration;
     }
 };
 #endif

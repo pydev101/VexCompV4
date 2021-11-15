@@ -1,13 +1,11 @@
 #ifndef __ROBOTCONTROL_H__
 #define __ROBOTCONTROL_H__
 #include "vex.h"
-#include "odom/odometry.h"
+#include "odom/robot.h"
 
-OdomGrid grid = OdomGrid(Point(0,0), PI/2, false);
+//Point Pos, double CurrentHeading, bool headingGivenInDegrees, double linearKp, double angularKp
+Robot robot = Robot(Point(0,0), 90, true, 1, 1);
 
-extern motor leftMotorA;
-extern motor rightMotorA;
-extern inertial DrivetrainInertial;
 
 void track(){
   double leftEnc = leftMotorA.rotation(deg);
