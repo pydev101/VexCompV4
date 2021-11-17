@@ -1,19 +1,20 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
 // leftA                motor         1               
-// leftB                motor         2               
 // rightA               motor         3               
 // rightB               motor         4               
-// arm3M                motor         5               
-// arm4M                motor         6               
+// arm                  motor         5               
 // intakeM              motor         7               
 // leftC                motor         8               
 // rightC               motor         9               
-// Inertial             inertial      10              
-// pne                  digital_out   A               
+// leftB                motor         10              
+// Controller1          controller                    
+// Inertial             inertial      19              
+// backPne              digital_out   A               
+// frontPne             digital_out   H               
 // ---- END VEXCODE CONFIGURED DEVICES ----
+
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
@@ -46,54 +47,80 @@ void setRight(int speed){
   setM(rightB, speed);
   setM(rightC, speed);
 }
-void set3Bar(int speed){
-  setM(arm3M, speed);
-}
-void set4Bar(int speed){
-  setM(arm4M, speed);
+void setArm(int speed){
+  setM(arm, speed);
 }
 void setIntake(int speed){
   setM(intakeM, speed);
 }
-
-
+void toggleFront(bool currState){
+  static bool active = false;
+  static bool press = false;
+  if(currState != press){
+    press = currState;
+    if(currState){
+      active = !active;
+      frontPne.set(active);
+    }
+  }
+}
+void toggleBack(bool currState){
+  static bool active = false;
+  static bool press = false;
+  if(currState != press){
+    press = currState;
+    if(currState){
+      active = !active;
+      backPne.set(active);
+    }
+  }
+}
 
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
   //TODO NEED TO CALIBRATE INERTIAL SENSOR
 
-  arm4M.setStopping(hold);
-  arm3M.setStopping(hold);
+  arm.setStopping(hold);
 
-  //pne.set(true);
+  int intakeMode = 0;
+  bool intakePressing = false;
 
   while(true){
     setLeft(Controller1.Axis3.position(percent));
     setRight(Controller1.Axis2.position(percent));
 
     if(Controller1.ButtonR1.pressing()){
-      set4Bar(100);
+      setArm(100);
     }else if(Controller1.ButtonR2.pressing()){
-      set4Bar(-60);
+      setArm(-60);
     }else{
-      set4Bar(0);
+      setArm(0);
     }
 
-    if(Controller1.ButtonL1.pressing()){
-      set3Bar(100);
-    }else if(Controller1.ButtonL2.pressing()){
-      set3Bar(-60);
-    }else{
-      set3Bar(0);
-    }
+    toggleFront(Controller1.ButtonL1.pressing());
+    toggleBack(Controller1.ButtonL2.pressing());
 
-    if(Controller1.ButtonX.pressing()){
-      setIntake(100);
-    }else if(Controller1.ButtonA.pressing()){
-      setIntake(-60);
+    if(Controller1.ButtonX.pressing() && !intakePressing){
+      intakePressing = true;
+      if(intakeMode != 1){
+        intakeMode = 1;
+        setIntake(60);
+      }else{
+        intakeMode = 0;
+        setIntake(0);
+      }
+    }else if(Controller1.ButtonA.pressing() && !intakePressing){
+      intakePressing = true;
+      if(intakeMode != -1){
+        intakeMode = -1;
+        setIntake(-60);
+      }else{
+        intakeMode = 0;
+        setIntake(0);
+      }
     }else{
-      setIntake(0);
+      intakePressing = false;
     }
   }
 }
