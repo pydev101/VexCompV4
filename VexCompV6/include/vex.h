@@ -7,10 +7,14 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 //
+#ifndef __VEX_H__
+#define __VEX_H__
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
 
 #include "v5.h"
 #include "v5_vcs.h"
@@ -24,3 +28,4 @@
 
 #define repeat(iterations)                                                     \
   for (int iterator = 0; iterator < iterations; iterator++)
+#endif

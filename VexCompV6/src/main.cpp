@@ -25,102 +25,39 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
-#include "vex.h"
+#include "driver.h"
+#include "programs.h"
 
-using namespace vex;
+// A global instance of competition
+competition Competition;
 
-void setM(motor m, int speed){
-  m.setVelocity(speed, percent);
-  if(speed == 0){
-    m.stop();
-  }else{
-    m.spin(forward);
-  }
-}
-void setLeft(int speed){
-  setM(leftA, speed);
-  setM(leftB, speed);
-  setM(leftC, speed);
-}
-void setRight(int speed){
-  setM(rightA, speed);
-  setM(rightB, speed);
-  setM(rightC, speed);
-}
-void setArm(int speed){
-  setM(arm, speed);
-}
-void setIntake(int speed){
-  setM(intakeM, speed);
-}
-void toggleFront(bool currState){
-  static bool active = false;
-  static bool press = false;
-  if(currState != press){
-    press = currState;
-    if(currState){
-      active = !active;
-      frontPne.set(active);
-    }
-  }
-}
-void toggleBack(bool currState){
-  static bool active = false;
-  static bool press = false;
-  if(currState != press){
-    press = currState;
-    if(currState){
-      active = !active;
-      backPne.set(active);
-    }
-  }
-}
-
-int main() {
+void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-  //TODO NEED TO CALIBRATE INERTIAL SENSOR
-
+  frontPne.set(true);
+  backPne.set(true);
   arm.setStopping(hold);
 
-  int intakeMode = 0;
-  bool intakePressing = false;
+  Inertial.startCalibration();
+  while(Inertial.isCalibrating()){wait(10, msec);}
+  //TODO Clear encoders
+  BrainGUIProgram();
+}
 
-  while(true){
-    setLeft(Controller1.Axis3.position(percent));
-    setRight(Controller1.Axis2.position(percent));
+//
+// Main will set up the competition functions and callbacks.
+//
+//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+int main() {
+  // Set up callbacks for autonomous and driver control periods.
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
 
-    if(Controller1.ButtonR1.pressing()){
-      setArm(100);
-    }else if(Controller1.ButtonR2.pressing()){
-      setArm(-60);
-    }else{
-      setArm(0);
-    }
+  // Run the pre-autonomous function.
+  pre_auton();
 
-    toggleFront(Controller1.ButtonL1.pressing());
-    toggleBack(Controller1.ButtonL2.pressing());
-
-    if(Controller1.ButtonX.pressing() && !intakePressing){
-      intakePressing = true;
-      if(intakeMode != 1){
-        intakeMode = 1;
-        setIntake(60);
-      }else{
-        intakeMode = 0;
-        setIntake(0);
-      }
-    }else if(Controller1.ButtonA.pressing() && !intakePressing){
-      intakePressing = true;
-      if(intakeMode != -1){
-        intakeMode = -1;
-        setIntake(-60);
-      }else{
-        intakeMode = 0;
-        setIntake(0);
-      }
-    }else{
-      intakePressing = false;
-    }
+  // Prevent main from exiting with an infinite loop.
+  while (true) {
+    wait(100, msec);
   }
 }
