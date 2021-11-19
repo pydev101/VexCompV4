@@ -34,22 +34,25 @@ competition Competition;
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-  frontPne.set(true);
+  frontPne.set(false);
   backPne.set(true);
   arm.setStopping(hold);
 
   Inertial.startCalibration();
   while(Inertial.isCalibrating()){wait(10, msec);}
   //TODO Clear encoders
+
   BrainGUIProgram();
 }
 
 //
 // Main will set up the competition functions and callbacks.
 //
-//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
 int main() {
   // Set up callbacks for autonomous and driver control periods.
+
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
 

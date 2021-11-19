@@ -10,7 +10,9 @@ typedef struct {
 } autoEntry;
 
 void blueLeft(int mod){
-  setFront(false);
+  setIntake(30);
+  wait(300, msec);
+  setIntake(0);
   moveArm(60, 100);
   move(70, 600);
   move(-30, 210, true);
@@ -26,12 +28,14 @@ void blueLeft(int mod){
   setIntake(50);
 }
 void redRight(int mod){
-  setFront(false);
+  setIntake(30);
+  wait(300, msec);
+  setIntake(0);
   moveArm(60, 100);
   move(70, 1000);
   setFront(true);
   setBack(false);
-  move(-70, 360);
+  move(-70, 500);
   move(30, 700, true);
   move(-30, 360);
   setBack(true);
@@ -56,7 +60,7 @@ autoEntry entries[] = {
   {"Red Left", blueLeft},
   {"One Minute", OneMinute},
 };
-int indexAuto = 4;
+int indexAuto = 0;
 
 
 //START OF GUI------------------------------------------------------------------------
