@@ -17,19 +17,44 @@ class Robot{
       angularP = angularKp;
     } 
 
-    double * getRotationalSpeed(bool shortestArcToLineV=false){
+    double getRotationalSpeed(bool shortestArcToLineV=false){
       double o = location.getThetaError(shortestArcToLineV)*angularP;
-      double static output[2] = {-o, o};
-      return output;
+      return o;
     }
 
-    double * getLinearSpeed(){
+    double getLinearSpeed(){
       double o = location.getLinearError()*linearP;
-      double static output[2] = {o, o};
-      return output;
+      return o;
     }
 
+    //Sets Target using XY basis grid
+    void resetPID(){
 
+    }
+
+    void setHeadTarget(double theta, bool inDeg){
+      resetPID();
+      location.setTargetHead(theta, inDeg);
+    }
+
+    void setHeadTargetAbs(double head, bool inDeg){
+      resetPID();
+      location.setTargetHeadAbs(head, inDeg);
+    }
+
+    void setTarget(Vector v){
+      resetPID();
+      location.setTarget(v);
+      location.updateTargetHead();
+    }
+
+    //Sets realitive to current position and robot orientation
+    //dX is horizontal, dY is fwd
+    void setTargetRealitiveToRobotOrientation(Vector v){
+      resetPID();
+      location.setTargetRealitiveToTargetOrientation(v);
+      location.updateTargetHead();
+    }
 
   //PID, tracking, and speed control (Max accel, Max speed, Constant Velocity, self-adj of PID in order to get ideal settings)
 };

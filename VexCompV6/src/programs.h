@@ -1,5 +1,7 @@
 #include "Intergration.h"
 
+//Defines autonomous program and GUI selection screen
+
 bool programRunning = false;
 
 typedef struct {
@@ -14,16 +16,16 @@ void blueLeft(int mod){
   wait(300, msec);
   setIntake(0);
   moveArm(60, 100);
-  move(70, 600);
-  move(-30, 210, true);
-  move(30, 1000);
+  moveTime(70, 600);
+  moveTime(-30, 210, true);
+  moveTime(30, 1000);
   setFront(true);
   setBack(false);
-  move(-30, 1000);
-  move(30, 210, true);
-  move(-30, 1000);
-  move(30, 441, true);
-  move(-30, 1000);
+  moveTime(-30, 1000);
+  moveTime(30, 210, true);
+  moveTime(-30, 1000);
+  moveTime(30, 441, true);
+  moveTime(-30, 1000);
   setBack(true);
   setIntake(50);
 }
@@ -32,25 +34,25 @@ void redRight(int mod){
   wait(300, msec);
   setIntake(0);
   moveArm(60, 100);
-  move(70, 1000);
+  moveTime(70, 1000);
   setFront(true);
   setBack(false);
-  move(-70, 500);
-  move(30, 700, true);
-  move(-30, 360);
+  moveTime(-70, 500);
+  moveTime(30, 700, true);
+  moveTime(-30, 360);
   setBack(true);
-  move(70, 500);
+  moveTime(70, 500);
   setIntake(50);
 }
 void OneMinute(int mod){
   setFront(false);
   moveArm(60, 100);
-  move(70, 2000);
-  move(-30, 360, true);
-  move(-70, 2500);
-  move(30, 1000);
-  move(30, 360, true);
-  move(70, 2000);
+  moveTime(70, 2000);
+  moveTime(-30, 360, true);
+  moveTime(-70, 2500);
+  moveTime(30, 1000);
+  moveTime(30, 360, true);
+  moveTime(70, 2000);
 }
 
 autoEntry entries[] = {
@@ -203,10 +205,13 @@ void BrainGUIProgram(){
     wait(50, msec);
   }
 
+  Brain.Screen.setFillColor(black);
+  Brain.Screen.setPenColor(white);
   Brain.Screen.clearScreen();
   Brain.Screen.setCursor(1, 1);
   std::string out = entries[indexAuto].name;
   Brain.Screen.print("Selected: %s", out.c_str());
+  Brain.Screen.render();
 }
 
 void autonomous(void){

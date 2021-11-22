@@ -40,15 +40,16 @@ void pre_auton(void) {
 
   Inertial.startCalibration();
   while(Inertial.isCalibrating()){wait(10, msec);}
-  //TODO Clear encoders
+  resetEncoders();
 
+  task traker = task(trakerFunction);
   BrainGUIProgram();
 }
 
 //
 // Main will set up the competition functions and callbacks.
 //
-//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 int main() {
   // Set up callbacks for autonomous and driver control periods.

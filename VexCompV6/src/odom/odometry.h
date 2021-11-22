@@ -56,28 +56,39 @@ class OdomGrid{
       targetVec = Vector(pos, targetPos);
     }
 
-
     void setTarget(Vector v){
       targetPos = v + targetPos; //TODO Ensure the math/operator works here
       targetVec = Vector(pos, targetPos);
+    }
+    void setTargetRealitiveToTargetOrientation(Vector v){
+      Vector fwd = Vector(1, targetHeading, false).scale(v.getY());
+      Vector hor = Vector(1, targetHeading - (PI/2), false).scale(v.getX());
+      setTarget(fwd + hor); //TODO Ensure Operator does its job
     }
     void setAbsTarget(double x, double y){
       targetPos = Point(x, y);
       targetVec = Vector(pos, targetPos);
     }
-    void setTargetHead(double ang, bool headingInDegrees=false){
+    void setTargetHeadAbs(double ang, bool headingInDegrees=false){
       if(headingInDegrees){
         ang = degToRad(ang);
       }
       targetHeading = normalizeAngle(targetHeading);
       targetHeading = ang;
     }
+    void setTargetHead(double theta, bool inDegrees){
+      if(inDegrees){
+        theta = degToRad(theta);
+      }
+      setTargetHeadAbs(targetHeading + theta, false);
+    }
     void updateTargetHead(){
-      setTargetHead(Vector(1, 0).getAngle(targetVec));
+      setTargetHeadAbs(Vector(1, 0).getAngle(targetVec));
     }
 
+    //TODO ENSURE THIS IS ACCUATE
     double getLinearError(bool shortestArcToLineV=true){
-      updateTargetHead();
+      updateTargetHead(); //Overides how user last set target heading to turn in order to move robot linearly
       double a = getThetaError(shortestArcToLineV);
       if(cos(a) >= 0){
         return targetVec.getMagnitude();
@@ -85,6 +96,7 @@ class OdomGrid{
         return -targetVec.getMagnitude();
       }
     }
+    //TODO Ensure works hyper important
     double getThetaError(bool shortestArcToLineV=false){
       if(shortestArcToLineV){
         return shortestArcToLine(currentHeading, targetHeading);
