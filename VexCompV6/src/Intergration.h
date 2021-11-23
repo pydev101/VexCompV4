@@ -6,7 +6,7 @@
 #include "odom/robot.h"
 
 //Set position and target using robot, get linear and angular speed from robot, set speed of motors to reflect robot
-const double UnitsPerRev = PI*10.16; //Cms per revolution + 3/2 gear ratio
+const double UnitsPerRev = PI*10.16; //Cms per revolution + 3/2 gear ratio //TODO Ensure this is valid
 const double RobotDiameter = 42; //Cms (Same Units as above)
 const double linThreashold = 5; //CM
 const double angularThreashold = 0.0056*(2*PI); //1 deg
@@ -16,6 +16,8 @@ Robot robot = Robot(Point(0, 0), 90, true, 1, 3.6);
 void track(){
   static double lastHeading = 0;
   static double lastTime = 0;
+  static double lastLeft = 0;
+  static double lastRight = 0;
 
   double leftEnc = getLeftEnc();
   double rightEnc = getRightEnc();
@@ -23,16 +25,21 @@ void track(){
   double deltaT = Brain.timer(timeUnits::msec) - lastTime;
   deltaT = deltaT / 1000;
 
-  double deltaFwd = 0.5*(leftEnc + rightEnc)*UnitsPerRev;
   double deltaHead = lastHeading - head; //+ is CCW; Heading given + in CW so sign is flopped
+  lastHeading = head;
+  head = 360 - normalizeAngle(head, false); //Heading in CCW + direction
+
+  double deltaFwd = 0.5*((leftEnc-lastLeft) + (rightEnc-lastRight))*UnitsPerRev;
+  lastLeft = leftEnc;
+  lastRight = rightEnc;
 
   Vector deltaPos = Vector(deltaFwd, head, true);
-
   robot.location.updatePosition(deltaPos, deltaHead, deltaT, true);
+  robot.location.setHead(head, true);
+
+  //TODO Ensure robot location has correct position and correct angle, if yes then ensure target position is valid, if yes ensure vector is valid, if yes allow it to move
   std::cout << robot.location.getPos().x << ", " << robot.location.getPos().y << ", " << radToDeg(robot.location.getCurrHead()) << std::endl;
 
-  resetEncoders();
-  lastHeading = head;
   lastTime = Brain.timer(timeUnits::msec);
 }
 int trakerFunction(){

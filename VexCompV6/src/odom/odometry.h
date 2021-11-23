@@ -51,11 +51,17 @@ class OdomGrid{
 
       targetVec = Vector(pos, targetPos);
     }
-
+    void setHead(double newHead, bool headingInDegrees){
+      if(headingInDegrees){
+        newHead = degToRad(newHead);
+      }
+      currentHeading = newHead;
+    }
     void setPos(double x, double y){
       pos = Point(x, y);
       targetVec = Vector(pos, targetPos);
     }
+
 
     void setTarget(Vector v){
       targetPos = v + targetPos; //TODO Ensure the math/operator works here

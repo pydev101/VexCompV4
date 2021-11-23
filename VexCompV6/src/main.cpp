@@ -40,7 +40,7 @@ void pre_auton(void) {
 
   Inertial.startCalibration();
   while(Inertial.isCalibrating()){wait(10, msec);}
-  Inertial.setHeading(90, rotationUnits::deg);
+  Inertial.setHeading(270, rotationUnits::deg); //90 deg CCW but inertial sensor only measures in CW
 
   resetEncoders();
 
