@@ -16,6 +16,7 @@ Future Features
 --Ability to graph data on Brain Screen
 3) Machine Learning
 --Adjust gain values to ensure it reaches target and optimize velocity
+--Cost = TotalTime of travel; TotalTime over Gain must be minimized; Gain can be adjusted if constant ossilation or minimum speed is outside because total time would still not be fully optimal and so it won't break algorithm
 4) Nonhold move functions
 --Allow it to lower arm, etc while moving to a target and then mvoe to the next target as soon as it arrives at the orignal
 
