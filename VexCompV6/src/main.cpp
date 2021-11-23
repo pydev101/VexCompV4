@@ -29,7 +29,7 @@
 #include "programs.h"
 
 // A global instance of competition
-competition Competition;
+//competition Competition;
 
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
@@ -40,25 +40,27 @@ void pre_auton(void) {
 
   Inertial.startCalibration();
   while(Inertial.isCalibrating()){wait(10, msec);}
+  Inertial.setHeading(90, rotationUnits::deg);
+
   resetEncoders();
 
   task traker = task(trakerFunction);
-  BrainGUIProgram();
+  //BrainGUIProgram();
 }
 
 //
 // Main will set up the competition functions and callbacks.
 //
-//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 int main() {
   // Set up callbacks for autonomous and driver control periods.
 
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
+  //Competition.autonomous(autonomous);
+  //Competition.drivercontrol(usercontrol);
 
   // Run the pre-autonomous function.
   pre_auton();
+  //move(60,0);
 
   // Prevent main from exiting with an infinite loop.
   while (true) {

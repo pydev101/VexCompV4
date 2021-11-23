@@ -6,12 +6,12 @@
 #include "odom/robot.h"
 
 //Set position and target using robot, get linear and angular speed from robot, set speed of motors to reflect robot
-const double UnitsPerRev = PI*10.16; //Cms per revolution
-const double RobotDiameter = 1; //Cms (Same Units as above) //TODO TODO TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+const double UnitsPerRev = PI*10.16; //Cms per revolution + 3/2 gear ratio
+const double RobotDiameter = 42; //Cms (Same Units as above)
 const double linThreashold = 5; //CM
-const double angularThreashold = 0.02*(2*PI); //2% of 2PI
+const double angularThreashold = 0.0056*(2*PI); //1 deg
 
-Robot robot = Robot(Point(0, 0), 90, true, 1, 1);
+Robot robot = Robot(Point(0, 0), 90, true, 1, 3.6);
 
 void track(){
   static double lastHeading = 0;
@@ -19,18 +19,20 @@ void track(){
 
   double leftEnc = getLeftEnc();
   double rightEnc = getRightEnc();
-  double head = Inertial.heading(); //TODO Ensure this is NOT bounded between 0-2PI; Alternate option is orientation, or rotation; Also ensure + in CCW direction
+  double head = Inertial.angle(); //TODO Ensure this is NOT bounded between 0-2PI; Alternate option is orientation, or rotation; Also ensure + in CCW direction
   double deltaT = Brain.timer(timeUnits::msec) - lastTime;
   deltaT = deltaT / 1000;
 
   double deltaFwd = 0.5*(leftEnc + rightEnc)*UnitsPerRev;
-  double deltaHead = head - lastHeading; //TODO Ensure Direction of heading is Pos in CCW!!!!!!!!!!!!!!!!!!!!!!!!
+  double deltaHead = lastHeading - head; //+ is CCW; Heading given + in CW so sign is flopped
+
   Vector deltaPos = Vector(deltaFwd, head, true);
 
   robot.location.updatePosition(deltaPos, deltaHead, deltaT, true);
+  std::cout << robot.location.getPos().x << ", " << robot.location.getPos().y << ", " << radToDeg(robot.location.getCurrHead()) << std::endl;
 
-  lastHeading = head;
   resetEncoders();
+  lastHeading = head;
   lastTime = Brain.timer(timeUnits::msec);
 }
 int trakerFunction(){
@@ -69,6 +71,8 @@ void move(Vector v){
   while(abs(robot.location.getLinearError()) > linThreashold){
     double linVel = robot.getLinearSpeed()/UnitsPerRev*60; //Speed in terms of Rev/Min
     double angVel = robot.getRotationalSpeed()*(RobotDiameter*0.5)*0.5; //WR = V; Times 1/2 because two sets of wheels so 0.5WR = V
+
+    std::cout << robot.location.getLinearError() << std::endl;
 
     if(abs(robot.location.getThetaError()) < 0.1*(2*PI)){
       if(abs(robot.location.getThetaError()) < angularThreashold){

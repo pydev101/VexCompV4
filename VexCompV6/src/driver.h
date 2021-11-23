@@ -1,6 +1,6 @@
 #include "Intergration.h"
 
-//Defines Driver Program
+//Defines Driver Program.
 
 void toggleFront(bool currState){
   static bool active = false;

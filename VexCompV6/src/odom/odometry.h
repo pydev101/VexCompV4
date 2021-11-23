@@ -1,6 +1,7 @@
 #ifndef __ROBOTODOM_H__
 #define __ROBOTODOM_H__
 #include "robotmath.h"
+#include <iostream>
 
 //Describes positon, direction, size, and PID characteritics; PID control should be handled seperatly
 //Assume everything except angles which is stored in radiqans is stored in the same units given
@@ -88,6 +89,8 @@ class OdomGrid{
 
     //TODO ENSURE THIS IS ACCUATE
     double getLinearError(bool shortestArcToLineV=true){
+      targetVec = Vector(pos, targetPos);
+      //std::cout << "(" << pos.x << ", " << pos.y << "), Target: (" << targetPos.x << ", " << targetPos.y << "), Vector: <" << targetVec.getX() << ", " << targetVec.getY() << ">" << std::endl;
       updateTargetHead(); //Overides how user last set target heading to turn in order to move robot linearly
       double a = getThetaError(shortestArcToLineV);
       if(cos(a) >= 0){
@@ -104,6 +107,12 @@ class OdomGrid{
       return shortestArcToTarget(currentHeading, targetHeading);
     }
     
+    Point getPos(){
+      return pos;
+    }
+    double getCurrHead(){
+      return currentHeading;
+    }
     Vector getVel(){
       return vel;
     }
