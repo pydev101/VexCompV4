@@ -39,14 +39,14 @@ class OdomGrid{
         deltaHeading = degToRad(deltaHeading);
       }
 
-      pos = deltaPos + pos;
+      pos = deltaPos + pos; //TODO Ensure this works
       Vector newVel = deltaPos.scale(1/deltaT);
-      accel = newVel + vel.scale(-1);
+      accel = (newVel + vel.scale(-1)).scale(1/deltaT);
       vel = newVel;
 
-      currentHeading = currentHeading + deltaHeading;
+      currentHeading = currentHeading + deltaHeading; //TODO Examine this didn't seem to be working eariler
       double newAngularVelocity = deltaHeading / deltaT;
-      angularAcceleration = newAngularVelocity - angularVelocity;
+      angularAcceleration = (newAngularVelocity - angularVelocity) / deltaT;
       angularVelocity = newAngularVelocity;
 
       targetVec = Vector(pos, targetPos);

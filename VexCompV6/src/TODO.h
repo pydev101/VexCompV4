@@ -4,7 +4,8 @@ TODO:
 1) Finish tracking for GPS, Inertial/Encoder systems
 2) Ensure error functions return proper values
 3) Usable move functions
-4) Slight auto adjustments to PID values to ensure it will reach target (If not moving and not within threashold; increase gain by 1.01 per cycle until it starts moving again)
+4) Intellgent speed; Max accel, max speed, const speed, etc; Speed is returned as the output of robot class and unit conversian and mtor set occurs in intergration class
+5) Slight auto adjustments to PID values to ensure it will reach target (If not moving and not within threashold; increase gain by 1.01 per cycle until it starts moving again)
 
 Future Features
 1) GUI Libary

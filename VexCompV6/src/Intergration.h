@@ -21,7 +21,7 @@ void track(){
 
   double leftEnc = getLeftEnc();
   double rightEnc = getRightEnc();
-  double head = Inertial.angle(); //TODO Ensure this is NOT bounded between 0-2PI; Alternate option is orientation, or rotation; Also ensure + in CCW direction
+  double head = Inertial.angle(); //Gets unbounded angle; Postive in CW direction
   double deltaT = Brain.timer(timeUnits::msec) - lastTime;
   deltaT = deltaT / 1000;
 
