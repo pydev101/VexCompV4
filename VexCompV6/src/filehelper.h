@@ -1,60 +1,26 @@
-#include <stdio.h>
-#include <string.h>
+#include <fstream>
+#include <stdlib.h>
 
-//Data file format
-/*
-DATA\n
-int 56863\n
-double 53.33\n
-string 6 Hello\0\n      //Length/Size of String ; Reads into buffer until it hits null
-bool 1\n                //1 for true, 0 for false
-*/
+class FileManager {
+public:
+    std::string fileName;
 
-//Log file format
-/*
-HEADERA,HEADERB,HEADERC\n
-DATA1A,DATA1B,DATA1C\n
-DATA2A,DATA3B,DATA2C\n
-DATA3A,DATA2B,DATA3C\n
-*/
-
-class FileManager{
-  char* buffer;
-  int buffSize;
-  FILE *f;
-  int formatType; //0 if DATA, 1 if CSV
-
-  FileManager(char *fileName){
-    
-  }
-
-  bool status(){
-    if (f == NULL) {
-      return false;
-    }else{
-      return true;
+    FileManager(std::string filename) {
+        fileName = filename;
     }
-  }
 
-  int clear(){
+    void Dump(void* data, int size) {
+        std::ofstream f(fileName, std::ios::binary);
+        f.write((char*)data, size);
+        f.close();
+    }
 
-  }
-
-  int write(){
-
-  }
+    char* Load(int size) {
+        std::ifstream f(fileName, std::ios::binary);
+        char* b = (char*)malloc(size);
+        f.read(b, size);
+        f.close();
+        return b;
+    }
 };
-
-int main() {
-   int i, x = 4;
-   char s[20];
-   FILE *f = fopen("new.txt", "w");
-
-   for (i=0; i<x; i++) {
-      puts("Enter text");
-      gets(s);
-      fprintf(f,"%d.%s\n", i, s);
-   }
-   fclose(f);
-   return 0;
-}
+//free(point*), realloc(point*, newSize)
