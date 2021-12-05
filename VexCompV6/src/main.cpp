@@ -10,6 +10,22 @@
 // rightC               motor         9               
 // leftB                motor         21              
 // Controller1          controller                    
+// Inertial             inertial      10              
+// backPne              digital_out   A               
+// frontPne             digital_out   H               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// leftA                motor         1               
+// rightA               motor         3               
+// rightB               motor         11              
+// arm                  motor         12              
+// intakeM              motor         7               
+// leftC                motor         8               
+// rightC               motor         9               
+// leftB                motor         21              
+// Controller1          controller                    
 // Inertial             inertial      19              
 // backPne              digital_out   A               
 // frontPne             digital_out   H               
@@ -60,7 +76,9 @@ int main() {
 
   // Run the pre-autonomous function.
   pre_auton();
-  //move(60,0);
+  //setLeft(10);
+  //setRight(10);
+  move(150,-150);
 
   // Prevent main from exiting with an infinite loop.
   while (true) {

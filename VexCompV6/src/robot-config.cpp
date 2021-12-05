@@ -17,7 +17,7 @@ motor leftC = motor(PORT8, ratio18_1, true);
 motor rightC = motor(PORT9, ratio18_1, false);
 motor leftB = motor(PORT21, ratio18_1, false);
 controller Controller1 = controller(primary);
-inertial Inertial = inertial(PORT19);
+inertial Inertial = inertial(PORT10);
 digital_out backPne = digital_out(Brain.ThreeWirePort.A);
 digital_out frontPne = digital_out(Brain.ThreeWirePort.H);
 
