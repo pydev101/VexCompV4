@@ -6,12 +6,12 @@
 #include "odom/robot.h"
 
 //Set position and target using robot, get linear and angular speed from robot, set speed of motors to reflect robot
-const double UnitsPerRev = PI*10.16*1.4911; //Cms per revolution + 3/2 gear ratio //TODO Ensure this is valid
-const double RobotDiameter = 42; //Cms (Same Units as above)
-const double linThreashold = 5; //CM
+const double UnitsPerRev = PI*10.16*1.4911*0.37924; //Inches per revolution + 3/2 gear ratio
+const double RobotDiameter = 15; //Inches (Same Units as above)
+const double linThreashold = 1; //In
 const double angularThreashold = 0.0056*(2*PI); //1 deg
 
-Robot robot = Robot(Point(0, 0), 90, true, 0.5, 3.6);
+Robot robot = Robot(Point(0, 0), 90, true, 0.8, 8);
 
 void track(){
   static double lastHeading = 0;
@@ -37,10 +37,9 @@ void track(){
   robot.location.updatePosition(deltaPos, deltaHead, deltaT, true);
   robot.location.setHead(head, true);
 
-  std::cout << robot.location.getPos().x << ", " << robot.location.getPos().y << ", " << radToDeg(robot.location.getCurrHead()) << std::endl;
-
   lastTime = Brain.timer(timeUnits::msec);
 }
+
 int trakerFunction(){
   while(true){
     track();
@@ -76,12 +75,16 @@ void move(Vector v){
   //TODO Have "should loop" be in robot to provide more intellgence regarding when to stop, and allow it to govern how it stops
   while(abs(robot.location.getLinearError()) > linThreashold){
     double linVel = robot.getLinearSpeed()/UnitsPerRev*60; //Speed in terms of Rev/Min
-    double angVel = robot.getRotationalSpeed()*(RobotDiameter*0.5)*0.5; //WR = V; Times 1/2 because two sets of wheels so 0.5WR = V
+    double angVel = robot.getRotationalSpeed(true)*(RobotDiameter*0.5)*0.5; //WR = V; Times 1/2 because two sets of wheels so 0.5WR = V
 
-    std::cout << robot.location.getLinearError() << std::endl;
+    std::cout << robot.location.getPos().x << ", " << robot.location.getPos().y << ", " << radToDeg(robot.location.getCurrHead()) << std::endl;
+    //std::cout << robot.location.getThetaError() << ", " << robot.location.getLinearError() << std::endl;
 
-    if(abs(robot.location.getThetaError()) < 0.1*(2*PI)){
-      if(abs(robot.location.getThetaError()) < angularThreashold){
+    setLeft(linVel-angVel,velocityUnits::rpm);
+    setRight(linVel+angVel,velocityUnits::rpm);
+/*
+    if(abs(robot.location.getThetaError()) < 0.01*(2*PI)){
+      if(abs(robot.location.getThetaError()) < 3*angularThreashold){
         setLeft(linVel,velocityUnits::rpm);
         setRight(linVel,velocityUnits::rpm);
       }else{
@@ -89,8 +92,8 @@ void move(Vector v){
         setRight(linVel+angVel,velocityUnits::rpm);
       }
     }else{
-      turn(0, false);
-    }
+      //turn(0, false);
+    }*/
     wait(20, timeUnits::msec);
   }
   setLeft(0,velocityUnits::rpm);

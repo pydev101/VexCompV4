@@ -12,37 +12,38 @@ typedef struct {
 } autoEntry;
 
 void blueLeft(int mod){
-  setIntake(30);
-  wait(300, msec);
-  setIntake(0);
-  moveArm(60, 100);
-  moveTime(70, 600);
-  moveTime(-30, 210, true);
-  moveTime(30, 1000);
+  moveTime(80, 900);
   setFront(true);
   setBack(false);
-  moveTime(-30, 1000);
-  moveTime(30, 210, true);
-  moveTime(-30, 1000);
-  moveTime(30, 441, true);
-  moveTime(-30, 1000);
+  moveTime(33, 800, true);
+  moveTime(-70, 500);
   setBack(true);
-  setIntake(50);
+  moveTime(33, 480, true);
+  moveTime(70, 1300);
+  setBack(false);
+  moveTime(-33, 660, true);
+  moveTime(-50, 500);
+  moveArm(100, 500);
+  setIntake(-50);
 }
 void redRight(int mod){
-  setIntake(30);
-  wait(300, msec);
-  setIntake(0);
-  moveArm(60, 100);
-  moveTime(70, 1000);
+  moveTime(100, 580);
   setFront(true);
   setBack(false);
-  moveTime(-70, 500);
-  moveTime(30, 700, true);
-  moveTime(-30, 360);
+  moveTime(-33, 680, true);
+  moveTime(-70, 520);
   setBack(true);
-  moveTime(70, 500);
+  wait(200, timeUnits::msec);
+  moveTime(33, 1100, true);
+  moveTime(-70, 1600);
+  setBack(false);
+  moveTime(50, 390);
+  moveTime(33, 360, true);
+  moveTime(-50, 450);
+  setBack(true);
+  moveArm(60, 800);
   setIntake(50);
+  moveTime(70, 720);
 }
 void OneMinute(int mod){
   setFront(false);
