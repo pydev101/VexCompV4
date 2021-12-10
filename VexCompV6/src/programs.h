@@ -18,8 +18,8 @@ void blueLeft(int mod){
   moveTime(33, 800, true);
   moveTime(-70, 500);
   setBack(true);
-  moveTime(33, 480, true);
-  moveTime(70, 1300);
+  moveTime(33, 490, true);
+  moveTime(60, 1800);
   setBack(false);
   moveTime(-33, 660, true);
   moveTime(-50, 500);
@@ -46,14 +46,26 @@ void redRight(int mod){
   moveTime(70, 720);
 }
 void OneMinute(int mod){
+  moveTime(80, 900);
+  setFront(true);
+  moveTime(33, 320, true);
+
+  setArm(100);
+  setLeft(40);
+  setRight(40);
+  wait(1600, timeUnits::msec);
+  setArm(0);
+  moveTime(40, 1200);
+  moveArm(-70, 400);
   setFront(false);
-  moveArm(60, 100);
-  moveTime(70, 2000);
-  moveTime(-30, 360, true);
-  moveTime(-70, 2500);
-  moveTime(30, 1000);
-  moveTime(30, 360, true);
-  moveTime(70, 2000);
+  moveArm(70, 400);
+  moveTime(-70, 200);
+  moveTime(-33, 180, true);
+  moveTime(-70, 2900);
+  moveTime(-33, 680, true);
+  moveTime(-70, 800);
+  moveTime(-33, 340, true);
+  moveTime(-70, 500);
 }
 
 autoEntry entries[] = {

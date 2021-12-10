@@ -14,54 +14,6 @@
 // backPne              digital_out   A               
 // frontPne             digital_out   H               
 // ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// leftA                motor         1               
-// rightA               motor         3               
-// rightB               motor         11              
-// arm                  motor         12              
-// intakeM              motor         7               
-// leftC                motor         8               
-// rightC               motor         9               
-// leftB                motor         21              
-// Controller1          controller                    
-// Inertial             inertial      10              
-// backPne              digital_out   A               
-// frontPne             digital_out   H               
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// leftA                motor         1               
-// rightA               motor         3               
-// rightB               motor         11              
-// arm                  motor         12              
-// intakeM              motor         7               
-// leftC                motor         8               
-// rightC               motor         9               
-// leftB                motor         21              
-// Controller1          controller                    
-// Inertial             inertial      10              
-// backPne              digital_out   A               
-// frontPne             digital_out   H               
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// leftA                motor         1               
-// rightA               motor         3               
-// rightB               motor         11              
-// arm                  motor         12              
-// intakeM              motor         7               
-// leftC                motor         8               
-// rightC               motor         9               
-// leftB                motor         21              
-// Controller1          controller                    
-// Inertial             inertial      19              
-// backPne              digital_out   A               
-// frontPne             digital_out   H               
-// ---- END VEXCODE CONFIGURED DEVICES ----
 
 
 /*----------------------------------------------------------------------------*/
@@ -77,7 +29,7 @@
 #include "programs.h"
 
 // A global instance of competition
-//competition Competition;
+competition Competition;
 
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
@@ -93,7 +45,7 @@ void pre_auton(void) {
   resetEncoders();
 
   task traker = task(trakerFunction);
-  //BrainGUIProgram();
+  BrainGUIProgram();
 }
 
 //
@@ -103,16 +55,9 @@ void pre_auton(void) {
 int main() {
   // Set up callbacks for autonomous and driver control periods.
   pre_auton();
-  //Competition.autonomous(autonomous);
-  //Competition.drivercontrol(usercontrol);
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
 
-  wait(3, timeUnits::sec);
-  autonomous();
-
-  //move(36,0);
-  //move(0,36);
-  //move(-36,36);
-  //move(-36,0);
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
