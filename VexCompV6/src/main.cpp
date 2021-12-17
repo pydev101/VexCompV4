@@ -29,7 +29,7 @@
 #include "programs.h"
 
 // A global instance of competition
-competition Competition;
+//competition Competition;
 
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
@@ -55,12 +55,17 @@ void pre_auton(void) {
 int main() {
   // Set up callbacks for autonomous and driver control periods.
   pre_auton();
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
+  //Competition.autonomous(autonomous);
+  //Competition.drivercontrol(usercontrol);
 
+  //Checklist
+  //Set UnitsToRev by measuring the distance
+  //Ensure Position tracking works, test to see if target is set correctly, test CV motion, test CV+Angular Motion, test PID control math, work on cameras, auto-balence
+
+  moveTime(40, 1000);
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
-    wait(10000, msec);
+    wait(100, msec);
   }
 }

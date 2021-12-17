@@ -49,8 +49,11 @@ void track(){
 }
 
 int trakerFunction(){
+  Point p = Point(0,0);
   while(true){
     track();
+    p = robot.location.getPos();
+    std::cout << p.x << ", " << p.y << ", " << robot.location.getCurrHead() << std::endl;
     wait(20, timeUnits::msec);
   }
 } //Called in Pre-Auton
