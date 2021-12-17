@@ -4,7 +4,7 @@
 #include "vex.h"
 using namespace vex;
 
-void setM(motor m, int speed, velocityUnits uni=velocityUnits::pct){
+void setM(motor m, double speed, velocityUnits uni=velocityUnits::pct){
   m.setVelocity(speed, uni);
   if(speed == 0){
     m.stop();
@@ -12,24 +12,24 @@ void setM(motor m, int speed, velocityUnits uni=velocityUnits::pct){
     m.spin(forward);
   }
 }
-void setLeft(int speed,  velocityUnits uni=velocityUnits::pct){
+void setLeft(double speed,  velocityUnits uni=velocityUnits::pct){
   setM(leftA, speed, uni);
   setM(leftB, speed, uni);
   setM(leftC, speed, uni);
 }
-void setRight(int speed, velocityUnits uni=velocityUnits::pct){
+void setRight(double speed, velocityUnits uni=velocityUnits::pct){
   setM(rightA, speed, uni);
   setM(rightB, speed, uni);
   setM(rightC, speed, uni);
 }
-void setArm(int speed){
+void setArm(double speed){
   setM(arm, speed);
 }
-void setIntake(int speed){
+void setIntake(double speed){
   setM(intakeM, speed);
 }
 
-void moveTime(int speed, int dur, bool rotate=false){
+void moveTime(double speed, int dur, bool rotate=false){
   if(rotate){
     setRight(speed);
     setLeft(-speed);
@@ -42,7 +42,7 @@ void moveTime(int speed, int dur, bool rotate=false){
   setLeft(0);
   wait(500, msec);
 }
-void moveArm(int speed, int dur){
+void moveArm(double speed, int dur){
   setArm(speed);
   wait(dur, timeUnits::msec);
   setArm(0);

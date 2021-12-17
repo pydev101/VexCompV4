@@ -22,4 +22,11 @@ Future Features
 --Allow it to lower arm, etc while moving to a target and then mvoe to the next target as soon as it arrives at the orignal
 
 
+
+//TODO use gyro for autobalence
+//TODO ensure PID valeus set correctly
+//TODO raise arm to certain point when intake is activated
+//TODO Vision sensor to turn to face a goal
+//TODO bump swithc to know when goal is in the pot
+
 */

@@ -105,7 +105,7 @@ class OdomGrid{
         return -targetVec.getMagnitude();
       }
     }
-    //TODO Ensure works hyper important
+    //TODO Ensure works hyper important; should be -180 to 180
     double getThetaError(bool shortestArcToLineV=false){
       if(shortestArcToLineV){
         return shortestArcToLine(currentHeading, targetHeading);
