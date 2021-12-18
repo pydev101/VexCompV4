@@ -23,14 +23,14 @@ double abs(double x){
 }
 
 int sign(int x){
-  if(x < 1){
+  if(x < 0){
     return -1;
   }
   return 1;
 }
 
 double sign(double x){
-  if(x < 1){
+  if(x < 0){
     return -1;
   }
   return 1;

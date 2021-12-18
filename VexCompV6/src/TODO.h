@@ -30,3 +30,9 @@ Future Features
 //TODO bump swithc to know when goal is in the pot
 
 */
+
+
+/*
+Dont reset PID allow continous; If error is within threashold for x ammount of time set flag that will tell the next position to be set 
+destermine fwd/back dont allow it to do shortest
+*/

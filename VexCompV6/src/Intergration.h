@@ -6,11 +6,11 @@
 #include "odom/robot.h"
 
 //Set position and target using robot, get linear and angular speed from robot, set speed of motors to reflect robot
-const double UnitsPerRev = PI*10.16*1.4911*0.37924; //Inches per revolution + 3/2 gear ratio
+const double UnitsPerRev = 18.3207546*1.0167034; //Inches per revolution + 3/2 gear ratio
 const double RobotDiameter = 15; //Inches (Same Units as above)
 const double RobotRadius = 0.5*RobotDiameter;
 const double linThreashold = 1; //In
-const double angularThreashold = 0.0056*(2*PI); //1 deg
+const double angularThreashold = degToRad(1);
 
 Robot robot = Robot(Point(0, 0), 90, true, {0.8,0,0}, {8,0,0}, linThreashold, angularThreashold);
 
@@ -30,13 +30,7 @@ void track(){
   lastHeading = head;
   head = 360 - normalizeAngle(head, false); //Heading in CCW + direction
 
-  //double deltaFwd = 0.5*((leftEnc-lastLeft) + (rightEnc-lastRight))*UnitsPerRev; //TODO Breaks while turning
-  double deltaL = (leftEnc-lastLeft)*UnitsPerRev;
-  double deltaR = (rightEnc-lastRight)*UnitsPerRev;
-  double deltaC = degToRad(deltaHead)*RobotRadius;
-  deltaL = deltaL + deltaC;
-  deltaR = deltaR - deltaC;
-  double deltaFwd = 0.5*(deltaL + deltaR);
+  double deltaFwd = 0.5*((leftEnc-lastLeft) + (rightEnc-lastRight))*UnitsPerRev; //TODO Breaks while turning
 
   lastLeft = leftEnc;
   lastRight = rightEnc;
@@ -49,24 +43,22 @@ void track(){
 }
 
 int trakerFunction(){
-  Point p = Point(0,0);
   while(true){
     track();
-    p = robot.location.getPos();
-    std::cout << p.x << ", " << p.y << ", " << robot.location.getCurrHead() << std::endl;
     wait(20, timeUnits::msec);
   }
 } //Called in Pre-Auton
 
 //Moves realitive to current position using robot orientation
 //Rotates realitive to target
-void turn(double theta, bool inDeg){
+void turn(double theta, double speedSet, bool inDeg=true){
   robot.setHeadTarget(theta, inDeg);
-  double speed = robot.turnCV(33);
+  double speed = robot.turnCV(speedSet);
   while(abs(speed) > 0){
     setLeft(-speed);
     setRight(speed);
-    speed = robot.turnCV(33);
+    speed = robot.turnCV(speedSet);
+    wait(20, msec);
   }
   setLeft(0);
   setRight(0);
@@ -79,12 +71,13 @@ void turnTo(double theta, bool inDeg){
 
 void move(Vector v){
   robot.setTargetRealitiveToRobotOrientation(v);
-  turn(0, true);
-  double speed = robot.moveCV(300);
+  turn(0, 17);
+  double speed = robot.moveCV(30);
   while(abs(speed) > 0){
-    setLeft(speed);
-    setRight(speed);
-    speed = robot.moveCV(300);
+    double turnO = robot.turnCV(7);
+    setLeft(speed-turnO);
+    setRight(speed+turnO);
+    speed = robot.moveCV(30);
   }
   setLeft(0);
   setRight(0);

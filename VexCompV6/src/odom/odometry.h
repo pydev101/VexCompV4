@@ -39,12 +39,12 @@ class OdomGrid{
         deltaHeading = degToRad(deltaHeading);
       }
 
-      pos = deltaPos + pos; //TODO Ensure this works
+      pos = deltaPos + pos;
       Vector newVel = deltaPos.scale(1/deltaT);
       accel = (newVel + vel.scale(-1)).scale(1/deltaT);
       vel = newVel;
 
-      currentHeading = currentHeading + deltaHeading; //TODO Examine this didn't seem to be working eariler
+      currentHeading = currentHeading + deltaHeading;
       double newAngularVelocity = deltaHeading / deltaT;
       angularAcceleration = (newAngularVelocity - angularVelocity) / deltaT;
       angularVelocity = newAngularVelocity;
@@ -64,13 +64,13 @@ class OdomGrid{
 
 
     void setTarget(Vector v){
-      targetPos = v + targetPos; //TODO Ensure the math/operator works here
+      targetPos = v + targetPos;
       targetVec = Vector(pos, targetPos);
     }
     void setTargetRealitiveToTargetOrientation(Vector v){
       Vector fwd = Vector(1, targetHeading, false).scale(v.getY());
       Vector hor = Vector(1, targetHeading - (PI/2), false).scale(v.getX());
-      setTarget(fwd + hor); //TODO Ensure Operator does its job
+      setTarget(fwd + hor);
     }
     void setAbsTarget(double x, double y){
       targetPos = Point(x, y);
@@ -80,8 +80,7 @@ class OdomGrid{
       if(headingInDegrees){
         ang = degToRad(ang);
       }
-      targetHeading = normalizeAngle(targetHeading);
-      targetHeading = ang;
+      targetHeading = normalizeAngle(ang);
     }
     void setTargetHead(double theta, bool inDegrees){
       if(inDegrees){
@@ -93,23 +92,15 @@ class OdomGrid{
       setTargetHeadAbs(Vector(1, 0).getAngle(targetVec));
     }
 
-    //TODO ENSURE THIS IS ACCUATE
-    double getLinearError(bool shortestArcToLineV=true){
-      targetVec = Vector(pos, targetPos);
-      //std::cout << "(" << pos.x << ", " << pos.y << "), Target: (" << targetPos.x << ", " << targetPos.y << "), Vector: <" << targetVec.getX() << ", " << targetVec.getY() << ">" << std::endl;
-      updateTargetHead(); //Overides how user last set target heading to turn in order to move robot linearly
-      double a = getThetaError(shortestArcToLineV);
-      if(cos(a) >= 0){
-        return targetVec.getMagnitude();
-      }else{
-        return -targetVec.getMagnitude();
-      }
+    //+ if in front; - if in back
+    double getLinearError(){
+      //Make realitive to the front of the robot
+      Vector robotBasis = Vector(1, currentHeading, false);
+      Vector realitiveTargetVector = targetVec.project(robotBasis); //dy is fwd/bck and dx is right/lft
+      return realitiveTargetVector.getY();
     }
-    //TODO Ensure works hyper important; should be -180 to 180
-    double getThetaError(bool shortestArcToLineV=false){
-      if(shortestArcToLineV){
-        return shortestArcToLine(currentHeading, targetHeading);
-      }
+
+    double getThetaError(){
       return shortestArcToTarget(currentHeading, targetHeading);
     }
     

@@ -40,6 +40,7 @@ void pre_auton(void) {
 
   Inertial.startCalibration();
   while(Inertial.isCalibrating()){wait(10, msec);}
+  wait(500, msec);
   Inertial.setHeading(270, rotationUnits::deg); //90 deg CCW but inertial sensor only measures in CW
 
   resetEncoders();
@@ -58,14 +59,18 @@ int main() {
   //Competition.autonomous(autonomous);
   //Competition.drivercontrol(usercontrol);
 
-  //Checklist
-  //Set UnitsToRev by measuring the distance
-  //Ensure Position tracking works, test to see if target is set correctly, test CV motion, test CV+Angular Motion, test PID control math, work on cameras, auto-balence
-
-  moveTime(40, 1000);
-
-  // Prevent main from exiting with an infinite loop.
-  while (true) {
-    wait(100, msec);
-  }
+   
 }
+
+/*
+TODO
+
+-Turn into continous operation
+-PID is continious so no need for reset (target values are updated right in front of the robot while in motion on a path so PID shouldnt need a reset)
+-ALlow for auto turn adjustments during linear motion; Setup output of functions as a struct of left and right
+-implement a flag that triggers when it has reached the target position for x ammount of time
+-implement a path tracer which follows a path without worrying about slowing down to a stop each time
+--If rot. error > 90 degrees transition velocity = targetVelocityBasedOnFinalPosition.project(fwd/bck).dy if > 0
+
+--Cameras need to be done once above is done; Set the target poisition to the goal
+*/

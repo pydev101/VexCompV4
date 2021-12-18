@@ -32,48 +32,46 @@ class Robot{
       linearThreshold = linearThres;
     } 
 
-        //Sets Target using XY basis grid
-    void resetRotationalPID(bool shortestArcToLineV){
-      rotationalPid = {0,0,location.getThetaError(shortestArcToLineV)};
+    //Sets Target using XY basis grid
+    void resetRotationalPID(){
+      rotationalPid = {0,0,location.getThetaError()};
     }
-    void resetLinearPID(bool shortestArcToLineV){
-      resetRotationalPID(shortestArcToLineV);
+    void resetLinearPID(){
+      resetRotationalPID();
       linearPid = {0,0,location.getLinearError()};
     }
 
     void setHeadTarget(double theta, bool inDeg){
       location.setTargetHead(theta, inDeg);
-      resetRotationalPID(false);
+      resetRotationalPID();
     }
 
     void setHeadTargetAbs(double head, bool inDeg){
       location.setTargetHeadAbs(head, inDeg);
-      resetRotationalPID(false);
+      resetRotationalPID();
     }
 
-    void setTarget(Vector v, bool shortestArcToLineV=true){
+    void setTarget(Vector v){
       location.setTarget(v);
       location.updateTargetHead();
-      resetLinearPID(shortestArcToLineV);
+      resetLinearPID();
     }
 
     //Sets realitive to current position and robot orientation
     //dX is horizontal, dY is fwd
-    void setTargetRealitiveToRobotOrientation(Vector v, bool shortestArcToLineV=true){
+    void setTargetRealitiveToRobotOrientation(Vector v){
       location.setTargetRealitiveToTargetOrientation(v);
       location.updateTargetHead();
-      resetLinearPID(shortestArcToLineV);
+      resetLinearPID();
     }
 
-
-
     //Returns Rad/Sec
-    double getRotationalSpeed(bool shortestArcToLineV=false){
+    double getRotationalSpeed(){
       //Exit Condition; TODO IF angularspeed is signifigant don't just stop
       if(abs(location.getThetaError()) < rotationalThreshold){
         return 0;
       }
-      double e = location.getThetaError(shortestArcToLineV);
+      double e = location.getThetaError();
 
       double p = e*angularGains.p;
 
@@ -123,7 +121,7 @@ class Robot{
       if(abs(e) < linearThreshold){
         return 0;
       }else{
-        return sign(e)*speed;
+        return speed;
       }
     }
 
