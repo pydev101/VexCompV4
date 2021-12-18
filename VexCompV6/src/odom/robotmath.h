@@ -54,15 +54,15 @@ typedef struct{
 } PIDOutput;
 
 //Initalize
-PIDOutput initPID(double error, PIDGains gains){
+PIDOutput initPID(double error){
   return {0, 0, error};
 }
 
 //Recursive
-PIDOutput PID(double error, PIDGains gains, PIDOutput previous){
+PIDOutput PID(double error, double deltaT, PIDGains gains, PIDOutput previous){
   double p = gains.p*error;
-  double i = previous.reset + gains.i*error;
-  double d = gains.d*(error - previous.lastError);
+  double i = previous.reset + gains.i*error*deltaT;
+  double d = gains.d*(error - previous.lastError)/deltaT;
   return {p+i+d, i, error};
 }
 

@@ -95,6 +95,7 @@ class OdomGrid{
     //+ if in front; - if in back
     double getLinearError(){
       //Make realitive to the front of the robot
+      updateTargetHead();
       Vector robotBasis = Vector(1, currentHeading, false);
       Vector realitiveTargetVector = targetVec.project(robotBasis); //dy is fwd/bck and dx is right/lft
       return realitiveTargetVector.getY();

@@ -6,13 +6,14 @@
 #include "odom/robot.h"
 
 //Set position and target using robot, get linear and angular speed from robot, set speed of motors to reflect robot
-const double UnitsPerRev = 18.3207546*1.0167034; //Inches per revolution + 3/2 gear ratio
+const double UnitsPerRev = 18.3207546*1.0167034; //Inches per revolution
 const double RobotDiameter = 15; //Inches (Same Units as above)
 const double RobotRadius = 0.5*RobotDiameter;
 const double linThreashold = 1; //In
 const double angularThreashold = degToRad(1);
 
-Robot robot = Robot(Point(0, 0), 90, true, {0.8,0,0}, {8,0,0}, linThreashold, angularThreashold);
+//Recommended low P (0.1) and High I (1-10), no D
+Robot robot = Robot(Point(0, 0), 90, true, {0.1,5,0}, {0.1,5,0}, linThreashold, angularThreashold);
 
 void track(){
   static double lastHeading = 0;
@@ -49,16 +50,35 @@ int trakerFunction(){
   }
 } //Called in Pre-Auton
 
+
+
+
 //Moves realitive to current position using robot orientation
 //Rotates realitive to target
-void turn(double theta, double speedSet, bool inDeg=true){
+void turn(double theta, bool inDeg=true){
   robot.setHeadTarget(theta, inDeg);
-  double speed = robot.turnCV(speedSet);
-  while(abs(speed) > 0){
-    setLeft(-speed);
-    setRight(speed);
-    speed = robot.turnCV(speedSet);
-    wait(20, msec);
+  robot.rotate(0,true);
+
+  double lastTime = Brain.timer(timeUnits::msec);
+  double timeInZone = 0;
+  wait(5, msec);
+
+  while(timeInZone < 500){
+    double t = Brain.timer(timeUnits::msec);
+    double deltaT = t - lastTime;
+    lastTime = t;
+
+    double o = robot.rotate(deltaT);
+    setLeft(-o);
+    setRight(o);
+
+    if(abs(robot.location.getThetaError()) < angularThreashold){
+      timeInZone = timeInZone + deltaT;
+    }else{
+      timeInZone = 0;
+    }
+
+    wait(15, msec);
   }
   setLeft(0);
   setRight(0);
@@ -69,18 +89,43 @@ void turnTo(double theta, bool inDeg){
   turn(0, false);
 }
 
-void move(Vector v){
+void move(Vector v, bool backwards=false){
   robot.setTargetRealitiveToRobotOrientation(v);
-  turn(0, 17);
-  double speed = robot.moveCV(30);
-  while(abs(speed) > 0){
-    double turnO = robot.turnCV(7);
-    setLeft(speed-turnO);
-    setRight(speed+turnO);
-    speed = robot.moveCV(30);
+  int dir = 1;
+  if(backwards){
+    dir = -1;
+    robot.location.setTargetHead(180, true);
+  }
+  turn(0);
+
+  robot.linear(0,true);
+
+  double lastTime = Brain.timer(timeUnits::msec);
+  double timeInZone = 0;
+  wait(5, msec);
+
+  while(timeInZone < 500){
+    double t = Brain.timer(timeUnits::msec);
+    double deltaT = t - lastTime;
+    lastTime = t;
+
+    double o = robot.linear(deltaT);
+    double a = robot.rotate(deltaT);
+    setLeft(o*sign(dir)-a);
+    setRight(o*sign(dir)+a);
+
+    if(abs(robot.location.getLinearError()) < linThreashold){
+      timeInZone = timeInZone + deltaT;
+    }else{
+      timeInZone = 0;
+    }
+
+    wait(15, msec);
   }
   setLeft(0);
   setRight(0);
+
+
 }
 void move(double fwd, double hor){
   move(Vector(hor, fwd));
