@@ -11,9 +11,13 @@ const double RobotDiameter = 15; //Inches (Same Units as above)
 const double RobotRadius = 0.5*RobotDiameter;
 const double linThreashold = 1; //In
 const double angularThreashold = degToRad(1);
+const double maximumAccelerationLinear = 1000;
+const double maximumAngularAcceleration = 1000;
+const double maxVelocity = 1000;
+const double maxAngularVelocity = 1000;
 
 //Recommended low P (0.1) and High I (1-10), no D
-Robot robot = Robot(Point(0, 0), 90, true, {0.1,5,0}, {0.1,5,0}, linThreashold, angularThreashold);
+Robot robot = Robot(Point(0, 0), 90, true, {0.1,5,0}, {0.1,10,0}, linThreashold, angularThreashold, maxVelocity, maxAngularVelocity, maximumAccelerationLinear, maximumAngularAcceleration);
 
 void track(){
   static double lastHeading = 0;
@@ -37,8 +41,10 @@ void track(){
   lastRight = rightEnc;
 
   Vector deltaPos = Vector(deltaFwd, head, true);
-  robot.location.updatePosition(deltaPos, deltaHead, deltaT, true);
-  robot.location.setHead(head, true);
+  robot.updatePos(deltaT, deltaPos, deltaHead, true);
+  robot.setHead(head, true);
+  robot.updatePID(deltaT);
+  robot.updateStopStatus(deltaT);
 
   lastTime = Brain.timer(timeUnits::msec);
 }
@@ -53,35 +59,27 @@ int trakerFunction(){
 
 
 
-//Moves realitive to current position using robot orientation
-//Rotates realitive to target
-void turn(double theta, bool inDeg=true){
-  robot.setHeadTarget(theta, inDeg);
-  robot.rotate(0,true);
+void executeMove(int dir=1){
+  while(robot.isMoving()){
+    double linearSpeed = robot.getLinearSpeedTarget()*dir;
+    double angularSpeed = robot.getRotationalSpeedTarget();
 
-  double lastTime = Brain.timer(timeUnits::msec);
-  double timeInZone = 0;
-  wait(5, msec);
+    linearSpeed = (linearSpeed/UnitsPerRev)*60; //Units/Sec to RPM
+    angularSpeed = angularSpeed * (RobotRadius/UnitsPerRev) * 60 * 0.5; //Converts Rad/S to RPM and splits in half because there are 2 drive sides
 
-  while(timeInZone < 500){
-    double t = Brain.timer(timeUnits::msec);
-    double deltaT = t - lastTime;
-    lastTime = t;
-
-    double o = robot.rotate(deltaT);
-    setLeft(-o);
-    setRight(o);
-
-    if(abs(robot.location.getThetaError()) < angularThreashold){
-      timeInZone = timeInZone + deltaT;
-    }else{
-      timeInZone = 0;
-    }
-
+    setLeft(linearSpeed - angularSpeed, velocityUnits::rpm);
+    setRight(linearSpeed + angularSpeed, velocityUnits::rpm);
     wait(15, msec);
   }
   setLeft(0);
   setRight(0);
+}
+
+//Moves realitive to current position using robot orientation
+//Rotates realitive to target
+void turn(double theta, bool inDeg=true){
+  robot.setTargetHead(theta, inDeg);
+  executeMove();
 }
 //Turns to abs orientation
 void turnTo(double theta, bool inDeg){
@@ -94,38 +92,9 @@ void move(Vector v, bool backwards=false){
   int dir = 1;
   if(backwards){
     dir = -1;
-    robot.location.setTargetHead(180, true);
+    robot.setTargetHead(180, true);
   }
-  turn(0);
-
-  robot.linear(0,true);
-
-  double lastTime = Brain.timer(timeUnits::msec);
-  double timeInZone = 0;
-  wait(5, msec);
-
-  while(timeInZone < 500){
-    double t = Brain.timer(timeUnits::msec);
-    double deltaT = t - lastTime;
-    lastTime = t;
-
-    double o = robot.linear(deltaT);
-    double a = robot.rotate(deltaT);
-    setLeft(o*sign(dir)-a);
-    setRight(o*sign(dir)+a);
-
-    if(abs(robot.location.getLinearError()) < linThreashold){
-      timeInZone = timeInZone + deltaT;
-    }else{
-      timeInZone = 0;
-    }
-
-    wait(15, msec);
-  }
-  setLeft(0);
-  setRight(0);
-
-
+  executeMove(dir);
 }
 void move(double fwd, double hor){
   move(Vector(hor, fwd));
@@ -133,9 +102,5 @@ void move(double fwd, double hor){
 void move(double mag, double theta, bool inDeg){
   move(Vector(mag, theta, inDeg));
 }
-
-//TODO Continous tracking
-//Important to call linear before theta
-//TODO Program Drive and turn; Begin by seetting the target; Get the values from robot; Set values to motors after conversion; Repeat until within threashold and velcoity near zero
 
 #endif

@@ -91,16 +91,14 @@ class OdomGrid{
     void updateTargetHead(){
       setTargetHeadAbs(Vector(1, 0).getAngle(targetVec));
     }
-
+    
     //+ if in front; - if in back
     double getLinearError(){
       //Make realitive to the front of the robot
       updateTargetHead();
-      Vector robotBasis = Vector(1, currentHeading, false);
-      Vector realitiveTargetVector = targetVec.project(robotBasis); //dy is fwd/bck and dx is right/lft
-      return realitiveTargetVector.getY();
+      return getRealitiveTargetVector().getY();
     }
-
+    //+ if CCW; - if CW; Bounded between -180 - 180
     double getThetaError(){
       return shortestArcToTarget(currentHeading, targetHeading);
     }
@@ -111,17 +109,33 @@ class OdomGrid{
     double getCurrHead(){
       return currentHeading;
     }
+    Vector getRobotBasisVector(){
+      return Vector(1, currentHeading, false);
+    }
     Vector getVel(){
       return vel;
     }
+    Vector getRealitiveVel(){
+      return vel.project(getRobotBasisVector());
+    }
     Vector getAccel(){
       return accel;
+    }
+    Vector getRealitiveAccel(){
+      return accel.project(getRobotBasisVector());
     }
     double getAngularVel(){
       return angularVelocity;
     }
     double getAngularAccel(){
       return angularAcceleration;
+    }
+
+    Vector getTargetVector(){
+      return targetVec;
+    }
+    Vector getRealitiveTargetVector(){
+      return targetVec.project(getRobotBasisVector());
     }
 };
 #endif
