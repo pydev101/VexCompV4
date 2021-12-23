@@ -9,15 +9,19 @@
 const double UnitsPerRev = 18.3207546*1.0167034; //Inches per revolution
 const double RobotDiameter = 15; //Inches (Same Units as above)
 const double RobotRadius = 0.5*RobotDiameter;
+
+const double updateTime = 20; //msec
+const double motionDelay = 25; //msec
+
 const double linThreashold = 1; //In
 const double angularThreashold = degToRad(1);
 const double maximumAccelerationLinear = 1000;
 const double maximumAngularAcceleration = 1000;
 const double maxVelocity = 1000;
 const double maxAngularVelocity = 1000;
+const double updateTargetHeadingMinThreashold = 5;
 
-//Recommended low P (0.1) and High I (1-10), no D
-Robot robot = Robot(Point(0, 0), 90, true, {0.1,5,0}, {0.1,10,0}, linThreashold, angularThreashold, maxVelocity, maxAngularVelocity, maximumAccelerationLinear, maximumAngularAcceleration);
+Robot robot = Robot(Point(0, 0), 90, true, {1.3,0,0}, {5,0,0}, linThreashold, angularThreashold, maxVelocity, maxAngularVelocity, maximumAccelerationLinear, maximumAngularAcceleration, updateTargetHeadingMinThreashold);
 
 void track(){
   static double lastHeading = 0;
@@ -49,19 +53,30 @@ void track(){
   lastTime = Brain.timer(timeUnits::msec);
 }
 
+int frame = 0;
 int trakerFunction(){
+  std::cout << "Time,X,Y,H,XT,YT,HT,VTX,VTY,VRTX,VRTY" << std::endl;
   while(true){
     track();
-    wait(20, timeUnits::msec);
+    if(frame > 5){
+      std::cout << Brain.timer(timeUnits::msec) << "," << robot.location.pos.x << "," << robot.location.pos.y << "," << robot.location.currentHeading << "," << robot.location.targetPos.x << "," << robot.location.targetPos.y << "," << robot.location.targetHeading << ",";
+      Vector tVec = robot.location.getTargetVector();
+      Vector tRVec = robot.location.getRealitiveTargetVector().getRotatedVector(robot.location.getRobotBasisVector().getAngle(Vector(0, 1)));
+      std::cout << tVec.getX() << "," << tVec.getY() << "," << tRVec.getX() << "," << tRVec.getY() << std::endl;
+      frame = 0;
+    }else{
+      frame = frame + 1;
+    }
+    wait(updateTime, timeUnits::msec);
   }
 } //Called in Pre-Auton
 
 
 
-
-void executeMove(int dir=1){
+void executeMove(){
+  wait(updateTime+1, msec);
   while(robot.isMoving()){
-    double linearSpeed = robot.getLinearSpeedTarget()*dir;
+    double linearSpeed = robot.getLinearSpeedTarget();
     double angularSpeed = robot.getRotationalSpeedTarget();
 
     linearSpeed = (linearSpeed/UnitsPerRev)*60; //Units/Sec to RPM
@@ -69,7 +84,7 @@ void executeMove(int dir=1){
 
     setLeft(linearSpeed - angularSpeed, velocityUnits::rpm);
     setRight(linearSpeed + angularSpeed, velocityUnits::rpm);
-    wait(15, msec);
+    wait(motionDelay, msec);
   }
   setLeft(0);
   setRight(0);
@@ -78,6 +93,7 @@ void executeMove(int dir=1){
 //Moves realitive to current position using robot orientation
 //Rotates realitive to target
 void turn(double theta, bool inDeg=true){
+  robot.setRotateMode();
   robot.setTargetHead(theta, inDeg);
   executeMove();
 }
@@ -87,20 +103,22 @@ void turnTo(double theta, bool inDeg){
   turn(0, false);
 }
 
-void move(Vector v, bool backwards=false){
+void moveAbs(double x, double y, bool fwd=true){
+  robot.setMoveMode(fwd);
+  robot.setAbsTarget(x, y);
+  executeMove();
+}
+
+void move(Vector v, bool fwd=true){
+  robot.setMoveMode(fwd);
   robot.setTargetRealitiveToRobotOrientation(v);
-  int dir = 1;
-  if(backwards){
-    dir = -1;
-    robot.setTargetHead(180, true);
-  }
-  executeMove(dir);
+  executeMove();
 }
-void move(double fwd, double hor){
-  move(Vector(hor, fwd));
+void move(double fwd, double hor, bool dir=true){
+  move(Vector(hor, fwd), dir);
 }
-void move(double mag, double theta, bool inDeg){
-  move(Vector(mag, theta, inDeg));
+void move(double mag, double theta, bool inDeg, bool dir){
+  move(Vector(mag, theta, inDeg), dir);
 }
 
 #endif

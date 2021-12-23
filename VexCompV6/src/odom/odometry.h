@@ -6,7 +6,7 @@
 //Describes positon, direction, size, and PID characteritics; PID control should be handled seperatly
 //Assume everything except angles which is stored in radiqans is stored in the same units given
 class OdomGrid{
-  private:
+  public:
     Point pos = Point(0, 0); //Units given by user
     double currentHeading = 0; //Radians
 
@@ -20,7 +20,7 @@ class OdomGrid{
     double targetHeading = 0; //Radians
     Vector targetVec = Vector(0, 0);
 
-  public:
+  //public:
     //Constructors
     OdomGrid(Point Pos, double CurrentHeading, bool headingGivenInDegrees){
       if(headingGivenInDegrees){
@@ -88,20 +88,6 @@ class OdomGrid{
       }
       setTargetHeadAbs(targetHeading + theta, false);
     }
-    void updateTargetHead(){
-      setTargetHeadAbs(Vector(1, 0).getAngle(targetVec));
-    }
-    
-    //+ if in front; - if in back
-    double getLinearError(){
-      //Make realitive to the front of the robot
-      updateTargetHead();
-      return getRealitiveTargetVector().getY();
-    }
-    //+ if CCW; - if CW; Bounded between -180 - 180
-    double getThetaError(){
-      return shortestArcToTarget(currentHeading, targetHeading);
-    }
     
     Point getPos(){
       return pos;
@@ -137,5 +123,9 @@ class OdomGrid{
     Vector getRealitiveTargetVector(){
       return targetVec.project(getRobotBasisVector());
     }
+    double getTargetHead(){
+      return targetHeading;
+    }
+
 };
 #endif

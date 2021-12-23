@@ -5,7 +5,7 @@
 //Robot for a position give output of a speed to acheive target
 
 class Robot{
-  private:
+  public:
     OdomGrid location = OdomGrid(Point(0,0), 90, true);
     double RobotRadius;
     double UnitsPerRevolution;
@@ -29,8 +29,13 @@ class Robot{
     double maxLinearVel = 0;
     double maxAngularVel = 0;
 
-  public:
-    Robot(Point Pos, double CurrentHeading, bool headingGivenInDegrees, PIDGains linearK, PIDGains angularK, double linearThres, double rotationalThresInRadians, double maxLinearVelocity, double maxAngularVelocity, double maxLinearAccelleration, double maxAngularAccelleration){
+    bool usingPIDControls = true;
+    bool forward = true;
+    bool updateTargetHeadingWhileInMotion = true;
+    double updateTargetHeadingMinThreashold = 0;
+
+  //public:
+    Robot(Point Pos, double CurrentHeading, bool headingGivenInDegrees, PIDGains linearK, PIDGains angularK, double linearThres, double rotationalThresInRadians, double maxLinearVelocity, double maxAngularVelocity, double maxLinearAccelleration, double maxAngularAccelleration, double updateTargetHeadingMinThreasholdX){
       location = OdomGrid(Pos, CurrentHeading, headingGivenInDegrees);
       linearGains = linearK;
       angularGains = angularK;
@@ -40,6 +45,7 @@ class Robot{
       maxAngularAccel = maxAngularAccelleration;
       maxLinearVel = maxLinearVelocity;
       maxAngularVel = maxAngularVelocity;
+      updateTargetHeadingMinThreashold = updateTargetHeadingMinThreasholdX;
     } 
 
     void setMaxLinearVel(double x){
@@ -54,6 +60,13 @@ class Robot{
     void setMaxRotationalAccel(double x){
       maxAngularAccel = abs(x);
     }
+    void setTargetHeadingMinThreashold(double x){
+      updateTargetHeadingMinThreashold = abs(x);
+    }
+
+    void usePIDControls(bool active){
+      usingPIDControls = active;
+    }
 
 //------------------
     //Sets Target using XY basis grid
@@ -65,17 +78,14 @@ class Robot{
     }
     void setTarget(Vector v){
       location.setTarget(v);
-      location.updateTargetHead();
     }
     void setAbsTarget(double x, double y){
       location.setAbsTarget(x, y);
-      location.updateTargetHead();
     }
     //Sets realitive to last target position
     void setTargetRealitiveToRobotOrientation(Vector v){
       //dX is horizontal, dY is fwd
       location.setTargetRealitiveToTargetOrientation(v);
-      location.updateTargetHead();
     }
 //---------------
 
@@ -89,7 +99,7 @@ class Robot{
     location.setHead(head, headingGivenInDegrees);
   }
   void updateStopStatus(double deltaT){
-    if(abs(location.getThetaError()) < rotationalThreshold){
+    if(abs(getThetaError()) < rotationalThreshold){
       roatationStopTimer = roatationStopTimer + deltaT;
       if(roatationStopTimer > 0.5){
         stoppedRotating = true;
@@ -99,7 +109,7 @@ class Robot{
       stoppedRotating = false;
     }
 
-    if(abs(location.getLinearError()) < linearThreshold){
+    if(abs(getLinearError()) < linearThreshold){
       motionStopTimer = motionStopTimer + deltaT;
       if(motionStopTimer > 0.5){
         stoppedMoving = true;
@@ -110,39 +120,73 @@ class Robot{
     }
   }
   void updatePID(double deltaT){
-    double e = location.getLinearError();
-    linearPid = PID(e, deltaT, linearGains, linearPid);
-    double newVel = linearPid.output;
-    double accel = newVel - targetLinearVelocity;
-    if(abs(accel) > maxLinearAccel){
-      newVel = targetLinearVelocity + sign(accel)*maxLinearAccel;
-    }
-    if(abs(newVel) > maxLinearVel){
-      newVel = maxLinearVel*sign(newVel);
-    }
-    targetLinearVelocity = newVel;
+    if(usingPIDControls){
+      double e = getLinearError();
+      linearPid = PID(e, deltaT, linearGains, linearPid);
+      double newVel = linearPid.output;
+      if(abs(newVel) > maxLinearVel){
+        newVel = maxLinearVel*sign(newVel);
+      }
+      targetLinearVelocity = newVel;
 
+      double eTheta = getThetaError();
+      rotationalPid = PID(eTheta, deltaT, angularGains, rotationalPid);
+      double newOmega = rotationalPid.output;
+      if(abs(newOmega) > maxAngularVel){
+        newOmega = maxAngularVel*sign(newOmega);
+      }
+      targetAngularVelocity = newOmega;
+    }
+  }
 
-    rotationalPid = PID(location.getThetaError(), deltaT, angularGains, rotationalPid);
-    double newOmega = rotationalPid.output;
-    double alpha = newOmega - targetAngularVelocity;
-    if(abs(alpha) > maxAngularAccel){
-      newOmega = targetAngularVelocity + sign(alpha)*maxAngularAccel;
+  double getThetaError(){
+    return shortestArcToTarget(location.getCurrHead(), location.getTargetHead());
+  }
+  double getLinearError(){
+    Vector targetVector = location.getTargetVector();
+    Vector basis = location.getRobotBasisVector();
+    Vector temp = targetVector.project(basis);
+    double theta = basis.getAngle(Vector(0, 1));
+    temp = temp.getRotatedVector(theta);
+    double linErr = temp.getY();
+
+    if(targetVector.getMagnitude() > updateTargetHeadingMinThreashold){
+      if(updateTargetHeadingWhileInMotion){
+        int d = 1;
+        if(!forward){
+          d = -1;
+        }
+        location.setTargetHeadAbs(Vector(1, 0).getAngle(targetVector.scale(d)));
+      }
     }
-    if(abs(newOmega) > maxAngularVel){
-      newOmega = maxAngularVel*sign(newOmega);
-    }
-    targetAngularVelocity = newOmega;
+
+    return linErr;
+  }
+
+  void setMoveMode(bool fwd){
+    usingPIDControls = true;
+    forward = fwd;
+    updateTargetHeadingWhileInMotion = true;
+  }
+  void setRotateMode(){
+    usingPIDControls = true;
+    forward = true;
+    updateTargetHeadingWhileInMotion = false;
   }
 
   double getLinearSpeedTarget(){
+    usingPIDControls = true;
     return targetLinearVelocity;
   }
   double getRotationalSpeedTarget(){
+    usingPIDControls = true;
     return targetAngularVelocity;
   }
+  bool isRotating(){
+    return !stoppedRotating;
+  }
   bool isMoving(){
-    return !(stoppedRotating && stoppedRotating);
+    return !(stoppedMoving && stoppedRotating);
   }
 
 };

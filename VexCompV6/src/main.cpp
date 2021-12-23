@@ -58,8 +58,22 @@ int main() {
   pre_auton();
   //Competition.autonomous(autonomous);
   //Competition.drivercontrol(usercontrol);
+  
+  moveAbs(0, 20);
+  moveAbs(-20,20);
+  moveAbs(-20, 0, false);
+  moveAbs(20, 20);
+  turnTo(0, true);
 
-   
+  /*
+  double t = 0;
+  std::cout << "Time,X,Y,T" << std::endl;
+  while(true){
+    Point p = robot.location.getPos();
+    std::cout << t << "," << p.x << "," << p.y << "," << radToDeg(robot.location.getCurrHead()) << std::endl;
+    t = t + 0.015;
+    wait(100, msec);
+  } */
 }
 
 /*
