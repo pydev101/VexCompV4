@@ -33,9 +33,10 @@ class Robot{
     bool forward = true;
     bool updateTargetHeadingWhileInMotion = true;
     double updateTargetHeadingMinThreashold = 0;
+    double maxThetaErrorForMotion = 0;
 
   //public:
-    Robot(Point Pos, double CurrentHeading, bool headingGivenInDegrees, PIDGains linearK, PIDGains angularK, double linearThres, double rotationalThresInRadians, double maxLinearVelocity, double maxAngularVelocity, double maxLinearAccelleration, double maxAngularAccelleration, double updateTargetHeadingMinThreasholdX){
+    Robot(Point Pos, double CurrentHeading, bool headingGivenInDegrees, PIDGains linearK, PIDGains angularK, double linearThres, double rotationalThresInRadians, double maxLinearVelocity, double maxAngularVelocity, double maxLinearAccelleration, double maxAngularAccelleration, double updateTargetHeadingMinThreasholdX, double maxThetaErrorForMotionX, bool lastArgInDeg){
       location = OdomGrid(Pos, CurrentHeading, headingGivenInDegrees);
       linearGains = linearK;
       angularGains = angularK;
@@ -46,6 +47,11 @@ class Robot{
       maxLinearVel = maxLinearVelocity;
       maxAngularVel = maxAngularVelocity;
       updateTargetHeadingMinThreashold = updateTargetHeadingMinThreasholdX;
+      if(lastArgInDeg){
+        maxThetaErrorForMotion = degToRad(maxThetaErrorForMotionX);
+      }else{
+        maxThetaErrorForMotion = maxThetaErrorForMotionX;
+      }
     } 
 
     void setMaxLinearVel(double x){
@@ -62,6 +68,14 @@ class Robot{
     }
     void setTargetHeadingMinThreashold(double x){
       updateTargetHeadingMinThreashold = abs(x);
+    }
+    void setMaxThetaErrorForMotion(double x, bool inDeg){
+      x = abs(x);
+      if(inDeg){
+        maxThetaErrorForMotion = degToRad(x);
+      }else{
+        maxThetaErrorForMotion = x;
+      }
     }
 
     void usePIDControls(bool active){
@@ -145,10 +159,7 @@ class Robot{
   double getLinearError(){
     Vector targetVector = location.getTargetVector();
     Vector basis = location.getRobotBasisVector();
-    Vector temp = targetVector.project(basis);
-    double theta = basis.getAngle(Vector(0, 1));
-    temp = temp.getRotatedVector(theta);
-    double linErr = temp.getY();
+    double linErr = basis.dot(targetVector);
 
     if(targetVector.getMagnitude() > updateTargetHeadingMinThreashold){
       if(updateTargetHeadingWhileInMotion){
@@ -160,7 +171,11 @@ class Robot{
       }
     }
 
-    return linErr;
+    if(abs(getThetaError()) < maxThetaErrorForMotion){
+      return linErr;
+    }else{
+      return 0;
+    }
   }
 
   void setMoveMode(bool fwd){

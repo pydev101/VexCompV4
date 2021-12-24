@@ -1,17 +1,15 @@
 #include <stdlib.h>
-#include <string.h>
 #include <iostream>
+#include "robotmath.h"
 
 typedef struct {
-    double x;
-    double y;
+    Point p;
     const char* color;
 } PointPair;
 
 typedef struct{
-    double x;
-    double y;
-    int v;
+    Point p;
+    Vector v;
     const char* color;
 } VectorPair;
 
@@ -51,27 +49,14 @@ public:
     void output() {
         for (int i = 0; i < numOfVectors; i++) {
             VectorPair v = vectors[i];
-            std::cout << "V:" << v.x << "," << v.y << "," << v.v << "," << v.color << std::endl;
+            std::cout << "V:" << v.p.x << "," << v.p.y << "," << v.v.getX() << "," << v.v.getY() << "," << v.color << std::endl;
         }
         for (int i = 0; i < numOfPoints; i++) {
             PointPair p = points[i];
-            std::cout << "P:" << p.x << "," << p.y << "," << p.color << std::endl;
+            std::cout << "P:" << p.p.x << "," << p.p.y << "," << p.color << std::endl;
         }
         std::cout << "END:END" << std::endl;
     }
 };
 
-using namespace std;
-int main(){
-    Graph log = Graph();
-    log.addPoint({ 5,5,"blue" });
-    log.addPoint({ 5,6,"green" });
-    log.addVector({ 5,7,13,"purple" });
-    log.output();
-    log.clear();
-    log.addVector({ 0,75,1003,"purple" });
-    log.addVector({ -15.0025452,17,13,"purple" });
-    log.output();
-
-    return 0;
-}
+Graph graph = Graph();

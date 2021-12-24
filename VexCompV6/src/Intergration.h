@@ -20,8 +20,10 @@ const double maximumAngularAcceleration = 1000;
 const double maxVelocity = 1000;
 const double maxAngularVelocity = 1000;
 const double updateTargetHeadingMinThreashold = 5;
+const double maxThetaErrorForMotion = 15; //deg
+bool maxThetaErrorForMotionGivenInDegrees = true;
 
-Robot robot = Robot(Point(0, 0), 90, true, {1.3,0,0}, {5,0,0}, linThreashold, angularThreashold, maxVelocity, maxAngularVelocity, maximumAccelerationLinear, maximumAngularAcceleration, updateTargetHeadingMinThreashold);
+Robot robot = Robot(Point(0, 0), 90, true, {1.3,0,0}, {5,0,0}, linThreashold, angularThreashold, maxVelocity, maxAngularVelocity, maximumAccelerationLinear, maximumAngularAcceleration, updateTargetHeadingMinThreashold, maxThetaErrorForMotion, maxThetaErrorForMotionGivenInDegrees);
 
 void track(){
   static double lastHeading = 0;
@@ -55,14 +57,22 @@ void track(){
 
 int frame = 0;
 int trakerFunction(){
-  std::cout << "Time,X,Y,H,XT,YT,HT,VTX,VTY,VRTX,VRTY" << std::endl;
   while(true){
     track();
     if(frame > 5){
-      std::cout << Brain.timer(timeUnits::msec) << "," << robot.location.pos.x << "," << robot.location.pos.y << "," << robot.location.currentHeading << "," << robot.location.targetPos.x << "," << robot.location.targetPos.y << "," << robot.location.targetHeading << ",";
       Vector tVec = robot.location.getTargetVector();
-      Vector tRVec = robot.location.getRealitiveTargetVector().getRotatedVector(robot.location.getRobotBasisVector().getAngle(Vector(0, 1)));
-      std::cout << tVec.getX() << "," << tVec.getY() << "," << tRVec.getX() << "," << tRVec.getY() << std::endl;
+      Vector tRVec = Vector(0, robot.getLinearError());
+
+      graph.addPoint({robot.location.pos, "green"});
+      graph.addPoint({robot.location.targetPos, "blue"});
+      graph.addVector({robot.location.pos, tVec, "teal"});
+      graph.addVector({robot.location.pos, tRVec, "purple"});
+      graph.addVector({robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(2), "yellow"});
+      graph.addVector({robot.location.pos, robot.location.getRobotBasisVector().scale(2), "red"}); 
+
+
+      graph.output();
+      graph.clear();
       frame = 0;
     }else{
       frame = frame + 1;

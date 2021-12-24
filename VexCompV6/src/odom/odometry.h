@@ -1,7 +1,6 @@
 #ifndef __ROBOTODOM_H__
 #define __ROBOTODOM_H__
-#include "robotmath.h"
-#include <iostream>
+#include "logger.h"
 
 //Describes positon, direction, size, and PID characteritics; PID control should be handled seperatly
 //Assume everything except angles which is stored in radiqans is stored in the same units given
