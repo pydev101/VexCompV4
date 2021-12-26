@@ -20,6 +20,16 @@ controller Controller1 = controller(primary);
 inertial Inertial = inertial(PORT10);
 digital_out backPne = digital_out(Brain.ThreeWirePort.A);
 digital_out frontPne = digital_out(Brain.ThreeWirePort.H);
+/*vex-vision-config:begin*/
+signature Vision__YELLOWGOAL = signature (1, 723, 2159, 1440, -4149, -3325, -3738, 1.1, 0);
+signature Vision__SIG_2 = signature (2, 0, 0, 0, 0, 0, 0, 3, 0);
+signature Vision__SIG_3 = signature (3, 0, 0, 0, 0, 0, 0, 3, 0);
+signature Vision__SIG_4 = signature (4, 0, 0, 0, 0, 0, 0, 3, 0);
+signature Vision__SIG_5 = signature (5, 0, 0, 0, 0, 0, 0, 3, 0);
+signature Vision__SIG_6 = signature (6, 0, 0, 0, 0, 0, 0, 3, 0);
+signature Vision__SIG_7 = signature (7, 0, 0, 0, 0, 0, 0, 3, 0);
+vision Vision = vision (PORT5, 50, Vision__YELLOWGOAL, Vision__SIG_2, Vision__SIG_3, Vision__SIG_4, Vision__SIG_5, Vision__SIG_6, Vision__SIG_7);
+/*vex-vision-config:end*/
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

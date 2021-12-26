@@ -13,6 +13,7 @@
 // Inertial             inertial      10              
 // backPne              digital_out   A               
 // frontPne             digital_out   H               
+// Vision               vision        5               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 
@@ -59,32 +60,32 @@ int main() {
   //Competition.autonomous(autonomous);
   //Competition.drivercontrol(usercontrol);
   
-  moveAbs(0, 20);
-  moveAbs(-20,20);
-  moveAbs(-20, 0, false);
-  moveAbs(20, 20);
-  turnTo(0, true);
-
   /*
-  double t = 0;
-  std::cout << "Time,X,Y,T" << std::endl;
+  moveAbs(0, 20);
+  moveAbs(-20, 20);
+  moveAbs(-20, 0, false);
+  moveAbs(0, 20);
+  turnTo(90, true);
+  moveAbs(0, 0, false);
+  */
+
+  Vision.setWifiMode(vex::vision::wifiMode::off);
+  //Vision.setMode(vex::vision::detectionMode::);
+
   while(true){
-    Point p = robot.location.getPos();
-    std::cout << t << "," << p.x << "," << p.y << "," << radToDeg(robot.location.getCurrHead()) << std::endl;
-    t = t + 0.015;
-    wait(100, msec);
-  } */
+    int num = Vision.takeSnapshot(Vision__YELLOWGOAL);
+    if(num > 0){
+      std::cout << "HI" << std::endl;
+      std::cout << Vision.largestObject.centerX << ", " << Vision.largestObject.centerY << std::endl;
+    }
+    wait(150, msec);
+  }
 }
 
 /*
 TODO
 
--Turn into continous operation
--PID is continious so no need for reset (target values are updated right in front of the robot while in motion on a path so PID shouldnt need a reset)
--ALlow for auto turn adjustments during linear motion; Setup output of functions as a struct of left and right
--implement a flag that triggers when it has reached the target position for x ammount of time
 -implement a path tracer which follows a path without worrying about slowing down to a stop each time
---If rot. error > 90 degrees transition velocity = targetVelocityBasedOnFinalPosition.project(fwd/bck).dy if > 0
-
+-Look at vex::serial_link as part of logger
 --Cameras need to be done once above is done; Set the target poisition to the goal
 */
