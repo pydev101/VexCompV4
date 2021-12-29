@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <iostream>
+#include <fstream>
 #include "robotmath.h"
 
 typedef struct {
@@ -13,31 +14,53 @@ typedef struct{
     const char* color;
 } VectorPair;
 
+typedef struct{
+  double error;
+  PIDOutput pidOutput;
+  double realTargetVel;
+  double realVel;
+} PIDData;
+
 class Graph{
 public:
     PointPair* points = (PointPair*)malloc(0);
-    VectorPair* vectors = (VectorPair*)malloc(0);
     int numOfPoints = 0;
+    VectorPair* vectorlist = (VectorPair*)malloc(0);
     int numOfVectors = 0;
+    PIDData* linearPIDData = (PIDData*)malloc(0);
+    int numOfLinPIDData = 0;
+    PIDData* rotPIDData = (PIDData*)malloc(0);
+    int numOfRotPIDData = 0;
 
     ~Graph() {
         free(points);
-        free(vectors);
+        free(vectorlist);
+        free(linearPIDData);
+        free(rotPIDData);
     }
 
     void clear() {
         free(points);
-        free(vectors);
         points = (PointPair*)malloc(0);
-        vectors = (VectorPair*)malloc(0);
         numOfPoints = 0;
+
+        free(vectorlist);
+        vectorlist = (VectorPair*)malloc(0);
         numOfVectors = 0;
+
+        free(linearPIDData);
+        linearPIDData = (PIDData*)malloc(0);
+        numOfLinPIDData = 0;
+
+        free(rotPIDData);
+        rotPIDData = (PIDData*)malloc(0);
+        numOfRotPIDData = 0;
     }
 
     void addVector(VectorPair x) {
         numOfVectors++;
-        vectors = (VectorPair*)realloc(vectors, sizeof(VectorPair) * numOfVectors);
-        vectors[numOfVectors - 1] = x;
+        vectorlist = (VectorPair*)realloc(vectorlist, sizeof(VectorPair) * numOfVectors);
+        vectorlist[numOfVectors - 1] = x;
     }
 
     void addPoint(PointPair x) {
@@ -46,14 +69,34 @@ public:
         points[numOfPoints - 1] = x;
     }
 
+    void addPID(PIDData data, bool linearPID) {
+      if(linearPID){
+        numOfLinPIDData++;
+        linearPIDData = (PIDData*)realloc(linearPIDData, sizeof(PIDData) * numOfLinPIDData);
+        linearPIDData[numOfLinPIDData - 1] = data;
+      }else{
+        numOfRotPIDData++;
+        rotPIDData = (PIDData*)realloc(rotPIDData, sizeof(PIDData) * numOfRotPIDData);
+        rotPIDData[numOfRotPIDData - 1] = data;
+      }
+    }
+
     void output() {
         for (int i = 0; i < numOfVectors; i++) {
-            VectorPair v = vectors[i];
+            VectorPair v = vectorlist[i];
             std::cout << "V:" << v.p.x << "," << v.p.y << "," << v.v.getX() << "," << v.v.getY() << "," << v.color << std::endl;
         }
         for (int i = 0; i < numOfPoints; i++) {
             PointPair p = points[i];
             std::cout << "P:" << p.p.x << "," << p.p.y << "," << p.color << std::endl;
+        }
+        for (int i = 0; i < numOfLinPIDData; i++) {
+            PIDData d = linearPIDData[i];
+            std::cout << "LPID:" << d.error << "," << d.pidOutput.output << "," << d.pidOutput.reset << "," << d.realTargetVel << "," << d.realVel << std::endl;
+        }
+        for (int i = 0; i < numOfRotPIDData; i++) {
+            PIDData d = rotPIDData[i];
+            std::cout << "RPID:" << d.error << "," << d.pidOutput.output << "," << d.pidOutput.reset << "," << d.realTargetVel << "," << d.realVel << std::endl;
         }
         std::cout << "END:END" << std::endl;
     }

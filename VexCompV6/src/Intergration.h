@@ -5,13 +5,21 @@
 #include "motorFunctions.h"
 #include "odom/robot.h"
 
+
+//CONSTANTS
+
+
 //Set position and target using robot, get linear and angular speed from robot, set speed of motors to reflect robot
+const Point startingPoint = Point(0, 0);
+const double startingHead = 90; //Degrees (CCW +)
+
 const double UnitsPerRev = 18.3207546*1.0167034; //Inches per revolution
 const double RobotDiameter = 15; //Inches (Same Units as above)
 const double RobotRadius = 0.5*RobotDiameter;
 
 const double updateTime = 20; //msec
 const double motionDelay = 25; //msec
+const double cameraDelay = 20;
 
 const double linThreashold = 1; //In
 const double angularThreashold = degToRad(1);
@@ -23,7 +31,38 @@ const double updateTargetHeadingMinThreashold = 5;
 const double maxThetaErrorForMotion = 15; //deg
 bool maxThetaErrorForMotionGivenInDegrees = true;
 
-Robot robot = Robot(Point(0, 0), 90, true, {1.3,0,0}, {5,0,0}, linThreashold, angularThreashold, maxVelocity, maxAngularVelocity, maximumAccelerationLinear, maximumAngularAcceleration, updateTargetHeadingMinThreashold, maxThetaErrorForMotion, maxThetaErrorForMotionGivenInDegrees);
+//linGains, rotGains
+const PIDGains basicGains[3][2] = {
+  {{1.5,0,0}, {7,0,0}}, //1 towers
+  {{0,0,0}, {0,0,0}}, //2 tower
+  {{0,0,0}, {0,0,0}} //3 tower
+};
+const PIDGains cameraGains[2][2] = {
+  {{0.5,0,0}, {0.4,0,0}}, //0 towers
+  {{0,0,0}, {0,0,0}} //1 tower
+};
+
+
+typedef struct{
+  int xOffset;
+  int yOffset;
+  int xThreashold;
+  int yThreashold;
+  int minWidth;
+} CameraSettings;
+const CameraSettings frontCameraSettings = {153, 140, 15, 15, 30};
+const CameraSettings backCameraSettings = {153, 140, 15, 15, 30};
+const int camStopWait = 500; //msec
+const int camDelayLoop = 20; //msec
+
+
+///Robot Instantation
+Robot robot = Robot(startingPoint, startingHead, true, 
+                    basicGains[0][0], basicGains[0][1], 
+                    linThreashold, angularThreashold, 
+                    maxVelocity, maxAngularVelocity, 
+                    maximumAccelerationLinear, maximumAngularAcceleration, 
+                    updateTargetHeadingMinThreashold, maxThetaErrorForMotion, maxThetaErrorForMotionGivenInDegrees);
 
 void track(){
   static double lastHeading = 0;
@@ -59,17 +98,18 @@ int frame = 0;
 int trakerFunction(){
   while(true){
     track();
-    if(frame > 5){
+
+    if(frame >= 10){
       Vector tVec = robot.location.getTargetVector();
-      Vector tRVec = Vector(0, robot.getLinearError());
 
       graph.addPoint({robot.location.pos, "green"});
       graph.addPoint({robot.location.targetPos, "blue"});
       graph.addVector({robot.location.pos, tVec, "teal"});
-      graph.addVector({robot.location.pos, tRVec, "purple"});
       graph.addVector({robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(2), "yellow"});
       graph.addVector({robot.location.pos, robot.location.getRobotBasisVector().scale(2), "red"}); 
 
+      graph.addPID({robot.getLinearError(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
+      graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
 
       graph.output();
       graph.clear();
@@ -81,11 +121,8 @@ int trakerFunction(){
   }
 } //Called in Pre-Auton
 
-
-
-void executeMove(){
-  wait(updateTime+1, msec);
-  while(robot.isMoving()){
+bool updateMotors(){
+  if(robot.isMoving()){
     double linearSpeed = robot.getLinearSpeedTarget();
     double angularSpeed = robot.getRotationalSpeedTarget();
 
@@ -94,10 +131,25 @@ void executeMove(){
 
     setLeft(linearSpeed - angularSpeed, velocityUnits::rpm);
     setRight(linearSpeed + angularSpeed, velocityUnits::rpm);
+    return true;
+  }else{
+    setLeft(0);
+    setRight(0);
+    return false;
+  }
+}
+
+
+
+//MOTION FUNCTIONS
+
+void executeMove(){
+  wait(updateTime+1, msec);
+  bool inMotion = robot.isMoving();
+  while(inMotion){
+    inMotion = updateMotors();
     wait(motionDelay, msec);
   }
-  setLeft(0);
-  setRight(0);
 }
 
 //Moves realitive to current position using robot orientation
@@ -108,7 +160,7 @@ void turn(double theta, bool inDeg=true){
   executeMove();
 }
 //Turns to abs orientation
-void turnTo(double theta, bool inDeg){
+void turnTo(double theta, bool inDeg=true){
   robot.setHeadTargetAbs(theta, inDeg);
   turn(0, false);
 }
@@ -118,10 +170,9 @@ void moveAbs(double x, double y, bool fwd=true){
   robot.setAbsTarget(x, y);
   executeMove();
 }
-
 void move(Vector v, bool fwd=true){
   robot.setMoveMode(fwd);
-  robot.setTargetRealitiveToRobotOrientation(v);
+  robot.setTarget(v);
   executeMove();
 }
 void move(double fwd, double hor, bool dir=true){
@@ -129,6 +180,90 @@ void move(double fwd, double hor, bool dir=true){
 }
 void move(double mag, double theta, bool inDeg, bool dir){
   move(Vector(mag, theta, inDeg), dir);
+}
+
+
+
+class smartPointPointer{
+  public:
+  Point* data = (Point*)malloc(0);
+  int size = 0;
+
+  ~smartPointPointer(){
+    free(data);
+  }
+
+  void append(Point p){
+    size++;
+    data = (Point*)realloc(data, sizeof(Point) * size);
+    data[size - 1] = p;
+  }
+};
+Point bezierFormula(Point initPoint, Point finalPoint, Point C1, Point C2, double t){
+  double inverseT = (1-t);
+  double x = inverseT*inverseT*inverseT*initPoint.x + 3*inverseT*inverseT*t*C1.x + 3*inverseT*t*t*C2.x + t*t*t*finalPoint.x;
+  double y = inverseT*inverseT*inverseT*initPoint.y + 3*inverseT*inverseT*t*C1.y + 3*inverseT*t*t*C2.y + t*t*t*finalPoint.y;
+  return Point(x, y);
+}
+smartPointPointer generatePath(Point initPoint, Point finalPoint, Point C1, Point C2, const int steps=10){
+  smartPointPointer result = smartPointPointer();
+  for(double t=0; t<=1; t=t+(1.0/steps)){
+    result.append(bezierFormula(initPoint, finalPoint, C1, C2, t));
+  }
+  return result;
+}
+
+
+
+
+Vector getErrorFromCamera(vex::vision *cam, vex::vision::signature &sig, CameraSettings camsett){
+  int num = cam->takeSnapshot(sig);
+  double x = 0;
+  double y = 0;
+
+  if(num > 0){
+    if(cam->largestObject.width > camsett.minWidth){
+      x = cam->largestObject.centerX - camsett.xOffset;
+      y = cam->largestObject.centerY - camsett.yOffset;
+      x = x*-1;
+      y = y*-1;
+    }
+  }
+  //std::cout << num <<","<< x <<","<< y << std::endl;
+  return Vector(x, y);
+}
+
+//Example: trackWithCam(&BackCam, -1, backCameraSettings, 0, BackCam__YELLOWGOAL);
+void trackWithCam(vex::vision *camera, int d, CameraSettings settings, const int gainsIndex, vex::vision::signature &sig){
+  PIDOutput linValues = {0,0,0};
+  PIDOutput rotValues = {0,0,0};
+  int rotMove = 0;
+  int linMove = 0;
+
+  robot.usePIDControls(false);
+  while((rotMove<camStopWait) || (linMove<camStopWait)){
+    Vector r = getErrorFromCamera(camera, sig, settings);
+
+    linValues = PID(r.getY(), camDelayLoop/1000.0, cameraGains[gainsIndex][0], linValues);
+    rotValues = PID(r.getX(), camDelayLoop/1000.0, cameraGains[gainsIndex][1], rotValues);
+
+    setLeft(d*linValues.output - rotValues.output);
+    setRight(d*linValues.output + rotValues.output);
+
+    if(abs(r.getX()) < settings.xThreashold){
+      rotMove += camDelayLoop;
+    }else{
+      rotMove = 0;
+    }
+    if(abs(r.getY()) < settings.yThreashold){
+      linMove += camDelayLoop;
+    }else{
+      linMove = 0;
+    }
+    wait(camDelayLoop, msec);
+  }
+  setLeft(0);
+  setRight(0);
 }
 
 #endif

@@ -13,7 +13,7 @@
 // Inertial             inertial      10              
 // backPne              digital_out   A               
 // frontPne             digital_out   H               
-// Vision               vision        5               
+// BackCam              vision        5               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 
@@ -46,13 +46,14 @@ void pre_auton(void) {
 
   resetEncoders();
 
-  task traker = task(trakerFunction);
+  //task traker = task(trakerFunction);
   //BrainGUIProgram();
 }
 
 //
 // Main will set up the competition functions and callbacks.
 //
+
 
 int main() {
   // Set up callbacks for autonomous and driver control periods.
@@ -66,20 +67,8 @@ int main() {
   moveAbs(-20, 0, false);
   moveAbs(0, 20);
   turnTo(90, true);
-  moveAbs(0, 0, false);
-  */
+  moveAbs(0, 0, false);*/
 
-  Vision.setWifiMode(vex::vision::wifiMode::off);
-  //Vision.setMode(vex::vision::detectionMode::);
-
-  while(true){
-    int num = Vision.takeSnapshot(Vision__YELLOWGOAL);
-    if(num > 0){
-      std::cout << "HI" << std::endl;
-      std::cout << Vision.largestObject.centerX << ", " << Vision.largestObject.centerY << std::endl;
-    }
-    wait(150, msec);
-  }
 }
 
 /*

@@ -81,6 +81,14 @@ class Robot{
     void usePIDControls(bool active){
       usingPIDControls = active;
     }
+    void setLinPID(PIDGains x){
+      linearGains = x;
+      linearPid = initPID(0);
+    }
+    void setRotPID(PIDGains x){
+      angularGains = x;
+      rotationalPid = initPID(0);
+    }
 
 //------------------
     //Sets Target using XY basis grid

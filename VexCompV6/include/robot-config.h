@@ -17,14 +17,14 @@ extern controller Controller1;
 extern inertial Inertial;
 extern digital_out backPne;
 extern digital_out frontPne;
-extern signature Vision__YELLOWGOAL;
-extern signature Vision__SIG_2;
-extern signature Vision__SIG_3;
-extern signature Vision__SIG_4;
-extern signature Vision__SIG_5;
-extern signature Vision__SIG_6;
-extern signature Vision__SIG_7;
-extern vision Vision;
+extern signature BackCam__YELLOWGOAL;
+extern signature BackCam__SIG_2;
+extern signature BackCam__SIG_3;
+extern signature BackCam__SIG_4;
+extern signature BackCam__SIG_5;
+extern signature BackCam__SIG_6;
+extern signature BackCam__SIG_7;
+extern vision BackCam;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
