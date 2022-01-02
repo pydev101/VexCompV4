@@ -74,7 +74,7 @@ realRotSpeed = []
 resetRot = []
 
 plt.show(block=False)
-plt.waitforbuttonpress()
+# plt.pause(10)
 for i in range(0, len(graphs)):
     # Mention x and y limits to define their range
     graph = graphs[i]

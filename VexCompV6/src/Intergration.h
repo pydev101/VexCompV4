@@ -101,7 +101,6 @@ int trakerFunction(){
 
     if(frame >= 10){
       Vector tVec = robot.location.getTargetVector();
-
       graph.addPoint({robot.location.pos, "green"});
       graph.addPoint({robot.location.targetPos, "blue"});
       graph.addVector({robot.location.pos, tVec, "teal"});
@@ -111,26 +110,26 @@ int trakerFunction(){
       graph.addPID({robot.getLinearError(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
       graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
 
-      graph.output();
+      //graph.output();
       graph.clear();
       frame = 0;
     }else{
       frame = frame + 1;
     }
-    wait(updateTime, timeUnits::msec);
+
+    wait(updateTime, msec);
   }
 } //Called in Pre-Auton
 
 bool updateMotors(){
+  double linearSpeed = robot.getLinearSpeedTarget();
+  double angularSpeed = robot.getRotationalSpeedTarget();
+  linearSpeed = (linearSpeed/UnitsPerRev)*60; //Units/Sec to RPM
+  angularSpeed = angularSpeed * (RobotRadius/UnitsPerRev) * 60 * 0.5; //Converts Rad/S to RPM and splits in half because there are 2 drive sides
+  setLeft(linearSpeed - angularSpeed, velocityUnits::rpm);
+  setRight(linearSpeed + angularSpeed, velocityUnits::rpm);
+
   if(robot.isMoving()){
-    double linearSpeed = robot.getLinearSpeedTarget();
-    double angularSpeed = robot.getRotationalSpeedTarget();
-
-    linearSpeed = (linearSpeed/UnitsPerRev)*60; //Units/Sec to RPM
-    angularSpeed = angularSpeed * (RobotRadius/UnitsPerRev) * 60 * 0.5; //Converts Rad/S to RPM and splits in half because there are 2 drive sides
-
-    setLeft(linearSpeed - angularSpeed, velocityUnits::rpm);
-    setRight(linearSpeed + angularSpeed, velocityUnits::rpm);
     return true;
   }else{
     setLeft(0);
@@ -146,76 +145,75 @@ bool updateMotors(){
 void executeMove(){
   wait(updateTime+1, msec);
   bool inMotion = robot.isMoving();
+
   while(inMotion){
     inMotion = updateMotors();
-    wait(motionDelay, msec);
+    wait(motionDelay, timeUnits::msec);
   }
 }
 
 //Moves realitive to current position using robot orientation
 //Rotates realitive to target
-void turn(double theta, bool inDeg=true){
+void turn(double theta, bool inDeg=true, bool blocking=true){
   robot.setRotateMode();
   robot.setTargetHead(theta, inDeg);
-  executeMove();
+  if(blocking){
+    executeMove();
+  }
 }
 //Turns to abs orientation
-void turnTo(double theta, bool inDeg=true){
+void turnTo(double theta, bool inDeg=true, bool blocking=true){
   robot.setHeadTargetAbs(theta, inDeg);
-  turn(0, false);
+  turn(0, false, blocking);
 }
 
-void moveAbs(double x, double y, bool fwd=true){
-  robot.setMoveMode(fwd);
+void moveAbs(double x, double y, bool fwd=true, bool blocking=true){
+  robot.setLineMode(fwd);
   robot.setAbsTarget(x, y);
-  executeMove();
+  if(blocking){
+    executeMove();
+  }
 }
-void move(Vector v, bool fwd=true){
-  robot.setMoveMode(fwd);
+void moveAbs(Point p, bool fwd=true, bool blocking=true){
+  moveAbs(p.x, p.y);
+}
+void move(Vector v, bool fwd=true, bool blocking=true){
+  robot.setLineMode(fwd);
   robot.setTarget(v);
-  executeMove();
-}
-void move(double fwd, double hor, bool dir=true){
-  move(Vector(hor, fwd), dir);
-}
-void move(double mag, double theta, bool inDeg, bool dir){
-  move(Vector(mag, theta, inDeg), dir);
-}
-
-
-
-class smartPointPointer{
-  public:
-  Point* data = (Point*)malloc(0);
-  int size = 0;
-
-  ~smartPointPointer(){
-    free(data);
+  if(blocking){
+    executeMove();
   }
-
-  void append(Point p){
-    size++;
-    data = (Point*)realloc(data, sizeof(Point) * size);
-    data[size - 1] = p;
-  }
-};
-Point bezierFormula(Point initPoint, Point finalPoint, Point C1, Point C2, double t){
-  double inverseT = (1-t);
-  double x = inverseT*inverseT*inverseT*initPoint.x + 3*inverseT*inverseT*t*C1.x + 3*inverseT*t*t*C2.x + t*t*t*finalPoint.x;
-  double y = inverseT*inverseT*inverseT*initPoint.y + 3*inverseT*inverseT*t*C1.y + 3*inverseT*t*t*C2.y + t*t*t*finalPoint.y;
-  return Point(x, y);
 }
-smartPointPointer generatePath(Point initPoint, Point finalPoint, Point C1, Point C2, const int steps=10){
-  smartPointPointer result = smartPointPointer();
-  for(double t=0; t<=1; t=t+(1.0/steps)){
-    result.append(bezierFormula(initPoint, finalPoint, C1, C2, t));
-  }
-  return result;
+void move(double fwd, double hor, bool dir=true, bool blocking=true){
+  move(Vector(hor, fwd), dir, blocking);
+}
+void move(double mag, double theta, bool inDeg, bool dir, bool blocking=true){
+  move(Vector(mag, theta, inDeg), dir, blocking);
 }
 
 
+//Tracing functions
+void tracePath(smartPointPointer points){
+  moveAbs(Point(0,0));
+  robot.setIndependentTargetMode();
+  robot.setAbsTarget(points[points.size - 1]);
+
+  for(int i=1; i<points.size; i++){
+    Vector t = Vector(robot.location.getPos(), points[i]);
+    robot.setHeadTargetAbs(Vector(1, 0).getAngle(t), false);
+
+    wait(updateTime+1, msec);
+    while(robot.isRotating() && (abs(t.dot(robot.location.getRobotBasisVector())) > linThreashold)){
+      updateMotors();
+      wait(motionDelay, timeUnits::msec);
+    }
+  }
+  moveAbs(points[points.size - 1]);
+}
 
 
+
+//Camera functions
 Vector getErrorFromCamera(vex::vision *cam, vex::vision::signature &sig, CameraSettings camsett){
   int num = cam->takeSnapshot(sig);
   double x = 0;

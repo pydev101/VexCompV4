@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <iostream>
 #include <fstream>
 #include "robotmath.h"
@@ -103,3 +102,49 @@ public:
 };
 
 Graph graph = Graph();
+
+class PathLogger{
+public:
+  std::string fileName;
+  smartPointPointer path;
+  PathLogger(std::string name){
+    fileName = name;
+  }
+  void read(){
+    std::ifstream file("my_file");
+    std::string temp;
+
+    while(std::getline(file, temp)) {
+      int i = 0;
+      for ( ; i < temp.length(); i++ ){ if ( temp[i] == ',' ) break; }
+      if(i > 0){
+        double x = atof(temp.substr(0, i-1 ).c_str());
+        double y = atof(temp.substr(i+1, temp.length()-1 ).c_str());
+        path.append(Point(x, y));
+      }
+    }
+    file.close();
+  }
+  void save(){
+    std::ofstream file;
+    file.open(fileName);
+    file.clear();
+    for(int i=0; i<path.size; i++){
+      file << path[i].x << "," << path[i].y << std::endl;
+    }
+    file.close();
+  }
+  void output(int format=0){
+    if(format==0){
+      for(int i=0; i<path.size; i++){
+        std::cout << "P:" << path[i].x << "," << path[i].y << ",green" << std::endl;
+      }
+      std::cout << "END:END" << std::endl;
+    }else if (format==1) {
+      for(int i=0; i<path.size; i++){
+        std::cout << "(" << path[i].x << "," << path[i].y << "),";
+      }
+      std::cout << std::endl;
+    }
+  }
+};

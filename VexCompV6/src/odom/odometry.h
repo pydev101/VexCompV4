@@ -75,6 +75,10 @@ class OdomGrid{
       targetPos = Point(x, y);
       targetVec = Vector(pos, targetPos);
     }
+    void setAbsTarget(Point p){
+      targetPos = p;
+      targetVec = Vector(pos, targetPos);
+    }
     void setTargetHeadAbs(double ang, bool headingInDegrees=false){
       if(headingInDegrees){
         ang = degToRad(ang);

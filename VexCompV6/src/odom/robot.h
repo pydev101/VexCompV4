@@ -32,6 +32,7 @@ class Robot{
     bool usingPIDControls = true;
     bool forward = true;
     bool updateTargetHeadingWhileInMotion = true;
+    bool blockLinearMotionIfThetaErrorTooHigh = true;
     double updateTargetHeadingMinThreashold = 0;
     double maxThetaErrorForMotion = 0;
 
@@ -103,6 +104,9 @@ class Robot{
     }
     void setAbsTarget(double x, double y){
       location.setAbsTarget(x, y);
+    }
+    void setAbsTarget(Point p){
+      location.setAbsTarget(p);
     }
     //Sets realitive to last target position
     void setTargetRealitiveToRobotOrientation(Vector v){
@@ -179,22 +183,35 @@ class Robot{
       }
     }
 
-    if(abs(getThetaError()) < maxThetaErrorForMotion){
-      return linErr;
+    if(blockLinearMotionIfThetaErrorTooHigh){
+      if(abs(getThetaError()) < maxThetaErrorForMotion){
+        return linErr;
+      }else{
+        return 0;
+      }
     }else{
-      return 0;
+      return linErr;
     }
   }
 
-  void setMoveMode(bool fwd){
+  void setLineMode(bool fwd){
     usingPIDControls = true;
     forward = fwd;
     updateTargetHeadingWhileInMotion = true;
+    blockLinearMotionIfThetaErrorTooHigh = true;
   }
   void setRotateMode(){
     usingPIDControls = true;
     forward = true;
     updateTargetHeadingWhileInMotion = false;
+    blockLinearMotionIfThetaErrorTooHigh = true;
+  }
+  //Use for tracing, camera and mechanium wheels; Doesnt allow theta target to change during linear motion so targets can be set indepenedently
+  void setIndependentTargetMode(){
+    usingPIDControls = true;
+    forward = true;
+    updateTargetHeadingWhileInMotion = false;
+    blockLinearMotionIfThetaErrorTooHigh = false;
   }
 
   double getLinearSpeedTarget(){

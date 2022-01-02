@@ -1,6 +1,7 @@
 #ifndef __ROBOTMATH_H__
 #define __ROBOTMATH_H__
 #include "math.h"
+#include <stdlib.h>
 
 const double PI = 3.14159265;
 class Vector;
@@ -140,14 +141,6 @@ class Point{
       x = X;
       y = Y;
     }
-
-    //TODO Test collision
-    bool collision(double otherX, double otherY, double r){
-      return (((x-otherX)*(x-otherX))+((y-otherY)*(y-otherY))) <= (r*r);
-    }
-    bool collision(Point other, double r){
-      return (((x-other.x)*(x-other.x))+((y-other.y)*(y-other.y))) <= (r*r);
-    }
 };
 
 
@@ -190,7 +183,7 @@ class Vector{
     //TODO Test (Maybe worked in JS?)
     double getAngle(Vector vecB) {
       if((getMagnitude() == 0) || (vecB.getMagnitude() == 0)){
-        return 2*PI; // Its bound between 0-PI so 2PI is error indication
+        return 0; // Its bound between 0-PI so 2PI is error indication
       }
       double theta = acos(dot(vecB) / (getMagnitude() * vecB.getMagnitude()));
       double dotZ = deltaX * -vecB.deltaY + deltaY * vecB.deltaX;
@@ -210,7 +203,7 @@ class Vector{
     }
     Vector getUnitVector(){
       if(getMagnitude() == 0){
-        return Vector(0, 0);
+        return Vector(1, 0);
       }
       return Vector(deltaX/getMagnitude(), deltaY/getMagnitude());
     }
@@ -224,6 +217,9 @@ class Vector{
 
     Vector project(Vector vec){
       //Projects this on to vec
+      if(vec.getMagnitude() == 0){
+        return Vector(0, 0);
+      }
       return vec.scale(dot(vec) / (vec.getMagnitude() * vec.getMagnitude()));
     }
     
@@ -250,5 +246,48 @@ class Vector{
     }
 };
 
-#endif
+class smartPointPointer{
+  public:
+  Point* data = (Point*)malloc(0);
+  int size = 0;
 
+  ~smartPointPointer(){
+    free(data);
+  }
+
+  void clear(){
+    size = 0;
+    free(data);
+    data = (Point*)malloc(0);
+  }
+  void append(Point p){
+    size++;
+    data = (Point*)realloc(data, sizeof(Point) * size);
+    data[size - 1] = p;
+  }
+
+  Point &operator[](size_t index) {
+    return data[index];
+  }
+};
+Point bezierFormula(Point initPoint, Point finalPoint, Point C1, Point C2, double t){
+  double inverseT = (1-t);
+  double x = inverseT*inverseT*inverseT*initPoint.x + 3*inverseT*inverseT*t*C1.x + 3*inverseT*t*t*C2.x + t*t*t*finalPoint.x;
+  double y = inverseT*inverseT*inverseT*initPoint.y + 3*inverseT*inverseT*t*C1.y + 3*inverseT*t*t*C2.y + t*t*t*finalPoint.y;
+  return Point(x, y);
+}
+smartPointPointer generatePath(Point initPoint, Point finalPoint, Point C1, Point C2, const int steps=10){
+  smartPointPointer result = smartPointPointer();
+  for(double t=0; t<=1; t=t+(1.0/steps)){
+    result.append(bezierFormula(initPoint, finalPoint, C1, C2, t));
+  }
+  return result;
+}
+smartPointPointer generatePath(Point initPoint, Point finalPoint, Vector V1, Vector V2, const int steps=10){
+  smartPointPointer result = smartPointPointer();
+  for(double t=0; t<=1; t=t+(1.0/steps)){
+    result.append(bezierFormula(initPoint, finalPoint, V1+initPoint, V2+finalPoint, t));
+  }
+  return result;
+}
+#endif
