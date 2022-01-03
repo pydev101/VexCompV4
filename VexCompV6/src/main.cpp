@@ -69,9 +69,9 @@ int main() {
   turnTo(90, true);
   moveAbs(0, 0, false);*/
 
-  smartPointPointer path = generatePath(Point(0,0), Point(0,24.8), Point(-35.4,3.85), Point(31.53, 12.35));
+  smartPointPointer path = generatePath(Point(0,0), Point(0,24.8), Point(-35.4,3.85), Point(31.53, 12.35), 25);
   tracePath(path);
-  std::cout << "Complete" << std::endl;
+  //std::cout << "Complete" << std::endl;
 
   while(true){
     wait(200, msec);

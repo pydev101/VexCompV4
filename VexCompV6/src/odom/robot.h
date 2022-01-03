@@ -29,12 +29,60 @@ class Robot{
     double maxLinearVel = 0;
     double maxAngularVel = 0;
 
-    bool usingPIDControls = true;
+    bool usingLinearPIDControls = true;
+    bool usingRotPIDControls = true;
     bool forward = true;
     bool updateTargetHeadingWhileInMotion = true;
     bool blockLinearMotionIfThetaErrorTooHigh = true;
     double updateTargetHeadingMinThreashold = 0;
     double maxThetaErrorForMotion = 0;
+    bool traceModeOn = false;
+    double traceVelocity = 0;
+    smartPointPointer pathToTrace;
+    int pathTraceIndex = 0;
+
+    void updatePID(double deltaT){
+      if(usingLinearPIDControls){
+        double e = getLinearError();
+        linearPid = PID(e, deltaT, linearGains, linearPid);
+        double newVel = linearPid.output;
+        if(abs(newVel) > maxLinearVel){
+          newVel = maxLinearVel*sign(newVel);
+        }
+        targetLinearVelocity = newVel;
+      }
+      if(usingRotPIDControls){
+        double eTheta = getThetaError();
+        rotationalPid = PID(eTheta, deltaT, angularGains, rotationalPid);
+        double newOmega = rotationalPid.output;
+        if(abs(newOmega) > maxAngularVel){
+          newOmega = maxAngularVel*sign(newOmega);
+        }
+        targetAngularVelocity = newOmega;
+      }
+    }
+
+    void updateTrace(double deltaT){
+      //Set linear velocity for path tracing; Maybe take an input path or something
+      if(traceModeOn){
+        if(abs(location.getRobotBasisVector().dot(Vector(location.getPos(), pathToTrace[pathTraceIndex]))) < linearThreshold){
+          pathTraceIndex++;
+        }
+
+        Point p = pathToTrace[pathTraceIndex];
+        setAbsTarget(p);
+        Vector t = Vector(location.getPos(), p).getUnitVector();
+        Vector v = location.getRobotBasisVector().scale(traceVelocity);
+
+        if(pathTraceIndex == (pathToTrace.size - 1)){
+          setAbsTarget(pathToTrace[pathToTrace.size - 1]);
+          setLineMode(true);
+        }else{
+          setHeadTargetAbs(Vector(1 ,0).getAngle(t), false);
+          targetLinearVelocity = v.dot(t);
+        }
+      }
+    }
 
   //public:
     Robot(Point Pos, double CurrentHeading, bool headingGivenInDegrees, PIDGains linearK, PIDGains angularK, double linearThres, double rotationalThresInRadians, double maxLinearVelocity, double maxAngularVelocity, double maxLinearAccelleration, double maxAngularAccelleration, double updateTargetHeadingMinThreasholdX, double maxThetaErrorForMotionX, bool lastArgInDeg){
@@ -55,6 +103,8 @@ class Robot{
       }
     } 
 
+
+    //SET VARS-----------------------------------------------------------------------------------------------------------------
     void setMaxLinearVel(double x){
       maxLinearVel = abs(x);
     }
@@ -79,8 +129,15 @@ class Robot{
       }
     }
 
+
+    //PID Access---------------------------------------------------------------------------------------------------------------
     void usePIDControls(bool active){
-      usingPIDControls = active;
+      usingLinearPIDControls = active;
+      usingRotPIDControls = active;
+    }
+    void usePIDControls(bool linActive, bool rotActive){
+      usingLinearPIDControls = linActive;
+      usingRotPIDControls = rotActive;
     }
     void setLinPID(PIDGains x){
       linearGains = x;
@@ -90,8 +147,42 @@ class Robot{
       angularGains = x;
       rotationalPid = initPID(0);
     }
+    void setLineMode(bool fwd){
+      traceModeOn = false;
+      usePIDControls(true);
+      forward = fwd;
+      updateTargetHeadingWhileInMotion = true;
+      blockLinearMotionIfThetaErrorTooHigh = true;
+    }
+    void setRotateMode(){
+      traceModeOn = false;
+      usePIDControls(true);
+      forward = true;
+      updateTargetHeadingWhileInMotion = false;
+      blockLinearMotionIfThetaErrorTooHigh = true;
+    }
+    void setIndependentTargetMode(){
+      traceModeOn = false;
+      usePIDControls(true);
+      forward = true;
+      updateTargetHeadingWhileInMotion = false;
+      blockLinearMotionIfThetaErrorTooHigh = false;
+    }
+    void traceMode(smartPointPointer &path, double vel){
+      if(path.size >= 2){
+        usePIDControls(false, true);
+        forward = true;
+        updateTargetHeadingWhileInMotion = false;
+        blockLinearMotionIfThetaErrorTooHigh = false;
+        traceVelocity = vel;
+        setAbsTarget(path[path.size - 1]);
+        pathToTrace = path;
+        pathTraceIndex = 0;
+        traceModeOn = true;
+      }
+    }
 
-//------------------
+//Target selection------------------------------------------------------------------------------------------------------------
     //Sets Target using XY basis grid
     void setTargetHead(double theta, bool inDeg){
       location.setTargetHead(theta, inDeg);
@@ -113,8 +204,9 @@ class Robot{
       //dX is horizontal, dY is fwd
       location.setTargetRealitiveToTargetOrientation(v);
     }
-//---------------
 
+
+  //Position Setting/Updates--------------------------------------------------------------------------------------------------------------
   void updatePos(double deltaT, Vector deltaPos, double deltaHead, bool deltaHeadInDegrees=false){
     location.updatePosition(deltaPos, deltaHead, deltaT, deltaHeadInDegrees);
   }
@@ -124,6 +216,7 @@ class Robot{
   void setHead(double head, bool headingGivenInDegrees=false){
     location.setHead(head, headingGivenInDegrees);
   }
+
   void updateStopStatus(double deltaT){
     if(abs(getThetaError()) < rotationalThreshold){
       roatationStopTimer = roatationStopTimer + deltaT;
@@ -145,26 +238,13 @@ class Robot{
       stoppedMoving = false;
     }
   }
-  void updatePID(double deltaT){
-    if(usingPIDControls){
-      double e = getLinearError();
-      linearPid = PID(e, deltaT, linearGains, linearPid);
-      double newVel = linearPid.output;
-      if(abs(newVel) > maxLinearVel){
-        newVel = maxLinearVel*sign(newVel);
-      }
-      targetLinearVelocity = newVel;
 
-      double eTheta = getThetaError();
-      rotationalPid = PID(eTheta, deltaT, angularGains, rotationalPid);
-      double newOmega = rotationalPid.output;
-      if(abs(newOmega) > maxAngularVel){
-        newOmega = maxAngularVel*sign(newOmega);
-      }
-      targetAngularVelocity = newOmega;
-    }
+  void updateVelocity(double deltaT){
+    updateTrace(deltaT);
+    updatePID(deltaT);
   }
 
+  //Error-----------------------------------------------------------------------------------------------------------------------------------
   double getThetaError(){
     return shortestArcToTarget(location.getCurrHead(), location.getTargetHead());
   }
@@ -194,33 +274,15 @@ class Robot{
     }
   }
 
-  void setLineMode(bool fwd){
-    usingPIDControls = true;
-    forward = fwd;
-    updateTargetHeadingWhileInMotion = true;
-    blockLinearMotionIfThetaErrorTooHigh = true;
-  }
-  void setRotateMode(){
-    usingPIDControls = true;
-    forward = true;
-    updateTargetHeadingWhileInMotion = false;
-    blockLinearMotionIfThetaErrorTooHigh = true;
-  }
-  //Use for tracing, camera and mechanium wheels; Doesnt allow theta target to change during linear motion so targets can be set indepenedently
-  void setIndependentTargetMode(){
-    usingPIDControls = true;
-    forward = true;
-    updateTargetHeadingWhileInMotion = false;
-    blockLinearMotionIfThetaErrorTooHigh = false;
-  }
-
+  //Output---------------------------------------------------------------------------------------------------------------------------------------------------------------
   double getLinearSpeedTarget(){
-    usingPIDControls = true;
     return targetLinearVelocity;
   }
   double getRotationalSpeedTarget(){
-    usingPIDControls = true;
     return targetAngularVelocity;
+  }
+  bool isLinMoving(){
+    return !stoppedMoving;
   }
   bool isRotating(){
     return !stoppedRotating;

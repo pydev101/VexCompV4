@@ -88,7 +88,7 @@ void track(){
   Vector deltaPos = Vector(deltaFwd, head, true);
   robot.updatePos(deltaT, deltaPos, deltaHead, true);
   robot.setHead(head, true);
-  robot.updatePID(deltaT);
+  robot.updateVelocity(deltaT);
   robot.updateStopStatus(deltaT);
 
   lastTime = Brain.timer(timeUnits::msec);
@@ -110,7 +110,7 @@ int trakerFunction(){
       graph.addPID({robot.getLinearError(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
       graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
 
-      //graph.output();
+      graph.output();
       graph.clear();
       frame = 0;
     }else{
@@ -121,7 +121,7 @@ int trakerFunction(){
   }
 } //Called in Pre-Auton
 
-bool updateMotors(){
+bool updateMotors(double overide=0, bool overideLinear=true){
   double linearSpeed = robot.getLinearSpeedTarget();
   double angularSpeed = robot.getRotationalSpeedTarget();
   linearSpeed = (linearSpeed/UnitsPerRev)*60; //Units/Sec to RPM
@@ -193,22 +193,9 @@ void move(double mag, double theta, bool inDeg, bool dir, bool blocking=true){
 
 
 //Tracing functions
-void tracePath(smartPointPointer points){
-  moveAbs(Point(0,0));
-  robot.setIndependentTargetMode();
-  robot.setAbsTarget(points[points.size - 1]);
-
-  for(int i=1; i<points.size; i++){
-    Vector t = Vector(robot.location.getPos(), points[i]);
-    robot.setHeadTargetAbs(Vector(1, 0).getAngle(t), false);
-
-    wait(updateTime+1, msec);
-    while(robot.isRotating() && (abs(t.dot(robot.location.getRobotBasisVector())) > linThreashold)){
-      updateMotors();
-      wait(motionDelay, timeUnits::msec);
-    }
-  }
-  moveAbs(points[points.size - 1]);
+void tracePath(smartPointPointer &points, double vel=20){
+  robot.traceMode(points, vel);
+  executeMove();
 }
 
 
