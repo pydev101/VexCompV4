@@ -5,7 +5,6 @@
 #include "motorFunctions.h"
 #include "odom/robot.h"
 
-
 //CONSTANTS
 
 
@@ -55,6 +54,7 @@ const CameraSettings backCameraSettings = {153, 140, 15, 15, 30};
 const int camStopWait = 500; //msec
 const int camDelayLoop = 20; //msec
 
+Graph graph = Graph("tracker.txt", &Brain);
 
 ///Robot Instantation
 Robot robot = Robot(startingPoint, startingHead, true, 
@@ -95,11 +95,13 @@ void track(){
 }
 
 int frame = 0;
+
 int trakerFunction(){
   while(true){
     track();
 
     if(frame >= 10){
+      /*
       Vector tVec = robot.location.getTargetVector();
       graph.addPoint({robot.location.pos, "green"});
       graph.addPoint({robot.location.targetPos, "blue"});
@@ -107,11 +109,12 @@ int trakerFunction(){
       graph.addVector({robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(2), "yellow"});
       graph.addVector({robot.location.pos, robot.location.getRobotBasisVector().scale(2), "red"}); 
 
-      graph.addPID({robot.getLinearError(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
+      graph.addPID({robot.getLinearErrorForPID(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
       graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
 
-      graph.output();
-      graph.clear();
+      //std::cout << graph.getString() << std::flush;
+
+      graph.clear();*/
       frame = 0;
     }else{
       frame = frame + 1;

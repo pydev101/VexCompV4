@@ -1,6 +1,7 @@
 #include <iostream>
-#include <fstream>
+#include <sstream>
 #include "robotmath.h"
+#include "filehelper.h"
 
 typedef struct {
     Point p;
@@ -30,6 +31,11 @@ public:
     int numOfLinPIDData = 0;
     PIDData* rotPIDData = (PIDData*)malloc(0);
     int numOfRotPIDData = 0;
+    File f = File();
+
+    Graph(const char* fileName, vex::brain* vexbrain){
+      f = File(fileName, vexbrain);
+    }
 
     ~Graph() {
         free(points);
@@ -80,29 +86,59 @@ public:
       }
     }
 
-    void output() {
+    std::string getString() {
+        std::ostringstream strs;
         for (int i = 0; i < numOfVectors; i++) {
             VectorPair v = vectorlist[i];
-            std::cout << "V:" << v.p.x << "," << v.p.y << "," << v.v.getX() << "," << v.v.getY() << "," << v.color << std::endl;
+            strs << "V:" << v.p.x << "," << v.p.y << "," << v.v.getX() << "," << v.v.getY() << "," << v.color << std::endl;
         }
         for (int i = 0; i < numOfPoints; i++) {
             PointPair p = points[i];
-            std::cout << "P:" << p.p.x << "," << p.p.y << "," << p.color << std::endl;
+            strs << "P:" << p.p.x << "," << p.p.y << "," << p.color << std::endl;
         }
         for (int i = 0; i < numOfLinPIDData; i++) {
             PIDData d = linearPIDData[i];
-            std::cout << "LPID:" << d.error << "," << d.pidOutput.output << "," << d.pidOutput.reset << "," << d.realTargetVel << "," << d.realVel << std::endl;
+            strs << "LPID:" << d.error << "," << d.pidOutput.output << "," << d.pidOutput.reset << "," << d.realTargetVel << "," << d.realVel << std::endl;
         }
         for (int i = 0; i < numOfRotPIDData; i++) {
             PIDData d = rotPIDData[i];
-            std::cout << "RPID:" << d.error << "," << d.pidOutput.output << "," << d.pidOutput.reset << "," << d.realTargetVel << "," << d.realVel << std::endl;
+            strs << "RPID:" << d.error << "," << d.pidOutput.output << "," << d.pidOutput.reset << "," << d.realTargetVel << "," << d.realVel << std::endl;
         }
-        std::cout << "END:END" << std::endl;
+        strs << "END:END" << std::endl;
+        return strs.str();
     }
+
+
+      /*
+      void writeCommand(double cmd, double arg, bool isStart=false){
+          if(isStart){
+            sprintf(buffer, "%g,%g;", cmd, arg);
+            return;
+          }
+          sprintf(buffer, "%s%g,%g;", buffer, cmd, arg);
+      }
+        int size = sizeof(char)*(strlen(buffer)+1);
+        char* charToPrint = (char*)malloc(size);
+        strcpy (charToPrint, buffer);
+        Brain.SDcard.savefile("recorded.csv", reinterpret_cast<unsigned char*>(charToPrint), size);
+        free(charToPrint);*/
 };
 
-Graph graph = Graph();
 
+/*
+  int size = Brain.SDcard.size("recorded.csv");
+  int length = size/sizeof(uint8_t);
+  uint8_t* rawFileData = (uint8_t*)malloc(size);
+  char* charList = (char*)malloc(sizeof(char)*length);
+
+  Brain.SDcard.loadfile("recorded.csv", rawFileData, size);
+
+  for(int i=0; i<length; i++){
+      charList[i] = static_cast<char>(rawFileData[i]);
+  }
+  free(rawFileData);*/
+
+/*
 class PathLogger{
 public:
   std::string fileName;
@@ -147,4 +183,4 @@ public:
       std::cout << std::endl;
     }
   }
-};
+};*/

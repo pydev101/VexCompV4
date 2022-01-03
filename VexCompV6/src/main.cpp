@@ -30,7 +30,7 @@
 #include "programs.h"
 
 // A global instance of competition
-//competition Competition;
+competition Competition;
 
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
@@ -47,7 +47,7 @@ void pre_auton(void) {
   resetEncoders();
 
   task traker = task(trakerFunction);
-  //BrainGUIProgram();
+  BrainGUIProgram();
 }
 
 //
@@ -58,8 +58,8 @@ void pre_auton(void) {
 int main() {
   // Set up callbacks for autonomous and driver control periods.
   pre_auton();
-  //Competition.autonomous(autonomous);
-  //Competition.drivercontrol(usercontrol);
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
   
   /*
   moveAbs(0, 20);
@@ -69,9 +69,10 @@ int main() {
   turnTo(90, true);
   moveAbs(0, 0, false);*/
 
-  smartPointPointer path = generatePath(Point(0,0), Point(0,24.8), Point(-35.4,3.85), Point(31.53, 12.35), 25);
-  tracePath(path);
+  //smartPointPointer path = generatePath(Point(0,0), Point(0,24.8), Point(-35.4,3.85), Point(31.53, 12.35), 25);
+  //tracePath(path);
   //std::cout << "Complete" << std::endl;
+
 
   while(true){
     wait(200, msec);

@@ -43,7 +43,7 @@ class Robot{
 
     void updatePID(double deltaT){
       if(usingLinearPIDControls){
-        double e = getLinearError();
+        double e = getLinearErrorForPID();
         linearPid = PID(e, deltaT, linearGains, linearPid);
         double newVel = linearPid.output;
         if(abs(newVel) > maxLinearVel){
@@ -228,7 +228,7 @@ class Robot{
       stoppedRotating = false;
     }
 
-    if(abs(getLinearError()) < linearThreshold){
+    if(abs(getLinearErrorForPID()) < linearThreshold){
       motionStopTimer = motionStopTimer + deltaT;
       if(motionStopTimer > 0.5){
         stoppedMoving = true;
@@ -248,7 +248,7 @@ class Robot{
   double getThetaError(){
     return shortestArcToTarget(location.getCurrHead(), location.getTargetHead());
   }
-  double getLinearError(){
+  double getLinearErrorForPID(){
     Vector targetVector = location.getTargetVector();
     Vector basis = location.getRobotBasisVector();
     double linErr = basis.dot(targetVector);
