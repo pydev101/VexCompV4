@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <sstream>
 
 class File{
 public:
@@ -20,6 +21,9 @@ public:
 
     void append(std::string data){
       int size = data.size();
+      if(!(vexbrain->SDcard.exists(fileName.c_str()))){
+        clear();
+      }
       vexbrain->SDcard.appendfile(fileName.c_str(), reinterpret_cast<unsigned char*>(&data[0]), size);
     }
 
@@ -28,6 +32,20 @@ public:
     }
 
     std::string load() {
-      return "";
+      std::string out = "";
+      if(vexbrain->SDcard.exists(fileName.c_str())){
+        int size = vexbrain->SDcard.size(fileName.c_str());
+        int length = size/sizeof(uint8_t);
+        uint8_t* rawFileData = (uint8_t*)malloc(size);
+
+        vexbrain->SDcard.loadfile(fileName.c_str(), rawFileData, size);
+
+        for(int i=0; i<length; i++){
+            out += static_cast<char>(rawFileData[i]);
+        }
+
+        free(rawFileData);
+      }
+      return out;
     }
 };
