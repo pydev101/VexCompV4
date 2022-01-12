@@ -101,20 +101,21 @@ int trakerFunction(){
     track();
 
     if(frame >= 10){
-      /*
-      Vector tVec = robot.location.getTargetVector();
-      graph.addPoint({robot.location.pos, "green"});
-      graph.addPoint({robot.location.targetPos, "blue"});
-      graph.addVector({robot.location.pos, tVec, "teal"});
-      graph.addVector({robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(2), "yellow"});
-      graph.addVector({robot.location.pos, robot.location.getRobotBasisVector().scale(2), "red"}); 
+      #if 0
+        Vector tVec = robot.location.getTargetVector();
+        graph.addPoint({robot.location.pos, "green"});
+        graph.addPoint({robot.location.targetPos, "blue"});
+        graph.addVector({robot.location.pos, tVec, "teal"});
+        graph.addVector({robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(2), "yellow"});
+        graph.addVector({robot.location.pos, robot.location.getRobotBasisVector().scale(2), "red"}); 
 
-      graph.addPID({robot.getLinearErrorForPID(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
-      graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
+        graph.addPID({robot.getLinearErrorForPID(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
+        graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
 
-      //std::cout << graph.getString() << std::flush;
+        std::cout << graph.getString() << std::flush;
 
-      graph.clear();*/
+        graph.clear();
+      #endif
       frame = 0;
     }else{
       frame = frame + 1;
@@ -194,6 +195,32 @@ void move(double mag, double theta, bool inDeg, bool dir, bool blocking=true){
   move(Vector(mag, theta, inDeg), dir, blocking);
 }
 
+void moveCV(double fwd, double hor, double linearSpeed){
+  bool dir = true;
+  double d = 0;
+  if(linearSpeed < 0){
+    dir = false;
+    d = PI;
+  }
+  turn(Vector(hor, fwd).getAngle(robot.location.getRobotBasisVector()) + d);
+  robot.setLineMode(dir);
+  robot.usePIDControls(false, true);
+  robot.setTarget(Vector(hor, fwd));
+  wait(updateTime+1, msec);
+  
+  while(abs(robot.getLinearErrorForPID()) > robot.linearThreshold){
+    double angularSpeed = robot.getRotationalSpeedTarget();
+    linearSpeed = (linearSpeed/UnitsPerRev)*60; //Units/Sec to RPM
+    angularSpeed = angularSpeed * (RobotRadius/UnitsPerRev) * 60 * 0.5; //Converts Rad/S to RPM and splits in half because there are 2 drive sides
+    setLeft(linearSpeed - angularSpeed, velocityUnits::rpm);
+    setRight(linearSpeed + angularSpeed, velocityUnits::rpm);
+    wait(motionDelay, timeUnits::msec);
+  }
+
+  setLeft(0);
+  setRight(0);
+}
+
 
 //Tracing functions
 void tracePath(smartPointPointer &points, double vel=20){
@@ -237,6 +264,36 @@ void trackWithCam(vex::vision *camera, int d, CameraSettings settings, const int
 
     setLeft(d*linValues.output - rotValues.output);
     setRight(d*linValues.output + rotValues.output);
+
+    if(abs(r.getX()) < settings.xThreashold){
+      rotMove += camDelayLoop;
+    }else{
+      rotMove = 0;
+    }
+    if(abs(r.getY()) < settings.yThreashold){
+      linMove += camDelayLoop;
+    }else{
+      linMove = 0;
+    }
+    wait(camDelayLoop, msec);
+  }
+  setLeft(0);
+  setRight(0);
+}
+
+void trackWithCam(vex::vision *camera, int d, CameraSettings settings, const int gainsIndex, vex::vision::signature &sig, const double setLinSpeed){
+  PIDOutput rotValues = {0,0,0};
+  int rotMove = 0;
+  int linMove = 0;
+
+  robot.usePIDControls(false);
+  while((rotMove<camStopWait) || (linMove<camStopWait)){
+    Vector r = getErrorFromCamera(camera, sig, settings);
+
+    rotValues = PID(r.getX(), camDelayLoop/1000.0, cameraGains[gainsIndex][1], rotValues);
+
+    setLeft(d*setLinSpeed - rotValues.output);
+    setRight(d*setLinSpeed + rotValues.output);
 
     if(abs(r.getX()) < settings.xThreashold){
       rotMove += camDelayLoop;

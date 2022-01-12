@@ -21,14 +21,14 @@ inertial Inertial = inertial(PORT10);
 digital_out backPne = digital_out(Brain.ThreeWirePort.A);
 digital_out frontPne = digital_out(Brain.ThreeWirePort.H);
 /*vex-vision-config:begin*/
-signature BackCam__YELLOWGOAL = signature (1, 321, 2443, 1382, -6959, -6351, -6654, 2.4, 0);
-signature BackCam__SIG_2 = signature (2, 0, 0, 0, 0, 0, 0, 3, 0);
-signature BackCam__SIG_3 = signature (3, 0, 0, 0, 0, 0, 0, 3, 0);
+signature BackCam__YELLOWGOAL = signature (1, 321, 2443, 1382, -6959, -6351, -6654, 9.9, 0);
+signature BackCam__BLUEGOAL = signature (2, -2595, -2049, -2322, 8159, 10031, 9094, 4.7, 0);
+signature BackCam__REDGOAL = signature (3, 9153, 10063, 9608, -1199, -767, -982, 6.4, 0);
 signature BackCam__SIG_4 = signature (4, 0, 0, 0, 0, 0, 0, 3, 0);
 signature BackCam__SIG_5 = signature (5, 0, 0, 0, 0, 0, 0, 3, 0);
 signature BackCam__SIG_6 = signature (6, 0, 0, 0, 0, 0, 0, 3, 0);
 signature BackCam__SIG_7 = signature (7, 0, 0, 0, 0, 0, 0, 3, 0);
-vision BackCam = vision (PORT5, 50, BackCam__YELLOWGOAL, BackCam__SIG_2, BackCam__SIG_3, BackCam__SIG_4, BackCam__SIG_5, BackCam__SIG_6, BackCam__SIG_7);
+vision BackCam = vision (PORT5, 50, BackCam__YELLOWGOAL, BackCam__BLUEGOAL, BackCam__REDGOAL, BackCam__SIG_4, BackCam__SIG_5, BackCam__SIG_6, BackCam__SIG_7);
 /*vex-vision-config:end*/
 
 // VEXcode generated functions
