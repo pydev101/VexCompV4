@@ -3,6 +3,14 @@
 #include "robotmath.h"
 #include "filehelper.h"
 
+/*
+Name: logger.h
+Written By: Carson Easterling
+
+Custom logging libary written for use with my python graphing program. Maps vectors and points onto a grid, and PID control values on to graphs can be exported in file or terminal format.
+
+*/
+
 typedef struct {
     Point p;
     const char* color;
@@ -107,80 +115,4 @@ public:
         strs << "END:END" << std::endl;
         return strs.str();
     }
-
-
-      /*
-      void writeCommand(double cmd, double arg, bool isStart=false){
-          if(isStart){
-            sprintf(buffer, "%g,%g;", cmd, arg);
-            return;
-          }
-          sprintf(buffer, "%s%g,%g;", buffer, cmd, arg);
-      }
-        int size = sizeof(char)*(strlen(buffer)+1);
-        char* charToPrint = (char*)malloc(size);
-        strcpy (charToPrint, buffer);
-        Brain.SDcard.savefile("recorded.csv", reinterpret_cast<unsigned char*>(charToPrint), size);
-        free(charToPrint);*/
 };
-
-
-/*
-  int size = Brain.SDcard.size("recorded.csv");
-  int length = size/sizeof(uint8_t);
-  uint8_t* rawFileData = (uint8_t*)malloc(size);
-  char* charList = (char*)malloc(sizeof(char)*length);
-
-  Brain.SDcard.loadfile("recorded.csv", rawFileData, size);
-
-  for(int i=0; i<length; i++){
-      charList[i] = static_cast<char>(rawFileData[i]);
-  }
-  free(rawFileData);*/
-
-/*
-class PathLogger{
-public:
-  std::string fileName;
-  smartPointPointer path;
-  PathLogger(std::string name){
-    fileName = name;
-  }
-  void read(){
-    std::ifstream file("my_file");
-    std::string temp;
-
-    while(std::getline(file, temp)) {
-      int i = 0;
-      for ( ; i < temp.length(); i++ ){ if ( temp[i] == ',' ) break; }
-      if(i > 0){
-        double x = atof(temp.substr(0, i-1 ).c_str());
-        double y = atof(temp.substr(i+1, temp.length()-1 ).c_str());
-        path.append(Point(x, y));
-      }
-    }
-    file.close();
-  }
-  void save(){
-    std::ofstream file;
-    file.open(fileName);
-    file.clear();
-    for(int i=0; i<path.size; i++){
-      file << path[i].x << "," << path[i].y << std::endl;
-    }
-    file.close();
-  }
-  void output(int format=0){
-    if(format==0){
-      for(int i=0; i<path.size; i++){
-        std::cout << "P:" << path[i].x << "," << path[i].y << ",green" << std::endl;
-      }
-      std::cout << "END:END" << std::endl;
-    }else if (format==1) {
-      for(int i=0; i<path.size; i++){
-        std::cout << "(" << path[i].x << "," << path[i].y << "),";
-      }
-      std::cout << std::endl;
-    }
-  }
-};*/

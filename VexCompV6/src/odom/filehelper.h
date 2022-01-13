@@ -1,6 +1,14 @@
 #include <stdlib.h>
 #include <sstream>
 
+/*
+Name: filehelper.h
+Written By: Carson Easterling
+
+Smart file manager for VEX OS
+
+*/
+
 class File{
 public:
     std::string fileName;

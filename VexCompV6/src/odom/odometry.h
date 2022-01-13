@@ -2,22 +2,29 @@
 #define __ROBOTODOM_H__
 #include "logger.h"
 
-//Describes positon, direction, size, and PID characteritics; PID control should be handled seperatly
-//Assume everything except angles which is stored in radiqans is stored in the same units given
+/*
+Name: odometry.h
+Written By: Carson Easterling
+
+All abstract functions and classes related to tracking the robot's current position on a grid and basic navigation to the specified target point and heading.
+Angles are stored in radians with CCW being positive; All units of length depend on the units given by the user or other programs parts (Typically encoders, inches, or cms)
+*/
+
+
 class OdomGrid{
   public:
-    Point pos = Point(0, 0); //Units given by user
-    double currentHeading = 0; //Radians
+    Point pos = Point(0, 0); //Current robot position
+    double currentHeading = 0; //Current robot heading (direction front of robot is facing)
 
-    Vector vel = Vector(0, 0);
-    Vector accel = Vector(0, 0);
+    Vector vel = Vector(0, 0); //Current robot linear velocity
+    Vector accel = Vector(0, 0); //Currrent robot linear acceleration
 
-    double angularVelocity = 0;
-    double angularAcceleration = 0;
+    double angularVelocity = 0; //Current robot angular velocity
+    double angularAcceleration = 0; //Current robot angular acceleration
 
-    Point targetPos = Point(0, 0); //Units given by user
-    double targetHeading = 0; //Radians
-    Vector targetVec = Vector(0, 0);
+    Point targetPos = Point(0, 0); //Target navigation point
+    double targetHeading = 0; //Target navigation heading
+    Vector targetVec = Vector(0, 0); //Vector repersenting the direct path from current position to target position
 
   //public:
     //Constructors

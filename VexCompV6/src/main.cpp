@@ -37,7 +37,6 @@
 #endif
 
 void pre_auton(void) {
-  // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
   frontPne.set(false);
   backPne.set(true);
@@ -46,7 +45,7 @@ void pre_auton(void) {
   Inertial.startCalibration();
   while(Inertial.isCalibrating()){wait(10, msec);}
   wait(500, msec);
-  Inertial.setHeading(270, rotationUnits::deg); //90 deg CCW but inertial sensor only measures in CW
+  Inertial.setHeading(270, rotationUnits::deg);
 
   resetEncoders();
 
