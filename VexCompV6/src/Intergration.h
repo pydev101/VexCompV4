@@ -10,7 +10,7 @@
 
 //Set position and target using robot, get linear and angular speed from robot, set speed of motors to reflect robot
 const Point startingPoint = Point(0, 0);
-const double startingHead = 90; //Degrees (CCW +)
+const double startingHead = 270; //Degrees (CCW +)
 
 const double UnitsPerRev = 18.3207546*1.0167034; //Inches per revolution
 const double RobotDiameter = 15; //Inches (Same Units as above)
@@ -106,8 +106,8 @@ int trakerFunction(){
         graph.addPoint({robot.location.pos, "green"});
         graph.addPoint({robot.location.targetPos, "blue"});
         graph.addVector({robot.location.pos, tVec, "teal"});
-        graph.addVector({robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(2), "yellow"});
-        graph.addVector({robot.location.pos, robot.location.getRobotBasisVector().scale(2), "red"}); 
+        graph.addVector({robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(10), "yellow"});
+        graph.addVector({robot.location.pos, robot.location.getRobotBasisVector().scale(10), "red"}); 
 
         graph.addPID({robot.getLinearErrorForPID(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
         graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
@@ -195,23 +195,25 @@ void move(double mag, double theta, bool inDeg, bool dir, bool blocking=true){
   move(Vector(mag, theta, inDeg), dir, blocking);
 }
 
-void moveCV(double fwd, double hor, double linearSpeed){
+void moveCV(double fwd, double hor, double linearSpeedTarget){
   bool dir = true;
   double d = 0;
-  if(linearSpeed < 0){
+  if(linearSpeedTarget < 0){
     dir = false;
     d = PI;
   }
-  turn(Vector(hor, fwd).getAngle(robot.location.getRobotBasisVector()) + d);
-  robot.setLineMode(dir);
+
+  turnTo(Vector(1, 0).getAngle(Vector(hor, fwd)) + d, false);
+  robot.setLineMode(dir, false);
   robot.usePIDControls(false, true);
   robot.setTarget(Vector(hor, fwd));
   wait(updateTime+1, msec);
   
   while(abs(robot.getLinearErrorForPID()) > robot.linearThreshold){
     double angularSpeed = robot.getRotationalSpeedTarget();
-    linearSpeed = (linearSpeed/UnitsPerRev)*60; //Units/Sec to RPM
+    double linearSpeed = (linearSpeedTarget/UnitsPerRev)*60; //Units/Sec to RPM
     angularSpeed = angularSpeed * (RobotRadius/UnitsPerRev) * 60 * 0.5; //Converts Rad/S to RPM and splits in half because there are 2 drive sides
+
     setLeft(linearSpeed - angularSpeed, velocityUnits::rpm);
     setRight(linearSpeed + angularSpeed, velocityUnits::rpm);
     wait(motionDelay, timeUnits::msec);

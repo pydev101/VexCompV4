@@ -39,13 +39,13 @@
 void pre_auton(void) {
   vexcodeInit();
   frontPne.set(false);
-  backPne.set(true);
+  backPne.set(false);
   arm.setStopping(hold);
 
   Inertial.startCalibration();
   while(Inertial.isCalibrating()){wait(10, msec);}
   wait(500, msec);
-  Inertial.setHeading(270, rotationUnits::deg);
+  Inertial.setHeading(360-startingHead, rotationUnits::deg); //90 deg CCW but inertial sensor only measures in CW
 
   resetEncoders();
 
@@ -68,8 +68,11 @@ int main() {
     Competition.drivercontrol(usercontrol);
   #endif
 
-  moveCV(20, 0, 12);
-  move(Vector(-7, -10), false);
+  moveCV(44, 0, -32);
+  wait(500, msec);
+  backPne.set(true);
+  wait(250, msec);
+  move(Vector(-7, -10));
   
   while(true){
     wait(200, msec);

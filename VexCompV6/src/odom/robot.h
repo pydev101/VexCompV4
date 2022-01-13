@@ -147,12 +147,12 @@ class Robot{
       angularGains = x;
       rotationalPid = initPID(0);
     }
-    void setLineMode(bool fwd){
+    void setLineMode(bool fwd, bool blockLineMotionIfThetaHigh=true){
       traceModeOn = false;
       usePIDControls(true);
       forward = fwd;
       updateTargetHeadingWhileInMotion = true;
-      blockLinearMotionIfThetaErrorTooHigh = true;
+      blockLinearMotionIfThetaErrorTooHigh = blockLineMotionIfThetaHigh;
     }
     void setRotateMode(){
       traceModeOn = false;

@@ -37,10 +37,6 @@ def readData(fileName):
 
 readData("data.csv")
 
-fig1, axes = plt.subplots(1, 1, figsize=(7, 7))
-fig1.suptitle("Map")
-fig1.tight_layout()
-
 fig2, PIDPlots = plt.subplots(3, 1, figsize=(5, 7))
 fig2.suptitle("Linear PID")
 PIDPlots[0].title.set_text("Error v Time")
@@ -54,6 +50,10 @@ PIDPlotsRot[0].title.set_text("Error v Time")
 PIDPlotsRot[1].title.set_text("Speed V Time")
 PIDPlotsRot[2].title.set_text("Reset V Time")
 fig3.tight_layout()
+
+fig1, axes = plt.subplots(1, 1, figsize=(7, 7))
+fig1.suptitle("Map")
+fig1.tight_layout()
 
 time = 0
 timeTable = []
@@ -91,7 +91,7 @@ for i in range(0, len(graphs)):
             Y.append(p[1])
     axes.plot(X, Y, "gray")
     axes.set_xlim(-25, 25)
-    axes.set_ylim(-10, 30)
+    axes.set_ylim(-10, 100)
     axes.grid(which="major", color='black', linestyle='-', linewidth=0.5)
     axes.grid(which="minor", color='black', linestyle=':', linewidth=0.5)
     axes.minorticks_on()
