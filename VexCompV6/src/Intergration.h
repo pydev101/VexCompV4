@@ -37,7 +37,7 @@ const PIDGains basicGains[3][2] = {
   {{0,0,0}, {0,0,0}} //3 tower
 };
 const PIDGains cameraGains[2][2] = {
-  {{0.5,0,0}, {0.4,0,0}}, //0 towers
+  {{0.7,0,0}, {0.7,0,0}}, //0 towers
   {{0,0,0}, {0,0,0}} //1 tower
 };
 

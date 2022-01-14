@@ -25,6 +25,7 @@ extern signature BackCam__SIG_5;
 extern signature BackCam__SIG_6;
 extern signature BackCam__SIG_7;
 extern vision BackCam;
+extern limit LimitBack;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

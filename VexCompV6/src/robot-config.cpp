@@ -30,6 +30,7 @@ signature BackCam__SIG_6 = signature (6, 0, 0, 0, 0, 0, 0, 3, 0);
 signature BackCam__SIG_7 = signature (7, 0, 0, 0, 0, 0, 0, 3, 0);
 vision BackCam = vision (PORT5, 50, BackCam__YELLOWGOAL, BackCam__BLUEGOAL, BackCam__REDGOAL, BackCam__SIG_4, BackCam__SIG_5, BackCam__SIG_6, BackCam__SIG_7);
 /*vex-vision-config:end*/
+limit LimitBack = limit(Brain.ThreeWirePort.E);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

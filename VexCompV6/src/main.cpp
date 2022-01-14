@@ -14,6 +14,24 @@
 // backPne              digital_out   A               
 // frontPne             digital_out   H               
 // BackCam              vision        5               
+// LimitBack            limit         E               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// leftA                motor         1               
+// rightA               motor         3               
+// rightB               motor         11              
+// arm                  motor         12              
+// intakeM              motor         7               
+// leftC                motor         8               
+// rightC               motor         9               
+// leftB                motor         21              
+// Controller1          controller                    
+// Inertial             inertial      10              
+// backPne              digital_out   A               
+// frontPne             digital_out   H               
+// BackCam              vision        5               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 
@@ -44,7 +62,9 @@ void pre_auton(void) {
 
   Inertial.startCalibration();
   while(Inertial.isCalibrating()){wait(10, msec);}
-  wait(500, msec);
+  #if COMPETITION == 0
+    wait(500, msec);
+  #endif
   Inertial.setHeading(360-startingHead, rotationUnits::deg); //90 deg CCW but inertial sensor only measures in CW
 
   resetEncoders();
@@ -68,12 +88,27 @@ int main() {
     Competition.drivercontrol(usercontrol);
   #endif
 
-  moveCV(44, 0, -32);
+  moveCV(36, 0, -130);
   wait(500, msec);
   backPne.set(true);
   wait(250, msec);
-  move(Vector(-7, -10));
-  
+  moveAbs(-7, 26);
+  moveAbs(-30, 52);
+  frontPne.set(true);
+  moveAbs(10, 5, false);
+  backPne.set(false);
+  moveAbs(0, 18);
+  turnTo(180);
+  trackWithCam(&BackCam, -1, backCameraSettings, 0, BackCam__BLUEGOAL);
+  while(!LimitBack.pressing()){
+    setLeft(-30);
+    setRight(-30);
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
+  setLeft(0);
+  setRight(0);
+
   while(true){
     wait(200, msec);
   }
