@@ -12,67 +12,74 @@ typedef struct {
 } autoEntry;
 
 void blueLeft(int mod){
-  moveTime(80, 900);
-  setFront(true);
-  setBack(false);
-  moveTime(33, 800, true);
-  moveTime(-70, 500);
-  setBack(true);
-  moveTime(33, 490, true);
-  moveTime(60, 1800);
-  setBack(false);
-  moveTime(-33, 660, true);
-  moveTime(-50, 500);
-  moveArm(100, 500);
+  
+}
+void blueRight(int mod){
+  moveCV(30, 0, -130);
+  double t = Brain.timer(timeUnits::msec);
+  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
+  wait(250, msec);
+  moveAbs(-7, 26);
+  moveAbs(-30, 52);
+  frontPne.set(true);
+  moveAbs(10, 5, false);
+  backPne.set(false);
+  moveAbs(0, 18);
+  turnTo(180);
+  trackWithCam(&BackCam, -1, backCameraSettings, 0, BackCam__BLUEGOAL);
+  while(!LimitBack.pressing()){
+    setLeft(-30);
+    setRight(-30);
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
+  setLeft(0);
+  setRight(0);
+  arm.startRotateTo(720, rotationUnits::deg, 70, velocityUnits::pct);
   setIntake(-50);
 }
+void redLeft(int mod){
+
+}
 void redRight(int mod){
-  moveTime(100, 580);
-  setFront(true);
-  setBack(false);
-  moveTime(-33, 680, true);
-  moveTime(-70, 520);
-  setBack(true);
-  wait(200, timeUnits::msec);
-  moveTime(33, 1100, true);
-  moveTime(-70, 1600);
-  setBack(false);
-  moveTime(50, 390);
-  moveTime(33, 360, true);
-  moveTime(-50, 450);
-  setBack(true);
-  moveArm(60, 800);
-  setIntake(50);
-  moveTime(70, 720);
+  moveCV(30, 0, -130);
+  double t = Brain.timer(timeUnits::msec);
+  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
+  wait(250, msec);
+  moveAbs(-7, 26);
+  moveAbs(-30, 52);
+  frontPne.set(true);
+  moveAbs(10, 5, false);
+  backPne.set(false);
+  moveAbs(0, 18);
+  turnTo(180);
+  trackWithCam(&BackCam, -1, backCameraSettings, 0, BackCam__REDGOAL);
+  while(!LimitBack.pressing()){
+    setLeft(-30);
+    setRight(-30);
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
+  setLeft(0);
+  setRight(0);
+  arm.startRotateTo(720, rotationUnits::deg, 70, velocityUnits::pct);
+  setIntake(-50);
 }
 void OneMinute(int mod){
-  moveTime(80, 900);
-  setFront(true);
-  moveTime(33, 320, true);
 
-  setArm(100);
-  setLeft(40);
-  setRight(40);
-  wait(1600, timeUnits::msec);
-  setArm(0);
-  moveTime(40, 1200);
-  moveArm(-70, 400);
-  setFront(false);
-  moveArm(70, 400);
-  moveTime(-70, 200);
-  moveTime(-33, 180, true);
-  moveTime(-70, 2900);
-  moveTime(-33, 680, true);
-  moveTime(-70, 800);
-  moveTime(-33, 340, true);
-  moveTime(-70, 500);
 }
 
 autoEntry entries[] = {
   {"Blue Left", blueLeft},
-  {"Blue Right", redRight},
+  {"Blue Right", blueRight},
   {"Red Right", redRight},
-  {"Red Left", blueLeft},
+  {"Red Left", redLeft},
   {"One Minute", OneMinute},
 };
 int indexAuto = 0;

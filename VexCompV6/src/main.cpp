@@ -47,7 +47,7 @@
 #include "driver.h"
 #include "programs.h"
 
-#define COMPETITION 0
+#define COMPETITION 1
 
 // A global instance of competition
 #if COMPETITION
@@ -88,26 +88,7 @@ int main() {
     Competition.drivercontrol(usercontrol);
   #endif
 
-  moveCV(36, 0, -130);
-  wait(500, msec);
-  backPne.set(true);
-  wait(250, msec);
-  moveAbs(-7, 26);
-  moveAbs(-30, 52);
-  frontPne.set(true);
-  moveAbs(10, 5, false);
-  backPne.set(false);
-  moveAbs(0, 18);
-  turnTo(180);
-  trackWithCam(&BackCam, -1, backCameraSettings, 0, BackCam__BLUEGOAL);
-  while(!LimitBack.pressing()){
-    setLeft(-30);
-    setRight(-30);
-    wait(motionDelay, msec);
-  }
-  backPne.set(true);
-  setLeft(0);
-  setRight(0);
+  
 
   while(true){
     wait(200, msec);
