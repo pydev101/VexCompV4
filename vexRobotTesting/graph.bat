@@ -1,1 +1,1 @@
-.\usbpython\Scripts\python.exe analysis.py
+.\Python38\python.exe analysis.py

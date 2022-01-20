@@ -1,0 +1,1 @@
+.\Python38\Lib\idlelib\idle.bat
