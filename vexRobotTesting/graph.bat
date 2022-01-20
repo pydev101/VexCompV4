@@ -1,1 +1,1 @@
-"./venv/Scripts/python.exe" "analysis.py"
+.\usbpython\Scripts\python.exe analysis.py
