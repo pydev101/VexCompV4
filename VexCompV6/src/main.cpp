@@ -88,8 +88,6 @@ int main() {
     Competition.drivercontrol(usercontrol);
   #endif
 
-  
-
   while(true){
     wait(200, msec);
   }

@@ -233,41 +233,47 @@ void tracePath(smartPointPointer &points, double vel=20){
 
 
 //Camera functions
+
+//Function returns a Vector objects repersenting the error in camera pixels that the biggest object with a given signature is from the shifted center of the robot
 Vector getErrorFromCamera(vex::vision *cam, vex::vision::signature &sig, CameraSettings camsett){
   int num = cam->takeSnapshot(sig);
   double x = 0;
   double y = 0;
 
   if(num > 0){
+    //If an object exists
     if(cam->largestObject.width > camsett.minWidth){
-      x = cam->largestObject.centerX - camsett.xOffset;
-      y = cam->largestObject.centerY - camsett.yOffset;
-      x = x*-1;
+      //If an object is real and not some random color it spotted
+      x = cam->largestObject.centerX - camsett.xOffset; //X offset
+      y = cam->largestObject.centerY - camsett.yOffset; //Y offset
+      x = x*-1; //Flip x and y values to change camera coornates to match with robot orientation
       y = y*-1;
     }
   }
-  //std::cout << num <<","<< x <<","<< y << std::endl;
-  return Vector(x, y);
+  return Vector(x, y); //Return a new vector object
 }
 
+//Sets motor values directly proporional to the value of error determined by the camera; Lines robot up with object while moving torward it
 //Example: trackWithCam(&BackCam, -1, backCameraSettings, 0, BackCam__YELLOWGOAL);
 void trackWithCam(vex::vision *camera, int d, CameraSettings settings, const int gainsIndex, vex::vision::signature &sig){
-  PIDOutput linValues = {0,0,0};
+  PIDOutput linValues = {0,0,0}; //Storage structs for illitertive PID
   PIDOutput rotValues = {0,0,0};
-  int rotMove = 0;
+  int rotMove = 0; //Time spent within threashold range
   int linMove = 0;
 
-  robot.usePIDControls(false);
+  robot.usePIDControls(false); //Disable continous PID update for primary robot tracking so an extended break from 
   while((rotMove<camStopWait) || (linMove<camStopWait)){
-    Vector r = getErrorFromCamera(camera, sig, settings);
+    //While time spent within threasHold values is less than minimum time within threashold than the robot is not considered fully stopped
+    Vector r = getErrorFromCamera(camera, sig, settings); //Error values
 
-    linValues = PID(r.getY(), camDelayLoop/1000.0, cameraGains[gainsIndex][0], linValues);
+    linValues = PID(r.getY(), camDelayLoop/1000.0, cameraGains[gainsIndex][0], linValues); // Get motor values using PID algorithm (error, deltaTime, proporionality constant values, previous PID info)
     rotValues = PID(r.getX(), camDelayLoop/1000.0, cameraGains[gainsIndex][1], rotValues);
 
-    setLeft(d*linValues.output - rotValues.output);
+    setLeft(d*linValues.output - rotValues.output); //Speed = direction*speedBasedOnError - rotationalSpeed Value (So + rotSpeed is turning the robot CCW)
     setRight(d*linValues.output + rotValues.output);
 
     if(abs(r.getX()) < settings.xThreashold){
+      //If within threashold add delay time to the counter; If not within threashold set counter to zero; Only considers robot stopped if the robot has spent signifgant time within its threashold boundries
       rotMove += camDelayLoop;
     }else{
       rotMove = 0;
@@ -279,6 +285,7 @@ void trackWithCam(vex::vision *camera, int d, CameraSettings settings, const int
     }
     wait(camDelayLoop, msec);
   }
+  //Once within threashold and stopped activate motor breaks and end function
   setLeft(0);
   setRight(0);
 }

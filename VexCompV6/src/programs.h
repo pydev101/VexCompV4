@@ -12,8 +12,19 @@ typedef struct {
 } autoEntry;
 
 void blueLeft(int mod){
-  
+  moveCV(30, 5, -130);
+  double t = Brain.timer(timeUnits::msec);
+  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
+  wait(250, msec);
+  moveAbs(7, 20);
+  moveAbs(46, 55);
+  frontPne.set(true);
+  moveAbs(7, 20, false);  
 }
+
 void blueRight(int mod){
   moveCV(30, 0, -130);
   double t = Brain.timer(timeUnits::msec);
@@ -41,9 +52,21 @@ void blueRight(int mod){
   arm.startRotateTo(720, rotationUnits::deg, 70, velocityUnits::pct);
   setIntake(-50);
 }
-void redLeft(int mod){
 
+void redLeft(int mod){
+  moveCV(30, 5, -130);
+  double t = Brain.timer(timeUnits::msec);
+  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
+  wait(250, msec);
+  moveAbs(7, 20);
+  moveAbs(46, 55);
+  frontPne.set(true);
+  moveAbs(7, 20, false);
 }
+
 void redRight(int mod){
   moveCV(30, 0, -130);
   double t = Brain.timer(timeUnits::msec);
