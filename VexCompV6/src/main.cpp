@@ -62,9 +62,6 @@ void pre_auton(void) {
 
   Inertial.startCalibration();
   while(Inertial.isCalibrating()){wait(10, msec);}
-  #if COMPETITION == 0
-    wait(500, msec);
-  #endif
   Inertial.setHeading(360-startingHead, rotationUnits::deg); //90 deg CCW but inertial sensor only measures in CW
 
   resetEncoders();
@@ -83,6 +80,7 @@ void pre_auton(void) {
 int main() {
   // Set up callbacks for autonomous and driver control periods.
   pre_auton();
+
   #if COMPETITION
     Competition.autonomous(autonomous);
     Competition.drivercontrol(usercontrol);
