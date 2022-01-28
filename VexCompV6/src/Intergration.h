@@ -10,7 +10,7 @@
 
 //Set position and target using robot, get linear and angular speed from robot, set speed of motors to reflect robot
 const Point startingPoint = Point(0, 0);
-const double startingHead = 270; //Degrees (CCW +)
+const double startingHead = 90; //Degrees (CCW +)
 
 const double UnitsPerRev = 18.3207546*1.0167034; //Inches per revolution
 const double RobotDiameter = 15; //Inches (Same Units as above)
@@ -32,7 +32,7 @@ bool maxThetaErrorForMotionGivenInDegrees = true;
 
 //linGains, rotGains
 const PIDGains basicGains[3][2] = {
-  {{1.5,0,0}, {7.3,0,0}}, //1 towers
+  {{1.8,0,0}, {7.3,0,0}}, //1 towers
   {{0,0,0}, {0,0,0}}, //2 tower
   {{0,0,0}, {0,0,0}} //3 tower
 };

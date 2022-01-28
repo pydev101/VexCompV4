@@ -12,7 +12,7 @@ typedef struct {
 } autoEntry;
 
 void blueLeft(int mod){
-  moveCV(30, 5, -130);
+  /*moveCV(30, 5, -130);
   double t = Brain.timer(timeUnits::msec);
   while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
     wait(motionDelay, msec);
@@ -22,39 +22,34 @@ void blueLeft(int mod){
   moveAbs(7, 20);
   moveAbs(46, 55);
   frontPne.set(true);
-  moveAbs(7, 20, false);  
+  moveAbs(7, 20, false);  */
 }
 
 void blueRight(int mod){
-  moveCV(30, 0, -130);
+  moveCV(30, 0, 130);
+  wait(700, msec);
+  frontPne.set(true);
+  wait(250, msec);
+  moveAbs(-7, 26, false);
+
+  moveAbs(-34, 52, false);
+  robot.usePIDControls(false);
   double t = Brain.timer(timeUnits::msec);
   while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
-    wait(motionDelay, msec);
-  }
-  backPne.set(true);
-  wait(250, msec);
-  moveAbs(-7, 26);
-  moveAbs(-30, 52);
-  frontPne.set(true);
-  moveAbs(10, 5, false);
-  backPne.set(false);
-  moveAbs(0, 18);
-  turnTo(180);
-  trackWithCam(&BackCam, -1, backCameraSettings, 0, BackCam__BLUEGOAL);
-  while(!LimitBack.pressing()){
-    setLeft(-30);
-    setRight(-30);
+    setLeft(-40);
+    setRight(-40);
     wait(motionDelay, msec);
   }
   backPne.set(true);
   setLeft(0);
   setRight(0);
+
+  turnTo(270);
   arm.startRotateTo(720, rotationUnits::deg, 70, velocityUnits::pct);
-  setIntake(-50);
 }
 
 void redLeft(int mod){
-  moveCV(30, 5, -130);
+  /*moveCV(30, 5, -130);
   double t = Brain.timer(timeUnits::msec);
   while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
     wait(motionDelay, msec);
@@ -64,10 +59,11 @@ void redLeft(int mod){
   moveAbs(7, 20);
   moveAbs(46, 55);
   frontPne.set(true);
-  moveAbs(7, 20, false);
+  moveAbs(7, 20, false);*/
 }
 
 void redRight(int mod){
+  /*
   moveCV(30, 0, -130);
   double t = Brain.timer(timeUnits::msec);
   while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
@@ -92,7 +88,7 @@ void redRight(int mod){
   setLeft(0);
   setRight(0);
   arm.startRotateTo(720, rotationUnits::deg, 70, velocityUnits::pct);
-  setIntake(-50);
+  setIntake(-50);*/
 }
 void OneMinute(int mod){
 

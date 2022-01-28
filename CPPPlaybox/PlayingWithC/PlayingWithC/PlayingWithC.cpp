@@ -50,7 +50,7 @@ public:
     }
 };
 
-class Label : protected Object {
+class Label : public Object {
 protected:
     TextInfo text;
 
@@ -77,13 +77,13 @@ public:
         positionInfomation.width = widthCalculator(positionInfomation.width, text);
         positionInfomation.height = getTextInfoHeight(text);
     };
-
     void draw() {
         if (positionInfomation.visible) {
             //Brain.Screen.setFont(text.font);
             //Brain.Screen.setPenWidth(text.penwidth); 
             //Brain.Screen.setPenColor(text.color.c_str());
             //Brain.Screen.printAt(positionInfomation.x, positionInfomation.y, text.value.c_str());
+            std::cout << "DRAWING " << text.value << std::endl;
         }
     }
 };
@@ -145,12 +145,44 @@ public:
 };
 
 class Frame : Object {
+protected:
+    int drawingNum = 0;
+    details* drawingInfo = (details*)std::malloc(0);
+    void** objects = (void**)std::malloc(0);
+public:
+    ~Frame() {
+        free(drawingInfo);
+        free(objects);
+    }
+    void add(Object L) {
+        drawingNum++;
+        drawingInfo = (details*)realloc(drawingInfo, sizeof(details) * drawingNum);
+        objects = (void**)realloc(objects, sizeof(void*) * drawingNum);
 
+        drawingInfo[drawingNum - 1] = L.positionInfomation;
+        objects[drawingNum - 1] = &L;
+    }
+    void add(Label L) {
+        drawingNum++;
+        drawingInfo = (details*)realloc(drawingInfo, sizeof(details) * drawingNum);
+        objects = (void**)realloc(objects, sizeof(void*) * drawingNum);
+
+        drawingInfo[drawingNum - 1] = L.positionInfomation;
+        objects[drawingNum - 1] = &L;
+    }
+    void add(Button L) {
+        drawingNum++;
+        drawingInfo = (details*)realloc(drawingInfo, sizeof(details) * drawingNum);
+        objects = (void**)realloc(objects, sizeof(void*) * drawingNum);
+
+        drawingInfo[drawingNum - 1] = L.positionInfomation;
+        objects[drawingNum - 1] = &L;
+    }
 };
 
 int main(){
     Label test = Label({ "Hello", 3, "blue" }, 30, true);
-
+    test.draw();
 
     return 0;
 }
