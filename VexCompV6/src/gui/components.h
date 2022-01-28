@@ -1,8 +1,1 @@
-class Component{
-
-};
-
-class Frame{
-  Component* components;
-  
-};
+extern vex::brain Brain;
