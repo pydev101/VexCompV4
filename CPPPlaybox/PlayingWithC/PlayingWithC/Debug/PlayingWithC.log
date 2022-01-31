@@ -1,2 +1,2 @@
 ﻿  PlayingWithC.cpp
-  PlayingWithC.vcxproj -> C:\Users\carson.easterling\Documents\GitHub\VexCompV4\CPPPlaybox\PlayingWithC\Debug\PlayingWithC.exe
+C:\Users\mainuser\Documents\vexcode-projects\VexCompV4\CPPPlaybox\PlayingWithC\PlayingWithC\PlayingWithC.cpp(230,18): error C2065: 'x': undeclared identifier

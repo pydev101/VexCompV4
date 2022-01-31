@@ -40,6 +40,8 @@ public:
     }
 
     virtual void draw() {};
+    virtual void call(int pressX, int pressY) {};
+    virtual bool newLine() { return false; };
 
     details* getPosInfo() {
         return &positionInfomation;
@@ -47,6 +49,19 @@ public:
 
     void setVisibility(bool v) {
         positionInfomation.visible = v;
+    }
+};
+
+class Spacer : public Object {
+protected:
+    bool isNewLine = false;
+public:
+    Spacer(int width, int height, bool newLine, bool visibility=true) : Object(0, 0, width, height, visibility) {
+        isNewLine = newLine;
+    }
+
+    bool newLine() {
+        return isNewLine;
     }
 };
 
@@ -149,6 +164,7 @@ protected:
     int drawingNum = 0;
     details* drawingInfo = (details*)std::malloc(0);
     void** objects = (void**)std::malloc(0);
+
 public:
     ~Frame() {
         free(drawingInfo);
@@ -162,27 +178,20 @@ public:
         drawingInfo[drawingNum - 1] = L.positionInfomation;
         objects[drawingNum - 1] = &L;
     }
-    void add(Label L) {
-        drawingNum++;
-        drawingInfo = (details*)realloc(drawingInfo, sizeof(details) * drawingNum);
-        objects = (void**)realloc(objects, sizeof(void*) * drawingNum);
-
-        drawingInfo[drawingNum - 1] = L.positionInfomation;
-        objects[drawingNum - 1] = &L;
-    }
-    void add(Button L) {
-        drawingNum++;
-        drawingInfo = (details*)realloc(drawingInfo, sizeof(details) * drawingNum);
-        objects = (void**)realloc(objects, sizeof(void*) * drawingNum);
-
-        drawingInfo[drawingNum - 1] = L.positionInfomation;
-        objects[drawingNum - 1] = &L;
-    }
 };
 
 int main(){
     Label test = Label({ "Hello", 3, "blue" }, 30, true);
-    test.draw();
+    //test.draw();
+
+    double x;
+    if (6 > 5) {
+        int x = 2;
+    }
+    else {
+        int x = 10;
+    }
+    std::cout << x << std::endl;
 
     return 0;
 }
