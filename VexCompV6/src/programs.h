@@ -44,8 +44,8 @@ void blueRight(int mod){
   setLeft(0);
   setRight(0);
 
-  turnTo(270);
-  arm.startRotateTo(720, rotationUnits::deg, 70, velocityUnits::pct);
+  moveAbs(-4, 30);
+  moveAbs(30, 2, false);
 }
 
 void redLeft(int mod){
@@ -91,7 +91,29 @@ void redRight(int mod){
   setIntake(-50);*/
 }
 void OneMinute(int mod){
+  moveCV(30, 0, 130);
+  wait(700, msec);
+  frontPne.set(true);
+  wait(250, msec);
+  moveAbs(-7, 26, false);
 
+  moveAbs(-34, 52, false);
+  robot.usePIDControls(false);
+  double t = Brain.timer(timeUnits::msec);
+  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
+    setLeft(-40);
+    setRight(-40);
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
+  setLeft(0);
+  setRight(0);
+
+  moveAbs(-34, 30);
+  turnTo(270);
+  arm.rotateTo(1540, rotationUnits::deg, 70, velocityUnits::pct);
+  moveAbs(-34, 15);
+  frontPne.set(false);
 }
 
 autoEntry entries[] = {

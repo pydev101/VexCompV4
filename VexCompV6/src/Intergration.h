@@ -32,7 +32,7 @@ bool maxThetaErrorForMotionGivenInDegrees = true;
 
 //linGains, rotGains
 const PIDGains basicGains[3][2] = {
-  {{1.8,0,0}, {7.3,0,0}}, //1 towers
+  {{1.8,0,0}, {7.42,0,0.2}}, //1 towers
   {{0,0,0}, {0,0,0}}, //2 tower
   {{0,0,0}, {0,0,0}} //3 tower
 };
