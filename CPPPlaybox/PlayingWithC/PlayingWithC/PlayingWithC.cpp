@@ -43,10 +43,6 @@ public:
     virtual void call(int pressX, int pressY) {};
     virtual bool newLine() { return false; };
 
-    details* getPosInfo() {
-        return &positionInfomation;
-    }
-
     void setVisibility(bool v) {
         positionInfomation.visible = v;
     }
@@ -188,15 +184,41 @@ protected:
             x->positionInfomation.x = screenX;
             x->positionInfomation.y = screenY;
             x->draw();
+        }else if (z.classID == 4) {
+            Frame* x = (Frame*)(z.classObj);
+            x->positionInfomation.x = screenX;
+            x->positionInfomation.y = screenY;
+            x->draw();
+        }
+    }
+    details iInfo(FrameStorageObj z) {
+        if (z.classID == 1) {
+            Spacer* x = (Spacer*)(z.classObj);
+            return x->positionInfomation;
+        }
+        else if (z.classID == 2) {
+            Label* x = (Label*)(z.classObj);
+            return x->positionInfomation;
+        }
+        else if (z.classID == 3) {
+            Button* x = (Button*)(z.classObj);
+            return x->positionInfomation;
+        }else if (z.classID == 4) {
+            Frame* x = (Frame*)(z.classObj);
+            return x->positionInfomation;
         }
     }
     void iCall(FrameStorageObj z, int pressX, int pressY) {
         if (z.classID == 3) {
             Button* x = (Button*)(z.classObj);
             x->call(pressX, pressY);
+        }else if (z.classID == 4) {
+            Frame* x = (Frame*)(z.classObj);
+            x->call(pressX, pressY);
         }
     }
 public:
+    const static int classID = 4;
     ~Frame() {
         free(objects);
     }
@@ -226,12 +248,45 @@ public:
             iCall(objects[i], screenX, screenY);
         }
     }
+
+    //TODO set width as calc width and height dependent on drawn
     void draw() {
+        int calcWidth = 0;
+        int calcHeight = 0;
         if (positionInfomation.visible) {
             int baseX = positionInfomation.x;
             int baseY = positionInfomation.y;
+            int currX = 0;
+            int currY = 0;
+            int yDeltaMax = 0;
+            int xMaxWidth = 0; //TODO IMPLEMENT
+            //For if visible then add x+y then draw or if spacer shift pos values
+            for (int i = 0; i < drawingNum; i++) {
+                details d = iInfo(objects[i]);
+                if (d.visible) {
+                    if ((d.up + d.down + d.height) > yDeltaMax) {
+                        yDeltaMax = d.up + d.down + d.height;
+                    }
+                    if (objects[i].classID == 1) {
+                        //Spacer
+                        Spacer* s = (Spacer*)(objects[i].classObj);
+                        if (s->newLine()) {
+                            currY = currY + yDeltaMax;
+                            yDeltaMax = 0;
+                        }else {
+                            currX = currX + d.width + d.left + d.right;
+                        }
+                    }else {
+                        currX = currX + d.left;
+                        iDraw(objects[i], baseX + currX, baseY + currY + d.up);
+                        currX = currX + d.width + d.right;
+                    }
+                }
+            }
+            positionInfomation.height = currY + yDeltaMax;
         }
     }
+    void call()
 
 };
 
