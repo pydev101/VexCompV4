@@ -26,13 +26,13 @@ void blueLeft(int mod){
 }
 
 void blueRight(int mod){
-  moveCV(30, 0, 130);
+  moveCV(27, 0, 130);
   wait(700, msec);
   frontPne.set(true);
   wait(250, msec);
-  moveAbs(-7, 26, false);
+  moveAbs(-11, 26, false);
 
-  moveAbs(-34, 52, false);
+  moveAbs(-36, 52, false);
   robot.usePIDControls(false);
   double t = Brain.timer(timeUnits::msec);
   while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
@@ -44,8 +44,13 @@ void blueRight(int mod){
   setLeft(0);
   setRight(0);
 
-  moveAbs(-4, 30);
-  moveAbs(30, 2, false);
+  moveAbs(0.5*(-34+13), 0.5*(52+0));
+
+  moveAbs(13, 0, false);
+  
+  backPne.set(false);
+  moveAbs(4, 18, true);
+  turnTo(180);
 }
 
 void redLeft(int mod){

@@ -172,6 +172,8 @@ void turnTo(double theta, bool inDeg=true, bool blocking=true){
 }
 
 void moveAbs(double x, double y, bool fwd=true, bool blocking=true){
+  Point p = robot.location.getPos();
+  turnTo(Vector(x-p.x, y-p.y).getAngle(Vector(1,0))); //TODO FIX THIS TO TURN TO TAGRTE
   robot.setLineMode(fwd);
   robot.setAbsTarget(x, y);
   if(blocking){
