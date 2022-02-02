@@ -251,19 +251,18 @@ public:
 
     //TODO set width as calc width and height dependent on drawn
     void draw() {
-        int calcWidth = 0;
-        int calcHeight = 0;
         if (positionInfomation.visible) {
             int baseX = positionInfomation.x;
             int baseY = positionInfomation.y;
             int currX = 0;
             int currY = 0;
             int yDeltaMax = 0;
-            int xMaxWidth = 0; //TODO IMPLEMENT
+            int xMaxWidth = 0;
             //For if visible then add x+y then draw or if spacer shift pos values
             for (int i = 0; i < drawingNum; i++) {
                 details d = iInfo(objects[i]);
                 if (d.visible) {
+                    //Issue if its a frame then its width and height is unknown until drawn
                     if ((d.up + d.down + d.height) > yDeltaMax) {
                         yDeltaMax = d.up + d.down + d.height;
                     }
@@ -273,17 +272,26 @@ public:
                         if (s->newLine()) {
                             currY = currY + yDeltaMax;
                             yDeltaMax = 0;
+                            if (currX+d.width+d.right > xMaxWidth) {
+                                xMaxWidth = currX + d.width + d.right;
+                            }
+                            currX = 0;
                         }else {
                             currX = currX + d.width + d.left + d.right;
                         }
                     }else {
                         currX = currX + d.left;
                         iDraw(objects[i], baseX + currX, baseY + currY + d.up);
+                        d = iInfo(objects[i]);
                         currX = currX + d.width + d.right;
                     }
                 }
             }
             positionInfomation.height = currY + yDeltaMax;
+            if (currX > xMaxWidth) {
+                xMaxWidth = currX;
+            }
+            positionInfomation.width = xMaxWidth;
         }
     }
     void call()
