@@ -36,7 +36,7 @@ void usercontrol(void) {
     if(Controller1.ButtonR1.pressing()){
       setArm(100);
     }else if(Controller1.ButtonR2.pressing()){
-      setArm(-60);
+      setArm(-80);
     }else{
       setArm(0);
     }
@@ -69,7 +69,7 @@ void usercontrol(void) {
     }else{
       intakePressing = false;
     }
-
+    updateControllerDisplay();
     wait(20, timeUnits::msec);
   }
 }

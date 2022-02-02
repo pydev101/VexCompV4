@@ -65,5 +65,30 @@ double getLeftEnc(){
 double getRightEnc(){
   return rightC.position(rotationUnits::rev);
 }
+double max(double a, double b){
+  if(a > b){
+    return a;
+  }
+  return b;
+}
+const int ControllerDisplayUpdateTime = 2000;
+void updateControllerDisplay(){
+  static int lastT = Brain.Timer.time(timeUnits::msec);
+  if(Brain.Timer.time(timeUnits::msec)-lastT > ControllerDisplayUpdateTime){
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.setCursor(1, 1);
+      Controller1.Screen.print("Battery: %d%", Brain.Battery.capacity());
+      Controller1.Screen.newLine();
+      double a = 0;
+      a = max(a, rightA.temperature(temperatureUnits::celsius));
+      a = max(a, rightB.temperature(temperatureUnits::celsius));
+      a = max(a, rightC.temperature(temperatureUnits::celsius));
+      a = max(a, leftA.temperature(temperatureUnits::celsius));
+      a = max(a, leftB.temperature(temperatureUnits::celsius));
+      a = max(a, leftC.temperature(temperatureUnits::celsius));
+      Controller1.Screen.print("HighTemp: %.2f C", a);
+      lastT = Brain.Timer.time(timeUnits::msec);
+  }
+}
 
 #endif

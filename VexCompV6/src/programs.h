@@ -258,6 +258,7 @@ void BrainGUIProgram(){
 
     std::string out = entries[indexAuto].name;
     Brain.Screen.print(out.c_str());
+    updateControllerDisplay();
 
     for(int i=0; i < (sizeof(buttons)/sizeof(ButtonGUI)); i++){
       buttons[i].draw();
