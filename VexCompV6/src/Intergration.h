@@ -93,13 +93,17 @@ void track(){
 
   static int lastArmPos = arm.position(rotationUnits::deg);
   int currArmPos = arm.position(rotationUnits::deg);
-  const int armIntakeActivationThreshold = 720;
+  const int armIntakeActivationThreshold = 400;
   if(currArmPos >= armIntakeActivationThreshold){
     if(lastArmPos < armIntakeActivationThreshold){
-      setIntake(50);
-      lastArmPos = currArmPos;
+      setIntake(-50);
+    }
+  }else{
+    if(armIntakeActivationThreshold < lastArmPos){
+      setIntake(0);
     }
   }
+  lastArmPos = currArmPos;
 
   lastTime = Brain.timer(timeUnits::msec);
 }

@@ -30,7 +30,7 @@
 #include "driver.h"
 #include "programs.h"
 
-#define COMPETITION 0
+#define COMPETITION 1
 
 // A global instance of competition
 #if COMPETITION
@@ -69,7 +69,7 @@ int main() {
     Competition.drivercontrol(usercontrol);
   #endif
 
-  blueRight(0);
+  //blueRight(0);
 
   while(true){
     wait(200, msec);
