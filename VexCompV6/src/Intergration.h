@@ -91,6 +91,16 @@ void track(){
   robot.updateVelocity(deltaT);
   robot.updateStopStatus(deltaT);
 
+  static int lastArmPos = arm.position(rotationUnits::deg);
+  int currArmPos = arm.position(rotationUnits::deg);
+  const int armIntakeActivationThreshold = 720;
+  if(currArmPos >= armIntakeActivationThreshold){
+    if(lastArmPos < armIntakeActivationThreshold){
+      setIntake(50);
+      lastArmPos = currArmPos;
+    }
+  }
+
   lastTime = Brain.timer(timeUnits::msec);
 }
 
