@@ -32,7 +32,7 @@ bool maxThetaErrorForMotionGivenInDegrees = true;
 
 //linGains, rotGains
 const PIDGains basicGains[3][2] = {
-  {{1.8,0,0}, {7.42,0,0.2}}, //1 towers
+  {{1.85,0,0}, {7.425,0,0.1}}, //1 towers
   {{0,0,0}, {0,0,0}}, //2 tower
   {{0,0,0}, {0,0,0}} //3 tower
 };
@@ -191,7 +191,7 @@ void moveAbs(double x, double y, bool fwd=true, bool blocking=true){
   if(!fwd){
     d = PI;
   }
-  turnTo(Vector(1, 0).getAngle(Vector(x-p.x, y-p.y)) + d, false);
+  //turnTo(Vector(1, 0).getAngle(Vector(x-p.x, y-p.y)) + d, false);
 
   robot.setLineMode(fwd);
   robot.setAbsTarget(x, y);
