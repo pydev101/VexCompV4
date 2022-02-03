@@ -220,7 +220,7 @@ class Robot{
   void updateStopStatus(double deltaT){
     if(abs(getThetaError()) < rotationalThreshold){
       roatationStopTimer = roatationStopTimer + deltaT;
-      if(roatationStopTimer > 0.5){
+      if(roatationStopTimer > 0.05){
         stoppedRotating = true;
       }
     }else{
@@ -230,7 +230,7 @@ class Robot{
 
     if(abs(getLinearErrorForPID()) < linearThreshold){
       motionStopTimer = motionStopTimer + deltaT;
-      if(motionStopTimer > 0.5){
+      if(motionStopTimer > 0.05){
         stoppedMoving = true;
       }
     }else{

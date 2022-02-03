@@ -16,8 +16,8 @@ const double UnitsPerRev = 18.3207546*1.0167034; //Inches per revolution
 const double RobotDiameter = 15; //Inches (Same Units as above)
 const double RobotRadius = 0.5*RobotDiameter;
 
-const double updateTime = 20; //msec
-const double motionDelay = 25; //msec
+const double updateTime = 5; //msec
+const double motionDelay = 10; //msec
 const double cameraDelay = 20;
 
 const double linThreashold = 1; //In
