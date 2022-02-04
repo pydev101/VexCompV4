@@ -233,9 +233,7 @@ class Robot{
 
     static double lastE = 0;
     if(abs(getLinearErrorForPID()) < linearThreshold){
-      if((abs(getLinearErrorForPID() - lastE)/deltaT) < (linearThreshold/deltaT)){
-        motionStopTimer = motionStopTimer + deltaT;
-      }
+      motionStopTimer = motionStopTimer + deltaT;
       if(motionStopTimer > 0.05){
         stoppedMoving = true;
       }
