@@ -12,17 +12,26 @@ typedef struct {
 } autoEntry;
 
 void blueLeft(int mod){
-  /*moveCV(30, 5, -130);
+  moveAbs(13, 63);
+  frontPne.set(true);
+  moveAbs(12, 40, false);
+  moveCV(0, 40, -40);
+  moveAbs(51, 40, true);
+  turnTo(270);
   double t = Brain.timer(timeUnits::msec);
   while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
+    setLeft(-40);
+    setRight(-40);
     wait(motionDelay, msec);
   }
   backPne.set(true);
-  wait(250, msec);
-  moveAbs(7, 20);
-  moveAbs(46, 55);
-  frontPne.set(true);
-  moveAbs(7, 20, false);  */
+  setLeft(0);
+  setRight(0);
+  moveAbs(10, 30);
+  moveAbs(0, 3, false);
+  backPne.set(false);
+  moveAbs(3, 6);
+  moveCV(4, 5, 20);
 }
 
 void blueRight(int mod){
@@ -60,48 +69,6 @@ void blueRight(int mod){
   backPne.set(true);
 }
 
-void redLeft(int mod){
-  /*moveCV(30, 5, -130);
-  double t = Brain.timer(timeUnits::msec);
-  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
-    wait(motionDelay, msec);
-  }
-  backPne.set(true);
-  wait(250, msec);
-  moveAbs(7, 20);
-  moveAbs(46, 55);
-  frontPne.set(true);
-  moveAbs(7, 20, false);*/
-}
-
-void redRight(int mod){
-  /*
-  moveCV(30, 0, -130);
-  double t = Brain.timer(timeUnits::msec);
-  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
-    wait(motionDelay, msec);
-  }
-  backPne.set(true);
-  wait(250, msec);
-  moveAbs(-7, 26);
-  moveAbs(-30, 52);
-  frontPne.set(true);
-  moveAbs(10, 5, false);
-  backPne.set(false);
-  moveAbs(0, 18);
-  turnTo(180);
-  trackWithCam(&BackCam, -1, backCameraSettings, 0, BackCam__REDGOAL);
-  while(!LimitBack.pressing()){
-    setLeft(-30);
-    setRight(-30);
-    wait(motionDelay, msec);
-  }
-  backPne.set(true);
-  setLeft(0);
-  setRight(0);
-  arm.startRotateTo(720, rotationUnits::deg, 70, velocityUnits::pct);
-  setIntake(-50);*/
-}
 void OneMinute(int mod){
   moveCV(30, 0, 130);
   wait(700, msec);
@@ -131,8 +98,8 @@ void OneMinute(int mod){
 autoEntry entries[] = {
   {"Blue Left", blueLeft},
   {"Blue Right", blueRight},
-  {"Red Right", redRight},
-  {"Red Left", redLeft},
+  {"Red Right", blueRight},
+  {"Red Left", blueLeft},
   {"One Minute", OneMinute},
 };
 int indexAuto = 0;

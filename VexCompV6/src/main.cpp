@@ -30,7 +30,7 @@
 #include "driver.h"
 #include "programs.h"
 
-#define COMPETITION 0
+#define COMPETITION 1
 
 // A global instance of competition
 #if COMPETITION
@@ -74,7 +74,7 @@ int main() {
   std::cout << robot.location.pos.x << ", " << robot.location.pos.y << std::endl;
   wait(2000, msec);
   std::cout << robot.location.pos.x << ", " << robot.location.pos.y << std::endl;*/
-  blueRight(0);
+  //blueLeft(0);
 
   while(true){
     wait(200, msec);
