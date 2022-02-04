@@ -22,7 +22,7 @@ const double cameraDelay = 20;
 
 const double linThreashold = 1; //In
 const double angularThreashold = degToRad(1);
-const double maximumAccelerationLinear = 3; //TODO Tune this to prevent jumping
+const double maximumAccelerationLinear = 1000; //TODO Tune this to prevent jumping
 const double maximumAngularAcceleration = 1000;
 const double maxVelocity = 1000;
 const double maxAngularVelocity = 1000;
@@ -34,7 +34,7 @@ bool maxThetaErrorForMotionGivenInDegrees = true;
 
 //Old values: {{1.85,0,0}, {7.425,0,0.1}}, //1 towers
 const PIDGains basicGains[3][2] = {
-  {{6,0,0}, {7.425,0,0.1}}, //1 towers      //TODO Tuen this to prevent ossiclation
+  {{1.85,0,0}, {7.425,0,0.1}},//{{6,0,0}, {7.425,0,0.1}}, //1 towers      //TODO Tuen this to prevent ossiclation
   {{0,0,0}, {0,0,0}}, //2 tower
   {{0,0,0}, {0,0,0}} //3 tower
 };

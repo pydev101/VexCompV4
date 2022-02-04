@@ -51,6 +51,13 @@ void blueRight(int mod){
   backPne.set(false);
   moveAbs(4, 18, true);
   turnTo(180);
+  t = Brain.timer(timeUnits::msec);
+  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
+    setLeft(-40);
+    setRight(-40);
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
 }
 
 void redLeft(int mod){
