@@ -49,10 +49,13 @@ class Robot{
         if(abs(newVel) > maxLinearVel){
           newVel = maxLinearVel*sign(newVel);
         }
+        if(abs(newVel - targetLinearVelocity) > maxLinearAccel){
+          newVel = targetLinearVelocity + sign(newVel - targetLinearVelocity)*maxLinearAccel;
+        }
         targetLinearVelocity = newVel;
       }
       if(usingRotPIDControls){
-        double eTheta = getThetaError();
+        double eTheta = getThetaError(); //TODO If in X of target dont turn back but reverse
         rotationalPid = PID(eTheta, deltaT, angularGains, rotationalPid);
         double newOmega = rotationalPid.output;
         if(abs(newOmega) > maxAngularVel){
@@ -228,8 +231,11 @@ class Robot{
       stoppedRotating = false;
     }
 
+    static double lastE = 0;
     if(abs(getLinearErrorForPID()) < linearThreshold){
-      motionStopTimer = motionStopTimer + deltaT;
+      if((abs(getLinearErrorForPID() - lastE)/deltaT) < (linearThreshold/deltaT)){
+        motionStopTimer = motionStopTimer + deltaT;
+      }
       if(motionStopTimer > 0.05){
         stoppedMoving = true;
       }
@@ -237,6 +243,7 @@ class Robot{
       motionStopTimer = 0;
       stoppedMoving = false;
     }
+    lastE = getLinearErrorForPID();
   }
 
   void updateVelocity(double deltaT){

@@ -16,13 +16,13 @@ const double UnitsPerRev = 18.3207546*1.0167034; //Inches per revolution
 const double RobotDiameter = 15; //Inches (Same Units as above)
 const double RobotRadius = 0.5*RobotDiameter;
 
-const double updateTime = 5; //msec
-const double motionDelay = 10; //msec
+const double updateTime = 10; //msec
+const double motionDelay = 15; //msec
 const double cameraDelay = 20;
 
 const double linThreashold = 1; //In
 const double angularThreashold = degToRad(1);
-const double maximumAccelerationLinear = 1000;
+const double maximumAccelerationLinear = 3; //TODO Tune this to prevent jumping
 const double maximumAngularAcceleration = 1000;
 const double maxVelocity = 1000;
 const double maxAngularVelocity = 1000;
@@ -31,8 +31,10 @@ const double maxThetaErrorForMotion = 15; //deg
 bool maxThetaErrorForMotionGivenInDegrees = true;
 
 //linGains, rotGains
+
+//Old values: {{1.85,0,0}, {7.425,0,0.1}}, //1 towers
 const PIDGains basicGains[3][2] = {
-  {{1.85,0,0}, {7.425,0,0.1}}, //1 towers
+  {{6,0,0}, {7.425,0,0.1}}, //1 towers      //TODO Tuen this to prevent ossiclation
   {{0,0,0}, {0,0,0}}, //2 tower
   {{0,0,0}, {0,0,0}} //3 tower
 };
