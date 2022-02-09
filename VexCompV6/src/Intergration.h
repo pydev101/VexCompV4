@@ -34,7 +34,7 @@ bool maxThetaErrorForMotionGivenInDegrees = true;
 
 //Old values: {{1.85,0,0}, {7.425,0,0.1}}, //1 towers
 const PIDGains basicGains[3][2] = {
-  {{1.85,0,0}, {7.425,0,0.1}},//{{6,0,0}, {7.425,0,0.1}}, //1 towers      //TODO Tuen this to prevent ossiclation
+  {{1.85,0,0}, {7.43,0,0.1}},//{{6,0,0}, {7.425,0,0.1}}, //1 towers      //TODO Tuen this to prevent ossiclation
   {{0,0,0}, {0,0,0}}, //2 tower
   {{0,0,0}, {0,0,0}} //3 tower
 };
@@ -339,6 +339,14 @@ void trackWithCam(vex::vision *camera, int d, CameraSettings settings, const int
     }
     wait(camDelayLoop, msec);
   }
+
+  double t = Brain.timer(timeUnits::msec);
+  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
+    setLeft(20*d);
+    setRight(20*d);
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
   setLeft(0);
   setRight(0);
 }

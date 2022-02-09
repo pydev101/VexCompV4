@@ -88,11 +88,30 @@ void OneMinute(int mod){
   setLeft(0);
   setRight(0);
 
-  moveAbs(-34, 30);
+  moveAbs(-36, 30);
   turnTo(270);
-  arm.rotateTo(1540, rotationUnits::deg, 70, velocityUnits::pct);
-  moveAbs(-34, 15);
+  arm.rotateTo(1520, rotationUnits::deg, 70, velocityUnits::pct);
+  moveAbs(-36, 15);
   frontPne.set(false);
+  wait(500, timeUnits::msec);
+
+  turnTo(180);
+  arm.startRotateTo(0, rotationUnits::deg, 70, velocityUnits::pct);
+  moveAbs(0, 15, false);
+  turnTo(120);
+  setLeft(-70);
+  setRight(-70);
+  wait(1000, timeUnits::msec);
+  backPne.set(false);
+  setLeft(70);
+  setRight(70);
+  wait(800, timeUnits::msec);
+  setLeft(0);
+  setRight(0);
+  turnTo(180);
+  
+
+  
 }
 
 autoEntry entries[] = {

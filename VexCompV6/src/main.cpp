@@ -69,6 +69,8 @@ int main() {
     Competition.drivercontrol(usercontrol);
   #endif
 
+  OneMinute(0);
+
   /*std::cout << robot.location.pos.x << ", " << robot.location.pos.y << std::endl;
   moveAbs(0, 20);
   std::cout << robot.location.pos.x << ", " << robot.location.pos.y << std::endl;
