@@ -99,19 +99,23 @@ void OneMinute(int mod){
   arm.startRotateTo(0, rotationUnits::deg, 70, velocityUnits::pct);
   moveAbs(0, 15, false);
   turnTo(120);
-  setLeft(-70);
-  setRight(-70);
-  wait(1000, timeUnits::msec);
+  moveCV(-16, 2, -70);
   backPne.set(false);
-  setLeft(70);
-  setRight(70);
-  wait(800, timeUnits::msec);
-  setLeft(0);
-  setRight(0);
+  wait(300, msec);
+  moveAbs(0, 10);
   turnTo(180);
   
-
+  t = Brain.timer(timeUnits::msec);
+  while(((Brain.timer(timeUnits::msec) - t) <= 1000) && (!LimitBack.pressing())){
+    setLeft(-80);
+    setRight(-80);
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
+  setLeft(0);
+  setRight(0);
   
+  moveAbs(-96, 15);
 }
 
 autoEntry entries[] = {

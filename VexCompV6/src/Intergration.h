@@ -34,7 +34,7 @@ bool maxThetaErrorForMotionGivenInDegrees = true;
 
 //Old values: {{1.85,0,0}, {7.425,0,0.1}}, //1 towers
 const PIDGains basicGains[3][2] = {
-  {{1.85,0,0}, {7.43,0,0.1}},//{{6,0,0}, {7.425,0,0.1}}, //1 towers      //TODO Tuen this to prevent ossiclation
+  {{1.851,0,0}, {7.44,0,0.075}},//{{6,0,0}, {7.425,0,0.1}}, //1 towers      //TODO Tuen this to prevent ossiclation
   {{0,0,0}, {0,0,0}}, //2 tower
   {{0,0,0}, {0,0,0}} //3 tower
 };
@@ -188,7 +188,7 @@ void turnTo(double theta, bool inDeg=true, bool blocking=true){
 }
 
 void moveAbs(double x, double y, bool fwd=true, bool blocking=true){
-  Point p = robot.location.getPos();
+  //Point p = robot.location.getPos();
   double d = 0;
   if(!fwd){
     d = PI;
