@@ -34,7 +34,7 @@ bool maxThetaErrorForMotionGivenInDegrees = true;
 
 //Old values: {{1.85,0,0}, {7.425,0,0.1}}, //1 towers
 const PIDGains basicGains[3][2] = {
-  {{1.851,0,0}, {7.44,0,0.075}},//{{6,0,0}, {7.425,0,0.1}}, //1 towers      //TODO Tuen this to prevent ossiclation
+  {{1.87,0,0.01}, {7.60,0,0.075}},//{{6,0,0}, {7.425,0,0.1}}, //1 towers      //TODO Tuen this to prevent ossiclation
   {{0,0,0}, {0,0,0}}, //2 tower
   {{0,0,0}, {0,0,0}} //3 tower
 };
@@ -245,7 +245,9 @@ void moveCV(double fwd, double hor, double linearSpeedTarget){
   setLeft(0);
   setRight(0);
 }
-
+void moveCV(Vector v, double linearSpeedTarget){
+  moveCV(v.getY(), v.getX(), linearSpeedTarget);
+}
 
 //Tracing functions
 void tracePath(smartPointPointer &points, double vel=20){

@@ -18,6 +18,7 @@ void blueLeft(int mod){
   moveCV(0, 40, -40);
   moveAbs(51, 40, true);
   turnTo(270);
+  robot.usePIDControls(false);
   double t = Brain.timer(timeUnits::msec);
   while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
     setLeft(-40);
@@ -60,6 +61,7 @@ void blueRight(int mod){
   backPne.set(false);
   moveAbs(4, 18, true);
   turnTo(180);
+  robot.usePIDControls(false);
   t = Brain.timer(timeUnits::msec);
   while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
     setLeft(-40);
@@ -76,7 +78,7 @@ void OneMinute(int mod){
   wait(250, msec);
   moveAbs(-7, 26, false);
 
-  moveAbs(-34, 52, false);
+  moveAbs(-36, 52, false);
   robot.usePIDControls(false);
   double t = Brain.timer(timeUnits::msec);
   while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
@@ -97,14 +99,16 @@ void OneMinute(int mod){
 
   turnTo(180);
   arm.startRotateTo(0, rotationUnits::deg, 70, velocityUnits::pct);
+  setIntake(0);
   moveAbs(0, 15, false);
-  turnTo(120);
+  //turnTo(120);
   moveCV(-16, 2, -70);
   backPne.set(false);
   wait(300, msec);
   moveAbs(0, 10);
   turnTo(180);
   
+  robot.usePIDControls(false);
   t = Brain.timer(timeUnits::msec);
   while(((Brain.timer(timeUnits::msec) - t) <= 1000) && (!LimitBack.pressing())){
     setLeft(-80);
@@ -115,7 +119,13 @@ void OneMinute(int mod){
   setLeft(0);
   setRight(0);
   
-  moveAbs(-96, 15);
+  moveAbs(-86, 15);
+  moveCV(Vector(10, 305, true), 40);
+  wait(400, timeUnits::msec);
+  frontPne.set(true);
+  wait(100, timeUnits::msec);
+  move(Vector(-4, 306, true), false);
+  moveCV(Vector(90, 70, true), -80);
 }
 
 autoEntry entries[] = {
