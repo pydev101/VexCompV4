@@ -7,7 +7,7 @@ Written By: Carson Easterling
 Defines driver program and function
 */
 
-#define specialSkillsMode 0
+#define specialSkillsMode 1
 #define armUpSpeed 100
 #define armDownSpeed -100
 #define fullUp 1520
