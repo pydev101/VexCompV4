@@ -37,7 +37,7 @@
   competition Competition;
 #endif
 
-
+//Pre Auto function sets up motor and tracking functions before compeition starts; Also starts GUI program to allow selection of program to be used during that round
 void pre_auton(void) {
   vexcodeInit();
   frontPne.set(false);
@@ -56,13 +56,8 @@ void pre_auton(void) {
   #endif
 }
 
-//
-// Main will set up the competition functions and callbacks.
-//
-
-
+//Main functon
 int main() {
-  // Set up callbacks for autonomous and driver control periods.
   pre_auton();
 
   #if COMPETITION

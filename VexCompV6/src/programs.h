@@ -1,15 +1,14 @@
 #include "Intergration.h"
 
-//Defines autonomous program and GUI selection screen
+/*
+Name: programs.h
+Written By: Carson Easterling
 
-bool programRunning = false;
+Implements the use function in intergation into robot programs that will run durign 15 second rounds or 1 minute skills round. Also contains implementation of a GUI for selection of which program to run
+*/
 
-typedef struct {
-  std::string name;
-  void (*function)(int);
-  int mod;
 
-} autoEntry;
+//Programs
 
 void blueLeft(int mod){
   moveAbs(13, 63);
@@ -128,6 +127,15 @@ void OneMinute(int mod){
   moveCV(Vector(90, 70, true), -80);
 }
 
+
+//Storage of program functions for use in the GUI
+typedef struct {
+  std::string name;
+  void (*function)(int);
+  int mod;
+} autoEntry;
+
+//Use of a table allows programs to be easily added or removed
 autoEntry entries[] = {
   {"Blue Left", blueLeft},
   {"Blue Right", blueRight},
@@ -139,6 +147,9 @@ int indexAuto = 0;
 
 
 //START OF GUI------------------------------------------------------------------------
+bool programRunning = false;
+
+//Abstract Button Class
 class ButtonGUI {
   public:
     int x;
@@ -175,6 +186,7 @@ class ButtonGUI {
     }
 };
 
+//Implementation of a button to increase the auto index to change which function is selected
 void increaseIndex(){
   indexAuto += 1;
   if(indexAuto > (sizeof(entries)/sizeof(entries[0]))-1){
@@ -234,8 +246,10 @@ void drawAAC(int x, int y, int w, int h, bool press){
 }
 ButtonGUI setBTN(480-50,160,50,70, setAuto, drawAAC);
 
+//All buttons used in GUI
 ButtonGUI buttons[] = {increaseBTN, decreaseBTN, setBTN};
 
+//Calls a button if pressed
 void pressHandler(){
   if(!GUIActivate){return;}
   static bool free = true;
@@ -259,6 +273,7 @@ void pressHandler(){
   }
 }
 
+//Main GUI loop that draws/animates button objects
 void BrainGUIProgram(){
   Brain.Screen.pressed(pressHandler);
 
@@ -288,6 +303,7 @@ void BrainGUIProgram(){
   Brain.Screen.render();
 }
 
+//Auto function used by competition template
 void autonomous(void){
   GUIActivate = false;
   entries[indexAuto].function(entries[indexAuto].mod);

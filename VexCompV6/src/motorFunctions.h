@@ -4,6 +4,13 @@
 #include "vex.h"
 using namespace vex;
 
+/*
+Name: motorFunctions.h
+Written By: Carson Easterling
+
+Functions related smarter motor control
+*/
+
 void setM(motor m, double speed, velocityUnits uni=velocityUnits::pct){
   m.setVelocity(speed, uni);
   if(speed == 0){

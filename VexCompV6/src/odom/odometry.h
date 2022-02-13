@@ -69,6 +69,7 @@ class OdomGrid{
     }
 
 
+    //Set Target Positions
     void setTarget(Vector v){
       targetPos = v + targetPos;
       targetVec = Vector(pos, targetPos);
@@ -99,6 +100,7 @@ class OdomGrid{
       setTargetHeadAbs(targetHeading + theta, false);
     }
     
+    //Get current details about position and velocity
     Point getPos(){
       return pos;
     }
@@ -106,13 +108,13 @@ class OdomGrid{
       return currentHeading;
     }
     Vector getRobotBasisVector(){
-      return Vector(1, currentHeading, false);
+      return Vector(1, currentHeading, false); //Vector pointing in the same direction as the front of the robot
     }
     Vector getVel(){
       return vel;
     }
     Vector getRealitiveVel(){
-      return vel.project(getRobotBasisVector());
+      return vel.project(getRobotBasisVector()); //The velocity in the direction of the front of the robot
     }
     Vector getAccel(){
       return accel;
@@ -131,7 +133,7 @@ class OdomGrid{
       return targetVec;
     }
     Vector getRealitiveTargetVector(){
-      return targetVec.project(getRobotBasisVector());
+      return targetVec.project(getRobotBasisVector()); //Get error in terms of how close the robot can get to the target without turning
     }
     double getTargetHead(){
       return targetHeading;

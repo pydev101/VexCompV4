@@ -1,5 +1,12 @@
 #include "Intergration.h"
 
+/*
+Name: driver.h
+Written By: Carson Easterling
+
+Defines driver program and function
+*/
+
 #define specialSkillsMode 0
 #define armUpSpeed 100
 #define armDownSpeed -100
@@ -31,6 +38,7 @@ void toggleBack(bool currState){
   }
 }
 
+//Driver function used by competition template
 void usercontrol(void) {
   int intakeMode = 0;
   bool intakePressing = false;

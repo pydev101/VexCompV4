@@ -1,6 +1,11 @@
 #ifndef __INTERGRATION_H__
 #define __INTERGRATION_H__
-//Intergrates phyical and virtual components
+/*
+Name: Intergration.h
+Written By: Carson Easterling
+
+Connects the motor and phycical characteritics of the robot to the abstracted math and algorithms into usable move function
+*/
 
 #include "motorFunctions.h"
 #include "odom/robot.h"
@@ -22,13 +27,15 @@ const double cameraDelay = 20;
 
 const double linThreashold = 1; //In
 const double angularThreashold = degToRad(1);
-const double maximumAccelerationLinear = 1000; //TODO Tune this to prevent jumping
+const double maximumAccelerationLinear = 1000;
 const double maximumAngularAcceleration = 1000;
 const double maxVelocity = 1000;
 const double maxAngularVelocity = 1000;
 const double updateTargetHeadingMinThreashold = 5;
 const double maxThetaErrorForMotion = 15; //deg
 bool maxThetaErrorForMotionGivenInDegrees = true;
+
+const int armIntakeActivationThreshold = 400;
 
 //linGains, rotGains
 
@@ -66,6 +73,11 @@ Robot robot = Robot(startingPoint, startingHead, true,
                     maximumAccelerationLinear, maximumAngularAcceleration, 
                     updateTargetHeadingMinThreashold, maxThetaErrorForMotion, maxThetaErrorForMotionGivenInDegrees);
 
+
+//End of user defined constants
+
+
+//Threaded tracking function to update robot positon and target output
 void track(){
   static double lastHeading = 0;
   static double lastTime = 0;
@@ -82,20 +94,23 @@ void track(){
   lastHeading = head;
   head = 360 - normalizeAngle(head, false); //Heading in CCW + direction
 
-  double deltaFwd = 0.5*((leftEnc-lastLeft) + (rightEnc-lastRight))*UnitsPerRev; //TODO Breaks while turning
+  double deltaFwd = 0.5*((leftEnc-lastLeft) + (rightEnc-lastRight))*UnitsPerRev;
 
   lastLeft = leftEnc;
   lastRight = rightEnc;
 
+
+  //Update robot class
   Vector deltaPos = Vector(deltaFwd, head, true);
   robot.updatePos(deltaT, deltaPos, deltaHead, true);
-  robot.setHead(head, true);
+  robot.setHead(head, true); //Set heading using more accurate inertial sensor
   robot.updateVelocity(deltaT);
   robot.updateStopStatus(deltaT);
 
+
+  //Activate intake automatically based on arm position
   static int lastArmPos = arm.position(rotationUnits::deg);
   int currArmPos = arm.position(rotationUnits::deg);
-  const int armIntakeActivationThreshold = 400;
   if(currArmPos >= armIntakeActivationThreshold){
     if(lastArmPos < armIntakeActivationThreshold){
       setIntake(-50);
@@ -112,6 +127,7 @@ void track(){
 
 int frame = 0;
 
+//Thread for update cycle, also contains logging code for robot motion for later analysis with python tools
 int trakerFunction(){
   while(true){
     track();
@@ -139,8 +155,10 @@ int trakerFunction(){
 
     wait(updateTime, msec);
   }
-} //Called in Pre-Auton
+} //Activated in preauton
 
+
+//Update motor outputs based on robot class output
 bool updateMotors(double overide=0, bool overideLinear=true){
   double linearSpeed = robot.getLinearSpeedTarget();
   double angularSpeed = robot.getRotationalSpeedTarget();
@@ -162,6 +180,7 @@ bool updateMotors(double overide=0, bool overideLinear=true){
 
 //MOTION FUNCTIONS
 
+//Block until robot arrives at target position
 void executeMove(){
   wait(updateTime+1, msec);
   bool inMotion = robot.isMoving();
@@ -187,6 +206,7 @@ void turnTo(double theta, bool inDeg=true, bool blocking=true){
   turn(0, false, blocking);
 }
 
+//Moves to absolute coordnate location
 void moveAbs(double x, double y, bool fwd=true, bool blocking=true){
   //Point p = robot.location.getPos();
   double d = 0;
@@ -204,6 +224,8 @@ void moveAbs(double x, double y, bool fwd=true, bool blocking=true){
 void moveAbs(Point p, bool fwd=true, bool blocking=true){
   moveAbs(p.x, p.y);
 }
+
+//Moves realitive to last target location point
 void move(Vector v, bool fwd=true, bool blocking=true){
   robot.setLineMode(fwd);
   robot.setTarget(v);
@@ -218,6 +240,8 @@ void move(double mag, double theta, bool inDeg, bool dir, bool blocking=true){
   move(Vector(mag, theta, inDeg), dir, blocking);
 }
 
+
+//Moves to target location with constant linear velocity
 void moveCV(double fwd, double hor, double linearSpeedTarget){
   bool dir = true;
   double d = 0;
@@ -249,7 +273,8 @@ void moveCV(Vector v, double linearSpeedTarget){
   moveCV(v.getY(), v.getX(), linearSpeedTarget);
 }
 
-//Tracing functions
+
+//Follow a generated path
 void tracePath(smartPointPointer &points, double vel=20){
   robot.traceMode(points, vel);
   executeMove();

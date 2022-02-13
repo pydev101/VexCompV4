@@ -2,26 +2,36 @@
 #define __ROBOTCON_H__
 #include "odometry.h"
 
-//Robot for a position give output of a speed to acheive target
+/*
+Name: robot.h
+Written By: Carson Easterling
+
+Implementation of PID, tracking, and motion algorithms; After inital setup using a given position the robot will return a left and right motor output in order to decrease error
+*/
+
 
 class Robot{
   public:
+    //Position infomation
     OdomGrid location = OdomGrid(Point(0,0), 90, true);
     double RobotRadius;
-    double UnitsPerRevolution;
+    double UnitsPerRevolution; //Units of measure per one full rotation of wheel base
 
+    //PID varibles
     PIDGains linearGains;
     PIDGains angularGains;
     PIDOutput linearPid = {0,0,0};
     PIDOutput rotationalPid = {0,0,0};
 
-    double linearThreshold;
+    //Varibles related to if the robot is currently stopped
+    double linearThreshold; //How close the robot should be from target before it is allowed to quit
     double rotationalThreshold;
-    double roatationStopTimer = 0;
+    double roatationStopTimer = 0; //How long has the robot spent within the threashold range
     double motionStopTimer = 0;
-    bool stoppedRotating = true;
+    bool stoppedRotating = true; //If true robot is has been in threashold long enough to be considered stop and allowed to continue
     bool stoppedMoving = true;
 
+    //Last target velocity and maximum allowed set outputs
     double targetLinearVelocity = 0;
     double targetAngularVelocity = 0;
     double maxLinearAccel = 0;
@@ -29,18 +39,22 @@ class Robot{
     double maxLinearVel = 0;
     double maxAngularVel = 0;
 
-    bool usingLinearPIDControls = true;
+    //Controls to how the PID system should update
+    bool usingLinearPIDControls = true; //If PID should update
     bool usingRotPIDControls = true;
-    bool forward = true;
-    bool updateTargetHeadingWhileInMotion = true;
-    bool blockLinearMotionIfThetaErrorTooHigh = true;
-    double updateTargetHeadingMinThreashold = 0;
-    double maxThetaErrorForMotion = 0;
+    bool forward = true; //Desired robot direction of travel
+    bool updateTargetHeadingWhileInMotion = true; //Determines if target heading updates to turn torwards target position while travelling
+    bool blockLinearMotionIfThetaErrorTooHigh = true; //Determines if it will stop and turn if the theta error is too high
+    double updateTargetHeadingMinThreashold = 0; //Will not update target heading if within X units of target to prevent overshoot, turning back, and repeating
+    double maxThetaErrorForMotion = 0; //Determines acceptable theta error for linear motion to occur
+
+    //Relates to robot following a defined path using a list of points
     bool traceModeOn = false;
     double traceVelocity = 0;
     smartPointPointer pathToTrace;
     int pathTraceIndex = 0;
 
+    //Internal function that updates the output of the class using the PID algorithm if allowed
     void updatePID(double deltaT){
       if(usingLinearPIDControls){
         double e = getLinearErrorForPID();
@@ -55,7 +69,7 @@ class Robot{
         targetLinearVelocity = newVel;
       }
       if(usingRotPIDControls){
-        double eTheta = getThetaError(); //TODO If in X of target dont turn back but reverse
+        double eTheta = getThetaError();
         rotationalPid = PID(eTheta, deltaT, angularGains, rotationalPid);
         double newOmega = rotationalPid.output;
         if(abs(newOmega) > maxAngularVel){
@@ -65,8 +79,8 @@ class Robot{
       }
     }
 
+    //Intenral function that sets target position of class based on current location, speed, and given path
     void updateTrace(double deltaT){
-      //Set linear velocity for path tracing; Maybe take an input path or something
       if(traceModeOn){
         if(abs(location.getRobotBasisVector().dot(Vector(location.getPos(), pathToTrace[pathTraceIndex]))) < linearThreshold){
           pathTraceIndex++;
@@ -88,6 +102,7 @@ class Robot{
     }
 
   //public:
+    //Constructor to save all required user defined varibles in safe manner
     Robot(Point Pos, double CurrentHeading, bool headingGivenInDegrees, PIDGains linearK, PIDGains angularK, double linearThres, double rotationalThresInRadians, double maxLinearVelocity, double maxAngularVelocity, double maxLinearAccelleration, double maxAngularAccelleration, double updateTargetHeadingMinThreasholdX, double maxThetaErrorForMotionX, bool lastArgInDeg){
       location = OdomGrid(Pos, CurrentHeading, headingGivenInDegrees);
       linearGains = linearK;
@@ -107,7 +122,7 @@ class Robot{
     } 
 
 
-    //SET VARS-----------------------------------------------------------------------------------------------------------------
+    //Set class paramters in a safe manner using these functions
     void setMaxLinearVel(double x){
       maxLinearVel = abs(x);
     }
@@ -133,7 +148,7 @@ class Robot{
     }
 
 
-    //PID Access---------------------------------------------------------------------------------------------------------------
+    //Functions that define how PID output should be handled; Useful for differnt functions for example camera has its own PID so this should be disabled to prevent confusion within the system
     void usePIDControls(bool active){
       usingLinearPIDControls = active;
       usingRotPIDControls = active;
@@ -150,6 +165,7 @@ class Robot{
       angularGains = x;
       rotationalPid = initPID(0);
     }
+    //Sets up PID controls to move in a straight line
     void setLineMode(bool fwd, bool blockLineMotionIfThetaHigh=true){
       traceModeOn = false;
       usePIDControls(true);
@@ -157,6 +173,7 @@ class Robot{
       updateTargetHeadingWhileInMotion = true;
       blockLinearMotionIfThetaErrorTooHigh = blockLineMotionIfThetaHigh;
     }
+    //Sets up PID controls to rotate in the same spot
     void setRotateMode(){
       traceModeOn = false;
       usePIDControls(true);
@@ -164,6 +181,7 @@ class Robot{
       updateTargetHeadingWhileInMotion = false;
       blockLinearMotionIfThetaErrorTooHigh = true;
     }
+    //Sets up PID controls to accept a constantly changing target
     void setIndependentTargetMode(){
       traceModeOn = false;
       usePIDControls(true);
@@ -171,6 +189,7 @@ class Robot{
       updateTargetHeadingWhileInMotion = false;
       blockLinearMotionIfThetaErrorTooHigh = false;
     }
+    //Setup robot output to follow a path at contant velocity
     void traceMode(smartPointPointer &path, double vel){
       if(path.size >= 2){
         usePIDControls(false, true);
@@ -210,6 +229,8 @@ class Robot{
 
 
   //Position Setting/Updates--------------------------------------------------------------------------------------------------------------
+
+  //Updates robot postion info and should be called first in update loop
   void updatePos(double deltaT, Vector deltaPos, double deltaHead, bool deltaHeadInDegrees=false){
     location.updatePosition(deltaPos, deltaHead, deltaT, deltaHeadInDegrees);
   }
@@ -220,6 +241,7 @@ class Robot{
     location.setHead(head, headingGivenInDegrees);
   }
 
+  //Check to see if robot has met the criteria to be considered stopped and ready to move to the next positon; Should be called last in update loop
   void updateStopStatus(double deltaT){
     if(abs(getThetaError()) < rotationalThreshold){
       roatationStopTimer = roatationStopTimer + deltaT;
@@ -244,20 +266,22 @@ class Robot{
     lastE = getLinearErrorForPID();
   }
 
+  //Updates class output and should be called second in update loop
   void updateVelocity(double deltaT){
     updateTrace(deltaT);
     updatePID(deltaT);
   }
 
-  //Error-----------------------------------------------------------------------------------------------------------------------------------
+  //Calculate error values used in PID calculations
   double getThetaError(){
-    return shortestArcToTarget(location.getCurrHead(), location.getTargetHead());
+    return shortestArcToTarget(location.getCurrHead(), location.getTargetHead()); //Returns the shortest angle in radians from position to target
   }
   double getLinearErrorForPID(){
     Vector targetVector = location.getTargetVector();
     Vector basis = location.getRobotBasisVector();
-    double linErr = basis.dot(targetVector);
+    double linErr = basis.dot(targetVector); //Linear error at current heading
 
+    //Updates target heading if alllowed
     if(targetVector.getMagnitude() > updateTargetHeadingMinThreashold){
       if(updateTargetHeadingWhileInMotion){
         int d = 1;
@@ -268,6 +292,7 @@ class Robot{
       }
     }
 
+    //Block motion if thetaError too high
     if(blockLinearMotionIfThetaErrorTooHigh){
       if(abs(getThetaError()) < maxThetaErrorForMotion){
         return linErr;
