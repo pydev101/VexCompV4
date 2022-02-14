@@ -71,12 +71,14 @@ void blueRight(int mod){
 }
 
 void OneMinute(int mod){
+  //Grab front
   moveCV(30, 0, 130);
   wait(700, msec);
   frontPne.set(true);
   wait(250, msec);
   moveAbs(-7, 26, false);
-
+  
+  //Grab middle
   moveAbs(-36, 52, false);
   robot.usePIDControls(false);
   double t = Brain.timer(timeUnits::msec);
@@ -89,6 +91,7 @@ void OneMinute(int mod){
   setLeft(0);
   setRight(0);
 
+  //Score bridge
   moveAbs(-36, 30);
   turnTo(270);
   arm.rotateTo(1520, rotationUnits::deg, 70, velocityUnits::pct);
@@ -96,17 +99,18 @@ void OneMinute(int mod){
   frontPne.set(false);
   wait(500, timeUnits::msec);
 
+  //Drop off middle
   turnTo(180);
   arm.startRotateTo(0, rotationUnits::deg, 70, velocityUnits::pct);
   setIntake(0);
   moveAbs(0, 15, false);
-  //turnTo(120);
   moveCV(-16, 2, -70);
   backPne.set(false);
-  wait(300, msec);
+  wait(400, msec);
   moveAbs(0, 10);
   turnTo(180);
   
+  //Grab red
   robot.usePIDControls(false);
   t = Brain.timer(timeUnits::msec);
   while(((Brain.timer(timeUnits::msec) - t) <= 1000) && (!LimitBack.pressing())){
@@ -118,13 +122,42 @@ void OneMinute(int mod){
   setLeft(0);
   setRight(0);
   
+  //Grab next red
   moveAbs(-86, 15);
-  moveCV(Vector(10, 305, true), 40);
+  moveCV(Vector(10, 303, true), 40);
   wait(400, timeUnits::msec);
   frontPne.set(true);
   wait(100, timeUnits::msec);
-  move(Vector(-4, 306, true), false);
-  moveCV(Vector(90, 70, true), -80);
+  
+
+  move(Vector(-2, 303, true), false);
+  moveCV(Vector(84, 83, true), -80);
+
+  backPne.set(false);
+  wait(100, timeUnits::msec);
+  moveAbs(-80, 80);
+  turnTo(320);
+
+  robot.usePIDControls(false);
+  t = Brain.timer(timeUnits::msec);
+  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
+    setLeft(-70);
+    setRight(-70);
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
+  setLeft(0);
+  setRight(0);
+
+  moveAbs(-45, 70);
+  moveAbs(13, 80);
+  frontPne.set(false);
+  turnTo(107);
+  moveTime(80, 700);
+  frontPne.set(true);
+  wait(100, timeUnits::msec);
+  moveTime(-80, 400);
+  moveAbs(5, 5, false);
 }
 
 

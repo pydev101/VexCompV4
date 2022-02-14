@@ -3,6 +3,24 @@
 // [Name]               [Type]        [Port(s)]
 // leftA                motor         1               
 // rightA               motor         3               
+// rightB               motor         4               
+// arm                  motor         12              
+// intakeM              motor         7               
+// leftC                motor         8               
+// rightC               motor         9               
+// leftB                motor         21              
+// Controller1          controller                    
+// Inertial             inertial      10              
+// backPne              digital_out   A               
+// frontPne             digital_out   H               
+// BackCam              vision        5               
+// LimitBack            limit         E               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// leftA                motor         1               
+// rightA               motor         3               
 // rightB               motor         11              
 // arm                  motor         12              
 // intakeM              motor         7               
