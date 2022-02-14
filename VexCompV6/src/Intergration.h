@@ -41,7 +41,7 @@ const int armIntakeActivationThreshold = 400;
 
 //Old values: {{1.85,0,0}, {7.425,0,0.1}}, //1 towers
 const PIDGains basicGains[3][2] = {
-  {{1.87,0,0.01}, {7.7,0,0.075}},//{{6,0,0}, {7.425,0,0.1}}, //1 towers      //TODO Tuen this to prevent ossiclation
+  {{1.87,0,0.01}, {7.63,0,0.075}},//{{6,0,0}, {7.425,0,0.1}}, //1 towers      //TODO Tuen this to prevent ossiclation
   {{0,0,0}, {0,0,0}}, //2 tower
   {{0,0,0}, {0,0,0}} //3 tower
 };
