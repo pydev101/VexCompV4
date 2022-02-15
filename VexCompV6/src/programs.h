@@ -94,14 +94,14 @@ void OneMinute(int mod){
   //Score bridge
   moveAbs(-36, 30);
   turnTo(270);
-  arm.rotateTo(1520, rotationUnits::deg, 70, velocityUnits::pct);
+  arm.rotateTo(1520, rotationUnits::deg, 90, velocityUnits::pct);
   moveAbs(-36, 15);
   frontPne.set(false);
   wait(500, timeUnits::msec);
 
   //Drop off middle
   turnTo(180);
-  arm.startRotateTo(0, rotationUnits::deg, 70, velocityUnits::pct);
+  arm.startRotateTo(0, rotationUnits::deg, 90, velocityUnits::pct);
   setIntake(0);
   moveAbs(0, 15, false);
   moveCV(-16, 2, -70);
