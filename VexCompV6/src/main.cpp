@@ -30,7 +30,7 @@
 #include "driver.h"
 #include "programs.h"
 
-#define COMPETITION 1
+#define COMPETITION 0
 
 // A global instance of competition
 #if COMPETITION
@@ -67,7 +67,7 @@ int main() {
 
   //TODO Increase P value of linear track i norder to boost speed
 
-  //OneMinute(0);
+  OneMinute(0);
 
   /*std::cout << robot.location.pos.x << ", " << robot.location.pos.y << std::endl;
   moveAbs(0, 20);
