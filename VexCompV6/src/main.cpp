@@ -65,16 +65,8 @@ int main() {
     Competition.drivercontrol(usercontrol);
   #endif
 
-  //TODO Increase P value of linear track i norder to boost speed
+  blueLeft(0);
 
-  OneMinute(0);
-
-  /*std::cout << robot.location.pos.x << ", " << robot.location.pos.y << std::endl;
-  moveAbs(0, 20);
-  std::cout << robot.location.pos.x << ", " << robot.location.pos.y << std::endl;
-  wait(2000, msec);
-  std::cout << robot.location.pos.x << ", " << robot.location.pos.y << std::endl;*/
-  //blueLeft(0);
 
   while(true){
     wait(200, msec);

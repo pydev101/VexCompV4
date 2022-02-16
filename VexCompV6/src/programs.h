@@ -92,10 +92,10 @@ void OneMinute(int mod){
   setRight(0);
 
   //Score bridge
-  moveAbs(-36, 30);
+  moveAbs(-35, 30);
   turnTo(270);
   arm.rotateTo(1520, rotationUnits::deg, 90, velocityUnits::pct);
-  moveAbs(-36, 15);
+  moveAbs(-35, 15);
   frontPne.set(false);
   wait(500, timeUnits::msec);
 
@@ -103,7 +103,7 @@ void OneMinute(int mod){
   turnTo(180);
   arm.startRotateTo(0, rotationUnits::deg, 90, velocityUnits::pct);
   setIntake(0);
-  moveAbs(0, 15, false);
+  moveAbs(0, 17, false);
   moveCV(-16, 2, -70);
   backPne.set(false);
   wait(400, msec);
@@ -129,15 +129,17 @@ void OneMinute(int mod){
   frontPne.set(true);
   wait(100, timeUnits::msec);
   
-
+  //Move accross field
   move(Vector(-2, 303, true), false);
   moveCV(Vector(84, 83, true), -80);
 
+  //Drop
   backPne.set(false);
   wait(100, timeUnits::msec);
   moveAbs(-80, 80);
   turnTo(320);
 
+  //Grab
   robot.usePIDControls(false);
   t = Brain.timer(timeUnits::msec);
   while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
@@ -149,15 +151,20 @@ void OneMinute(int mod){
   setLeft(0);
   setRight(0);
 
+  //Move and drop
   moveAbs(-45, 70);
-  moveAbs(13, 80);
+  moveAbs(20, 84);
   frontPne.set(false);
-  turnTo(107);
-  moveTime(80, 700);
+
+  //Grab
+  turnTo(105);
+  moveTime(80, 800);
   frontPne.set(true);
   wait(100, timeUnits::msec);
+
+  //Retreat
   moveTime(-80, 400);
-  moveAbs(5, 5, false);
+  moveAbs(20, 5, false);
 }
 
 
