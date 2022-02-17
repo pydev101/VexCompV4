@@ -65,7 +65,7 @@ int main() {
     Competition.drivercontrol(usercontrol);
   #endif
 
-  blueLeft(0);
+  blueRight(0);
 
 
   while(true){
