@@ -11,6 +11,9 @@ Implements the use function in intergation into robot programs that will run dur
 //Programs
 
 void blueLeft(int mod){
+  robot.setLinPID({2.3,0,0});
+  robot.setRotPID({8.3,0,0.06});
+
   moveAbs(13, 63);
   frontPne.set(true);
   moveAbs(12, 40, false);
