@@ -270,7 +270,7 @@ class Robot{
       roatationStopTimer = roatationStopTimer + deltaT;
       if(roatationStopTimer > 0.05){
         stoppedRotating = true;
-        lastStopHeading = normalizeAngle(location.getCurrHead());
+        lastStopHeading = location.getCurrHead();
       }
     }else{
       roatationStopTimer = 0;

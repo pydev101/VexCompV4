@@ -42,6 +42,7 @@
 Look into inertial drift; Put robot against the wall and set the sensor to zero, spin it around several times (more is better because it has diminisioning effect), 
   set back against the wall, look at the drift and divide by the number of turns then scale the output of the sensor by that ammount
   This is setup in motorFunctions.h
+  --Maybe Omar said it might not work; do the test and look at the results for confirmation
 
 Move sensor away from floor and torward the edge of the robot to minimize small shifts that occur in the center
 
