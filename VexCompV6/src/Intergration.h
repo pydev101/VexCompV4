@@ -27,10 +27,10 @@ const double cameraDelay = 20;
 
 const double linThreashold = 1; //In
 const double angularThreashold = degToRad(1);
-const double maximumAccelerationLinear = 1000;
-const double maximumAngularAcceleration = 1000;
+
 const double maxVelocity = 1000;
 const double maxAngularVelocity = 1000;
+
 const double updateTargetHeadingMinThreashold = 5;
 const double maxThetaErrorForMotion = 15; //deg
 bool maxThetaErrorForMotionGivenInDegrees = true;
@@ -39,16 +39,20 @@ const int armIntakeActivationThreshold = 400;
 
 //linGains, rotGains
 
-//Old values: {{1.85,0,0}, {7.425,0,0.1}}, //1 towers
-const PIDGains basicGains[3][2] = {
-  {{1.87,0,0.01}, {8,0,0.075}},//{{1.87,0,0.01}, {7.63,0,0.075}} //1 towers      //TODO Tuen this to prevent ossiclation
-  {{0,0,0}, {0,0,0}}, //2 tower
-  {{0,0,0}, {0,0,0}} //3 tower
-};
+//PID Values used in move down state
+const PIDGains linGain = {1.87,0,0}; //I is treated like a constant
+const PIDGains rotGain = {8,0,0}; //I is constant
+
+//PID values moved in move up state (Typically twice the value of normal according to omar)
+const PIDGains linGainReverse = {3,0,0}; //I is constant 
+const PIDGains rotGainReverse = {16,0,0}; //I is constant 
+
+
+/*
 const PIDGains cameraGains[2][2] = {
   {{0.7,0,0}, {0.45,0,0}}, //0 towers
   {{0,0,0}, {0,0,0}} //1 tower
-};
+};*/
 
 
 typedef struct{
@@ -67,10 +71,10 @@ Graph graph = Graph("tracker.txt", &Brain);
 
 ///Robot Instantation
 Robot robot = Robot(startingPoint, startingHead, true, 
-                    basicGains[0][0], basicGains[0][1], 
+                    linGain, rotGain,
+                    linGainReverse, rotGainReverse,
                     linThreashold, angularThreashold, 
                     maxVelocity, maxAngularVelocity, 
-                    maximumAccelerationLinear, maximumAngularAcceleration, 
                     updateTargetHeadingMinThreashold, maxThetaErrorForMotion, maxThetaErrorForMotionGivenInDegrees);
 
 
@@ -240,7 +244,7 @@ void move(double mag, double theta, bool inDeg, bool dir, bool blocking=true){
   move(Vector(mag, theta, inDeg), dir, blocking);
 }
 
-
+/*
 //Moves to target location with constant linear velocity
 void moveCV(double fwd, double hor, double linearSpeedTarget){
   bool dir = true;
@@ -279,8 +283,6 @@ void tracePath(smartPointPointer &points, double vel=20){
   robot.traceMode(points, vel);
   executeMove();
 }
-
-
 
 //Camera functions
 
@@ -377,5 +379,6 @@ void trackWithCam(vex::vision *camera, int d, CameraSettings settings, const int
   setLeft(0);
   setRight(0);
 }
+*/
 
 #endif

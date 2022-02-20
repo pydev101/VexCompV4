@@ -30,7 +30,7 @@
 #include "driver.h"
 #include "programs.h"
 
-#define COMPETITION 1
+#define COMPETITION 0
 
 // A global instance of competition
 #if COMPETITION
@@ -46,15 +46,42 @@ void pre_auton(void) {
 
   Inertial.startCalibration();
   while(Inertial.isCalibrating()){wait(10, msec);}
-  Inertial.setHeading(360-startingHead, rotationUnits::deg); //90 deg CCW but inertial sensor only measures in CW
 
-  resetEncoders();
-
-  task traker = task(trakerFunction);
   #if COMPETITION
     BrainGUIProgram();
+  #else
+    Inertial.setHeading(360-startingHead, rotationUnits::deg); //90 deg CCW but inertial sensor only measures in CW
+    resetEncoders();
+    task traker = task(trakerFunction);
+    wait(updateTime+1, msec);
   #endif
 }
+
+
+/*
+
+Acceleration feature its replaced with reverse PC loop (propotional to the distance moved from its inital start point + constant "I" value to tune it)
+If rError < error then the normal PD loop is sued
+
+Vector errorVec = targetPos - currentPos;
+Vector motionVec = currentPos - lastStoppedPosition
+double output = 0
+
+if(errorVec.mag() > motionVec.mag()){
+  output = motionVec.mag() * Ka + Ca
+}else{
+  output = errorVec.mag() * Kb + Cb
+}
+output = sign(robotNormalVec.dot(errorVec)) * output
+
+if withinThreshold
+output = 0
+end
+
+return output
+
+*/
+
 
 //Main functon
 int main() {
@@ -66,6 +93,7 @@ int main() {
   #endif
 
   //blueRight(0);
+  moveAbs(0, 30);
 
 
   while(true){

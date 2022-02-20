@@ -19,9 +19,12 @@ class Robot{
 
     //PID varibles
     PIDGains linearGains;
-    PIDGains angularGains;
-    PIDOutput linearPid = {0,0,0};
-    PIDOutput rotationalPid = {0,0,0};
+    PIDGains rotGains;
+    PIDGains linearGainsReverse; 
+    PIDGains rotGainsReverse;
+
+    Point lastStopPosition = Point(0,0);
+    double lastStopHeading = 0;
 
     //Varibles related to if the robot is currently stopped
     double linearThreshold; //How close the robot should be from target before it is allowed to quit
@@ -34,8 +37,6 @@ class Robot{
     //Last target velocity and maximum allowed set outputs
     double targetLinearVelocity = 0;
     double targetAngularVelocity = 0;
-    double maxLinearAccel = 0;
-    double maxAngularAccel = 0;
     double maxLinearVel = 0;
     double maxAngularVel = 0;
 
@@ -57,24 +58,42 @@ class Robot{
     //Internal function that updates the output of the class using the PID algorithm if allowed
     void updatePID(double deltaT){
       if(usingLinearPIDControls){
-        double e = getLinearErrorForPID();
-        linearPid = PID(e, deltaT, linearGains, linearPid);
-        double newVel = linearPid.output;
+        double baseError = getLinearErrorForPID();
+        double reverseError = Vector(lastStopPosition, location.getPos()).dot(location.getTargetVector().getUnitVector());
+        double newVel = 0;
+
+        if(abs(baseError) > abs(reverseError)){
+          //Follow Reverse
+          newVel = linearGainsReverse.p*reverseError + sign(reverseError)*linearGainsReverse.i;
+        }else{
+          //Follow Standard
+          newVel = linearGains.p*baseError + sign(baseError)*linearGains.i;
+        }
+
         if(abs(newVel) > maxLinearVel){
           newVel = maxLinearVel*sign(newVel);
         }
-        if(abs(newVel - targetLinearVelocity) > maxLinearAccel){
-          newVel = targetLinearVelocity + sign(newVel - targetLinearVelocity)*maxLinearAccel;
-        }
+
         targetLinearVelocity = newVel;
       }
+
       if(usingRotPIDControls){
         double eTheta = getThetaError();
-        rotationalPid = PID(eTheta, deltaT, angularGains, rotationalPid);
-        double newOmega = rotationalPid.output;
+        double reverseETheta = normalizeAngle(location.getCurrHead()) - lastStopHeading;
+        double newOmega = 0;
+
+        if(abs(eTheta) > abs(reverseETheta)){
+          //Follow Reverse
+          newOmega = rotGainsReverse.p*reverseETheta + rotGainsReverse.i;
+        }else{
+          //Follow Standard
+          newOmega = rotGains.p*eTheta + rotGains.i;
+        }
+
         if(abs(newOmega) > maxAngularVel){
           newOmega = maxAngularVel*sign(newOmega);
         }
+
         targetAngularVelocity = newOmega;
       }
     }
@@ -103,14 +122,27 @@ class Robot{
 
   //public:
     //Constructor to save all required user defined varibles in safe manner
-    Robot(Point Pos, double CurrentHeading, bool headingGivenInDegrees, PIDGains linearK, PIDGains angularK, double linearThres, double rotationalThresInRadians, double maxLinearVelocity, double maxAngularVelocity, double maxLinearAccelleration, double maxAngularAccelleration, double updateTargetHeadingMinThreasholdX, double maxThetaErrorForMotionX, bool lastArgInDeg){
+    Robot(Point Pos, double CurrentHeading, bool headingGivenInDegrees, 
+          PIDGains linPID, PIDGains rotPID,
+          PIDGains linPIDR, PIDGains rotPIDR,
+          double linearThres, double rotationalThresInRadians, double maxLinearVelocity, double maxAngularVelocity,
+          double updateTargetHeadingMinThreasholdX, double maxThetaErrorForMotionX, bool lastArgInDeg){
       location = OdomGrid(Pos, CurrentHeading, headingGivenInDegrees);
-      linearGains = linearK;
-      angularGains = angularK;
+
+      lastStopPosition= Pos;
+      if(headingGivenInDegrees){
+        lastStopHeading = degToRad(CurrentHeading);
+      }else{
+        lastStopHeading = CurrentHeading;
+      }
+
+      linearGains = linPID;
+      rotGains = rotPID;
+      linearGainsReverse = linPIDR;
+      rotGainsReverse = rotPIDR;
+
       rotationalThreshold = rotationalThresInRadians;
       linearThreshold = linearThres;
-      maxLinearAccel = maxLinearAccelleration;
-      maxAngularAccel = maxAngularAccelleration;
       maxLinearVel = maxLinearVelocity;
       maxAngularVel = maxAngularVelocity;
       updateTargetHeadingMinThreashold = updateTargetHeadingMinThreasholdX;
@@ -128,12 +160,6 @@ class Robot{
     }
     void setMaxRotationalVel(double x){
       maxAngularVel = abs(x);
-    }
-    void setMaxLinearAccel(double x){
-      maxLinearAccel = abs(x);
-    }
-    void setMaxRotationalAccel(double x){
-      maxAngularAccel = abs(x);
     }
     void setTargetHeadingMinThreashold(double x){
       updateTargetHeadingMinThreashold = abs(x);
@@ -157,14 +183,6 @@ class Robot{
       usingLinearPIDControls = linActive;
       usingRotPIDControls = rotActive;
     }
-    void setLinPID(PIDGains x){
-      linearGains = x;
-      linearPid = initPID(0);
-    }
-    void setRotPID(PIDGains x){
-      angularGains = x;
-      rotationalPid = initPID(0);
-    }
     //Sets up PID controls to move in a straight line
     void setLineMode(bool fwd, bool blockLineMotionIfThetaHigh=true){
       traceModeOn = false;
@@ -174,6 +192,11 @@ class Robot{
       blockLinearMotionIfThetaErrorTooHigh = blockLineMotionIfThetaHigh;
     }
     //Sets up PID controls to rotate in the same spot
+
+
+
+
+    //TODO ENSURE THIS DOESNT BREAK AUTON ACCELERATION FEATURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TODOTODO
     void setRotateMode(){
       traceModeOn = false;
       usePIDControls(true);
@@ -247,23 +270,23 @@ class Robot{
       roatationStopTimer = roatationStopTimer + deltaT;
       if(roatationStopTimer > 0.05){
         stoppedRotating = true;
+        lastStopHeading = normalizeAngle(location.getCurrHead());
       }
     }else{
       roatationStopTimer = 0;
       stoppedRotating = false;
     }
 
-    static double lastE = 0;
     if(abs(getLinearErrorForPID()) < linearThreshold){
       motionStopTimer = motionStopTimer + deltaT;
       if(motionStopTimer > 0.05){
         stoppedMoving = true;
+        lastStopPosition = location.getPos();
       }
     }else{
       motionStopTimer = 0;
       stoppedMoving = false;
     }
-    lastE = getLinearErrorForPID();
   }
 
   //Updates class output and should be called second in update loop
@@ -280,6 +303,10 @@ class Robot{
     Vector targetVector = location.getTargetVector();
     Vector basis = location.getRobotBasisVector();
     double linErr = basis.dot(targetVector); //Linear error at current heading
+
+    if(abs(linErr) < linearThreshold){
+      return 0;
+    }
 
     //Updates target heading if alllowed
     if(targetVector.getMagnitude() > updateTargetHeadingMinThreashold){

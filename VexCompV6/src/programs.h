@@ -9,7 +9,7 @@ Implements the use function in intergation into robot programs that will run dur
 
 
 //Programs
-
+/*
 void blueLeft(int mod){
   robot.setLinPID({2.3,0,0});
   robot.setRotPID({8.3,0,0.06});
@@ -168,7 +168,7 @@ void OneMinute(int mod){
   moveTime(-80, 400);
   moveAbs(20, 5, false);
 }
-
+*/
 
 //Storage of program functions for use in the GUI
 typedef struct {
@@ -177,13 +177,16 @@ typedef struct {
   int mod;
 } autoEntry;
 
+
+void blueLeft(int mod){} //ONLY FOR TESTING----------------------------------!!!!
+
 //Use of a table allows programs to be easily added or removed
 autoEntry entries[] = {
   {"Blue Left", blueLeft},
-  {"Blue Right", blueRight},
+  /*{"Blue Right", blueRight},
   {"Red Right", blueRight},
   {"Red Left", blueLeft},
-  {"One Minute", OneMinute},
+  {"One Minute", OneMinute},*/
 };
 int indexAuto = 0;
 
@@ -348,6 +351,12 @@ void BrainGUIProgram(){
 //Auto function used by competition template
 void autonomous(void){
   GUIActivate = false;
+
+  Inertial.setHeading(360-startingHead, rotationUnits::deg); //90 deg CCW but inertial sensor only measures in CW
+  resetEncoders();
+  task traker = task(trakerFunction);
+  wait(updateTime+1, msec);
+
   entries[indexAuto].function(entries[indexAuto].mod);
 }
 
