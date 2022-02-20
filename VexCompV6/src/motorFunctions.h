@@ -72,6 +72,24 @@ double getLeftEnc(){
 double getRightEnc(){
   return rightC.position(rotationUnits::rev);
 }
+
+
+const double headingDriftFactor = 1;
+double getHeadingUnbounded(){
+  double head = Inertial.angle();
+  return head*headingDriftFactor;
+}
+double getHeading(){
+  double toss;
+  double r = (360)*modf(getHeadingUnbounded()/(360), &toss);
+  if(r<0){r+=(360);}
+  return r;
+}
+double getHeadingCCW(){
+  return (360 - getHeading());
+}
+
+
 double max(double a, double b){
   if(a > b){
     return a;

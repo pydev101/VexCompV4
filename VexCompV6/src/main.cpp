@@ -37,6 +37,24 @@
   competition Competition;
 #endif
 
+
+/*
+Look into inertial drift; Put robot against the wall and set the sensor to zero, spin it around several times (more is better because it has diminisioning effect), 
+  set back against the wall, look at the drift and divide by the number of turns then scale the output of the sensor by that ammount
+  This is setup in motorFunctions.h
+
+Move sensor away from floor and torward the edge of the robot to minimize small shifts that occur in the center
+
+Change units of length from inches to tiles
+
+
+*/
+
+
+
+
+
+
 //Pre Auto function sets up motor and tracking functions before compeition starts; Also starts GUI program to allow selection of program to be used during that round
 void pre_auton(void) {
   vexcodeInit();
@@ -75,6 +93,8 @@ int main() {
     wait(200, msec);
   }
 }
+
+
 
 /*moveAbs(0, 20);
 moveAbs(-20, 20);

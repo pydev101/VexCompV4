@@ -44,8 +44,8 @@ const PIDGains linGain = {1.87,0,0}; //I is treated like a constant
 const PIDGains rotGain = {8,0,0}; //I is constant
 
 //PID values moved in move up state (Typically twice the value of normal according to omar)
-const PIDGains linGainReverse = {3,0,0}; //I is constant 
-const PIDGains rotGainReverse = {16,0,0}; //I is constant 
+const PIDGains linGainReverse = {3,0.5,0}; //I is constant 
+const PIDGains rotGainReverse = {16,1,0}; //I is constant 
 
 
 /*
@@ -90,7 +90,7 @@ void track(){
 
   double leftEnc = getLeftEnc();
   double rightEnc = getRightEnc();
-  double head = Inertial.angle(); //Gets unbounded angle; Postive in CW direction
+  double head = getHeadingUnbounded(); //Gets unbounded angle; Postive in CW direction
   double deltaT = Brain.timer(timeUnits::msec) - lastTime;
   deltaT = deltaT / 1000;
 
