@@ -58,31 +58,6 @@ void pre_auton(void) {
 }
 
 
-/*
-
-Acceleration feature its replaced with reverse PC loop (propotional to the distance moved from its inital start point + constant "I" value to tune it)
-If rError < error then the normal PD loop is sued
-
-Vector errorVec = targetPos - currentPos;
-Vector motionVec = currentPos - lastStoppedPosition
-double output = 0
-
-if(errorVec.mag() > motionVec.mag()){
-  output = motionVec.mag() * Ka + Ca
-}else{
-  output = errorVec.mag() * Kb + Cb
-}
-output = sign(robotNormalVec.dot(errorVec)) * output
-
-if withinThreshold
-output = 0
-end
-
-return output
-
-*/
-
-
 //Main functon
 int main() {
   pre_auton();
