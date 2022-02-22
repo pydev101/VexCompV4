@@ -96,6 +96,7 @@ for i in range(0, len(graphs)):
     axes.grid(which="minor", color='black', linestyle=':', linewidth=0.5)
     axes.minorticks_on()
 
+    """
     for d in graph[2]:
         errorLin.append(d[0])
         linOutput.append(d[1])
@@ -110,21 +111,22 @@ for i in range(0, len(graphs)):
     PIDPlots[1].grid(which="major", color='black', linestyle='-', linewidth=0.5)
     PIDPlots[2].grid(which="major", color='black', linestyle='-', linewidth=0.5)
 
-    for d in graph[3]:
-        errorRot.append(d[0])
-        rotOutput.append(d[1])
-        resetRot.append(d[2])
-        targetRotSpeed.append(d[3])
-        realRotSpeed.append(d[4])
-    PIDPlotsRot[0].plot(timeTable, errorRot, color="red")
-    PIDPlotsRot[1].plot(timeTable, targetRotSpeed, color="red")
-    PIDPlotsRot[1].plot(timeTable, realRotSpeed, color="blue")
-    PIDPlotsRot[2].plot(timeTable, resetRot, color="red")
-    PIDPlotsRot[0].grid(which="major", color='black', linestyle='-', linewidth=0.5)
-    PIDPlotsRot[1].grid(which="major", color='black', linestyle='-', linewidth=0.5)
-    PIDPlotsRot[2].grid(which="major", color='black', linestyle='-', linewidth=0.5)
-    PIDPlotsRot[0].set_ylim(-90, 90)
-
+    
+        for d in graph[3]:
+            errorRot.append(d[0])
+            rotOutput.append(d[1])
+            resetRot.append(d[2])
+            targetRotSpeed.append(d[3])
+            realRotSpeed.append(d[4])
+        PIDPlotsRot[0].plot(timeTable, errorRot, color="red")
+        PIDPlotsRot[1].plot(timeTable, targetRotSpeed, color="red")
+        PIDPlotsRot[1].plot(timeTable, realRotSpeed, color="blue")
+        PIDPlotsRot[2].plot(timeTable, resetRot, color="red")
+        PIDPlotsRot[0].grid(which="major", color='black', linestyle='-', linewidth=0.5)
+        PIDPlotsRot[1].grid(which="major", color='black', linestyle='-', linewidth=0.5)
+        PIDPlotsRot[2].grid(which="major", color='black', linestyle='-', linewidth=0.5)
+        PIDPlotsRot[0].set_ylim(-90, 90)
+    """
     plt.pause(0.5)
 
 plt.show()

@@ -43,9 +43,8 @@ const int armIntakeActivationThreshold = 400;
 const PIDGains linGain = {1.87,0,0}; //I is treated like a constant
 const PIDGains rotGain = {8,0,0}; //I is constant
 
-//PID values moved in move up state (Typically twice the value of normal according to omar)
-const PIDGains linGainReverse = {3,0.5,0}; //I is constant 
-const PIDGains rotGainReverse = {16,1,0}; //I is constant 
+//PID values moved in move up state
+const PIDGains linGainReverse = {0,8,0}; //I is constant 
 
 
 /*
@@ -72,7 +71,7 @@ Graph graph = Graph("tracker.txt", &Brain);
 ///Robot Instantation
 Robot robot = Robot(startingPoint, startingHead, true, 
                     linGain, rotGain,
-                    linGainReverse, rotGainReverse,
+                    linGainReverse,
                     linThreashold, angularThreashold, 
                     maxVelocity, maxAngularVelocity, 
                     updateTargetHeadingMinThreashold, maxThetaErrorForMotion, maxThetaErrorForMotionGivenInDegrees);
@@ -107,7 +106,7 @@ void track(){
   //Update robot class
   Vector deltaPos = Vector(deltaFwd, head, true);
   robot.updatePos(deltaT, deltaPos, deltaHead, true);
-  robot.setHead(head, true); //Set heading using more accurate inertial sensor
+  robot.setHead(head, true); //Set heading using more accurate inertial senso
   robot.updateVelocity(deltaT);
   robot.updateStopStatus(deltaT);
 
@@ -136,17 +135,19 @@ int trakerFunction(){
   while(true){
     track();
 
+    //std::cout << robot.location.getCurrHead() << ", " << robot.location.getTargetHead() << std::endl;
+
     if(frame >= 10){
-      #if 0
+      #if 1
         Vector tVec = robot.location.getTargetVector();
         graph.addPoint({robot.location.pos, "green"});
         graph.addPoint({robot.location.targetPos, "blue"});
         graph.addVector({robot.location.pos, tVec, "teal"});
         graph.addVector({robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(10), "yellow"});
         graph.addVector({robot.location.pos, robot.location.getRobotBasisVector().scale(10), "red"}); 
-
-        graph.addPID({robot.getLinearErrorForPID(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
-        graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
+        graph.addVector({robot.location.pos, Vector(robot.lastStopPosition, robot.location.getPos()).project(robot.location.getTargetVector().getUnitVector()), "blue"});
+        //graph.addPID({robot.getLinearErrorForPID(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
+        //graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
 
         std::cout << graph.getString() << std::flush;
 

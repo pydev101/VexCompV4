@@ -21,10 +21,9 @@ class Robot{
     PIDGains linearGains;
     PIDGains rotGains;
     PIDGains linearGainsReverse; 
-    PIDGains rotGainsReverse;
 
     Point lastStopPosition = Point(0,0);
-    double lastStopHeading = 0;
+    PIDOutput rotPID = initPID(0);
 
     //Varibles related to if the robot is currently stopped
     double linearThreshold; //How close the robot should be from target before it is allowed to quit
@@ -65,6 +64,9 @@ class Robot{
         if(abs(baseError) > abs(reverseError)){
           //Follow Reverse
           newVel = linearGainsReverse.p*reverseError + sign(reverseError)*linearGainsReverse.i;
+          if(!forward){
+            newVel = -newVel;
+          }
         }else{
           //Follow Standard
           newVel = linearGains.p*baseError + sign(baseError)*linearGains.i;
@@ -79,16 +81,8 @@ class Robot{
 
       if(usingRotPIDControls){
         double eTheta = getThetaError();
-        double reverseETheta = normalizeAngle(location.getCurrHead()) - lastStopHeading;
-        double newOmega = 0;
-
-        if(abs(eTheta) > abs(reverseETheta)){
-          //Follow Reverse
-          newOmega = rotGainsReverse.p*reverseETheta + rotGainsReverse.i;
-        }else{
-          //Follow Standard
-          newOmega = rotGains.p*eTheta + rotGains.i;
-        }
+        rotPID = PID(eTheta, deltaT, rotGains, rotPID);
+        double newOmega = rotPID.output;
 
         if(abs(newOmega) > maxAngularVel){
           newOmega = maxAngularVel*sign(newOmega);
@@ -124,22 +118,16 @@ class Robot{
     //Constructor to save all required user defined varibles in safe manner
     Robot(Point Pos, double CurrentHeading, bool headingGivenInDegrees, 
           PIDGains linPID, PIDGains rotPID,
-          PIDGains linPIDR, PIDGains rotPIDR,
+          PIDGains linPIDR,
           double linearThres, double rotationalThresInRadians, double maxLinearVelocity, double maxAngularVelocity,
           double updateTargetHeadingMinThreasholdX, double maxThetaErrorForMotionX, bool lastArgInDeg){
       location = OdomGrid(Pos, CurrentHeading, headingGivenInDegrees);
 
-      lastStopPosition= Pos;
-      if(headingGivenInDegrees){
-        lastStopHeading = degToRad(CurrentHeading);
-      }else{
-        lastStopHeading = CurrentHeading;
-      }
+      lastStopPosition = Pos;
 
       linearGains = linPID;
       rotGains = rotPID;
       linearGainsReverse = linPIDR;
-      rotGainsReverse = rotPIDR;
 
       rotationalThreshold = rotationalThresInRadians;
       linearThreshold = linearThres;
@@ -270,7 +258,6 @@ class Robot{
       roatationStopTimer = roatationStopTimer + deltaT;
       if(roatationStopTimer > 0.05){
         stoppedRotating = true;
-        lastStopHeading = location.getCurrHead();
       }
     }else{
       roatationStopTimer = 0;

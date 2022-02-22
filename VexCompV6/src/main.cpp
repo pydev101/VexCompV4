@@ -10,6 +10,24 @@
 // rightC               motor         9               
 // leftB                motor         21              
 // Controller1          controller                    
+// Inertial             inertial      15              
+// backPne              digital_out   A               
+// frontPne             digital_out   H               
+// BackCam              vision        5               
+// LimitBack            limit         E               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// leftA                motor         1               
+// rightA               motor         3               
+// rightB               motor         4               
+// arm                  motor         12              
+// intakeM              motor         7               
+// leftC                motor         8               
+// rightC               motor         9               
+// leftB                motor         21              
+// Controller1          controller                    
 // Inertial             inertial      10              
 // backPne              digital_out   A               
 // frontPne             digital_out   H               
@@ -63,6 +81,7 @@ void pre_auton(void) {
   backPne.set(false);
   arm.setStopping(hold);
 
+  std::cout << Inertial.installed() << std::endl;
   Inertial.startCalibration();
   while(Inertial.isCalibrating()){wait(10, msec);}
 
@@ -87,7 +106,13 @@ int main() {
   #endif
 
   //blueRight(0);
-  moveAbs(0, 30);
+  /*moveAbs(0, 20);
+  moveAbs(-20, 20);
+  moveAbs(-20, 0, false);
+  moveAbs(0, 20);
+  turnTo(90, true);
+  moveAbs(0, 0, false);*/
+  moveAbs(0, 20, 0);
 
 
   while(true){

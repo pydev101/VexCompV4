@@ -89,7 +89,6 @@ double getHeadingCCW(){
   return (360 - getHeading());
 }
 
-
 double max(double a, double b){
   if(a > b){
     return a;
