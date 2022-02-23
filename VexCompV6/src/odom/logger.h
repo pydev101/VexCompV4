@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include "robotmath.h"
-#include "filehelper.h"
+#include <fstream>
 
 /*
 Name: logger.h
@@ -39,10 +39,10 @@ public:
     int numOfLinPIDData = 0;
     PIDData* rotPIDData = (PIDData*)malloc(0);
     int numOfRotPIDData = 0;
-    File f = File();
+    std::ofstream file;
 
-    Graph(const char* fileName, vex::brain* vexbrain){
-      f = File(fileName, vexbrain);
+    Graph(const char* fileName){
+      file.open(fileName, std::fstream::out | std::fstream::app);
     }
 
     ~Graph() {
@@ -50,6 +50,7 @@ public:
         free(vectorlist);
         free(linearPIDData);
         free(rotPIDData);
+        file.close();
     }
 
     void clear() {

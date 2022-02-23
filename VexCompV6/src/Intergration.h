@@ -67,7 +67,8 @@ const CameraSettings backCameraSettings = {153, 140, 15, 15, 30};
 const int camStopWait = 500; //msec
 const int camDelayLoop = 20; //msec
 
-Graph graph = Graph("tracker.txt", &Brain);
+const char fileName[] = "Hello.txt";
+Graph graph(fileName);
 
 ///Robot Instantation
 Robot robot = Robot(startingPoint, startingHead, true, 
