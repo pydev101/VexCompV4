@@ -58,15 +58,13 @@ class Robot{
     void updatePID(double deltaT){
       if(usingLinearPIDControls){
         double baseError = getLinearErrorForPID();
-        double reverseError = Vector(lastStopPosition, location.getPos()).dot(location.getTargetVector().getUnitVector());
+        Vector reverseError = Vector(lastStopPosition, location.getPos());
         double newVel = 0;
 
-        if(abs(baseError) > abs(reverseError)){
+        if(abs(baseError) > reverseError.getMagnitude()){
           //Follow Reverse
-          newVel = linearGainsReverse.p*reverseError + sign(reverseError)*linearGainsReverse.i;
-          if(!forward){
-            newVel = -newVel;
-          }
+          newVel = reverseError.getMagnitude()*linearGainsReverse.p + linearGainsReverse.i;
+          newVel = newVel * sign(baseError);
         }else{
           //Follow Standard
           newVel = linearGains.p*baseError + sign(baseError)*linearGains.i;
