@@ -112,7 +112,7 @@ int main() {
   moveAbs(0, 20);
   turnTo(90, true);
   moveAbs(0, 0, false);*/
-  moveAbs(0, 20, 0);
+  moveAbs(0, 60*12, 1);
 
 
   while(true){
