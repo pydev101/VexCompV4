@@ -81,12 +81,17 @@ void pre_auton(void) {
   backPne.set(false);
   arm.setStopping(hold);
 
-  
+  if(Brain.SDcard.isInserted()){
+    Brain.Screen.clearScreen();
+    Brain.Screen.drawImageFromFile("photoK.png", 0, 0);
+  }
 
   Inertial.startCalibration();
   wait(1000, msec);
   while(Inertial.isCalibrating()){wait(20, msec);}
   wait(1000, msec);
+
+  Brain.Screen.clearScreen();
 
   #if COMPETITION
     BrainGUIProgram();
@@ -115,9 +120,15 @@ int main() {
   moveAbs(0, 20);
   turnTo(90, true);
   moveAbs(0, 0, false);*/
-  moveAbs(0, 60*12, 1);
+  //moveAbs(0, 60*12, 1);
 
-
+  Log apple("apples.txt");
+  apple << "Pretty cool" << std::endl;
+  apple.print();
+  apple.clear();
+  apple << "I AM A FILE" << std::endl;
+  apple.save();
+  
   while(true){
     wait(200, msec);
   }
