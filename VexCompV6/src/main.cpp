@@ -81,9 +81,12 @@ void pre_auton(void) {
   backPne.set(false);
   arm.setStopping(hold);
 
-  std::cout << Inertial.installed() << std::endl;
+  
+
   Inertial.startCalibration();
-  while(Inertial.isCalibrating()){wait(10, msec);}
+  wait(1000, msec);
+  while(Inertial.isCalibrating()){wait(20, msec);}
+  wait(1000, msec);
 
   #if COMPETITION
     BrainGUIProgram();
