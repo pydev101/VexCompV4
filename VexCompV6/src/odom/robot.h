@@ -179,10 +179,6 @@ class Robot{
     }
     //Sets up PID controls to rotate in the same spot
 
-
-
-
-    //TODO ENSURE THIS DOESNT BREAK AUTON ACCELERATION FEATURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TODOTODO
     void setRotateMode(){
       traceModeOn = false;
       usePIDControls(true);

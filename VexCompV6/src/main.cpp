@@ -16,24 +16,6 @@
 // BackCam              vision        5               
 // LimitBack            limit         E               
 // ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// leftA                motor         1               
-// rightA               motor         3               
-// rightB               motor         4               
-// arm                  motor         12              
-// intakeM              motor         7               
-// leftC                motor         8               
-// rightC               motor         9               
-// leftB                motor         21              
-// Controller1          controller                    
-// Inertial             inertial      10              
-// backPne              digital_out   A               
-// frontPne             digital_out   H               
-// BackCam              vision        5               
-// LimitBack            limit         E               
-// ---- END VEXCODE CONFIGURED DEVICES ----
 
 
 /*----------------------------------------------------------------------------*/
@@ -54,24 +36,6 @@
 #if COMPETITION
   competition Competition;
 #endif
-
-
-/*
-Look into inertial drift; Put robot against the wall and set the sensor to zero, spin it around several times (more is better because it has diminisioning effect), 
-  set back against the wall, look at the drift and divide by the number of turns then scale the output of the sensor by that ammount
-  This is setup in motorFunctions.h
-  --Maybe Omar said it might not work; do the test and look at the results for confirmation
-
-Move sensor away from floor and torward the edge of the robot to minimize small shifts that occur in the center
-
-Change units of length from inches to tiles
-
-
-*/
-
-
-
-
 
 
 //Pre Auto function sets up motor and tracking functions before compeition starts; Also starts GUI program to allow selection of program to be used during that round
@@ -121,6 +85,19 @@ int main() {
   turnTo(90, true);
   moveAbs(0, 0, false);*/
   //moveAbs(0, 60*12, 1);
+
+  //TODO
+    /*
+    -Change units from RPM to PCT
+    -Implement max for speed so that it doesn't over account
+    -Keep in mind that the output of each side is already at maxed so the other side would need to be made twice as slow
+
+    Move sensor away from floor and torward the edge of the robot to minimize small shifts that occur in the center
+
+    Change units of length from inches to tiles
+
+
+    */
 
   Log apple("apples.txt");
   apple << "Pretty cool" << std::endl;
