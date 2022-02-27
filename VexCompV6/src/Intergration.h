@@ -28,8 +28,8 @@ const double cameraDelay = 20;
 const double linThreashold = 1; //In
 const double angularThreashold = degToRad(1);
 
-const double maxVelocity = 1000;
-const double maxAngularVelocity = 1000;
+const double maxVelocity = 100;
+const double maxAngularVelocity = 100;
 
 const double updateTargetHeadingMinThreashold = 5;
 const double maxThetaErrorForMotion = 15; //deg
@@ -169,10 +169,25 @@ int trakerFunction(){
 bool updateMotors(double overide=0, bool overideLinear=true){
   double linearSpeed = robot.getLinearSpeedTarget();
   double angularSpeed = robot.getRotationalSpeedTarget();
-  linearSpeed = (linearSpeed/UnitsPerRev)*60; //Units/Sec to RPM
-  angularSpeed = angularSpeed * (RobotRadius/UnitsPerRev) * 60 * 0.5; //Converts Rad/S to RPM and splits in half because there are 2 drive sides
-  setLeft(linearSpeed - angularSpeed, velocityUnits::rpm);
-  setRight(linearSpeed + angularSpeed, velocityUnits::rpm);
+
+  
+  //linearSpeed = (linearSpeed/UnitsPerRev)*60; //Units/Sec to RPM
+  //angularSpeed = angularSpeed * (RobotRadius/UnitsPerRev) * 60 * 0.5; //Converts Rad/S to RPM and splits in half because there are 2 drive sides
+  
+  double left = linearSpeed - angularSpeed;
+  double right = linearSpeed + angularSpeed;
+
+  if(abs(right) > maxVelocity){
+    left = left - (abs(right) - maxVelocity)*sign(left);
+    right = maxVelocity*sign(right);
+  }
+  if(abs(left) > maxVelocity){
+    right = right - (abs(left) - maxVelocity)*sign(left);
+    left = maxVelocity*sign(left);
+  }
+
+  setLeft(left, velocityUnits::pct);
+  setRight(right, velocityUnits::pct);
 
   if(robot.isMoving()){
     return true;

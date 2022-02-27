@@ -88,15 +88,12 @@ int main() {
 
   //TODO
     /*
-    -Change units from RPM to PCT
-    -Implement max for speed so that it doesn't over account
-    -Keep in mind that the output of each side is already at maxed so the other side would need to be made twice as slow
+    Tune PI for PCT
 
     Move sensor away from floor and torward the edge of the robot to minimize small shifts that occur in the center
 
     Change units of length from inches to tiles
-
-
+    
     */
 
   Log apple("apples.txt");
