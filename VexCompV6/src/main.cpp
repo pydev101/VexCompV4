@@ -96,12 +96,7 @@ int main() {
     
     */
 
-  Log apple("apples.txt");
-  apple << "Pretty cool" << std::endl;
-  apple.print();
-  apple.clear();
-  apple << "I AM A FILE" << std::endl;
-  apple.save();
+  turnTo(180);
   
   while(true){
     wait(200, msec);

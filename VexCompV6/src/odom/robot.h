@@ -61,19 +61,20 @@ class Robot{
         Vector reverseError = Vector(lastStopPosition, location.getPos());
         double newVel = 0;
 
-        if(abs(baseError) > reverseError.getMagnitude()){
-          //Follow Reverse
-          newVel = reverseError.getMagnitude()*linearGainsReverse.p + linearGainsReverse.i;
-          newVel = newVel * sign(baseError);
-        }else{
-          //Follow Standard
-          newVel = linearGains.p*baseError + sign(baseError)*linearGains.i;
-        }
+        if(baseError > linearThreshold){
+          if(abs(baseError) > reverseError.getMagnitude()){
+            //Follow Reverse
+            newVel = reverseError.getMagnitude()*linearGainsReverse.p + linearGainsReverse.i;
+            newVel = newVel * sign(baseError);
+          }else{
+            //Follow Standard
+            newVel = linearGains.p*baseError + sign(baseError)*linearGains.i;
+          }
 
-        if(abs(newVel) > maxLinearVel){
-          newVel = maxLinearVel*sign(newVel);
+          if(abs(newVel) > maxLinearVel){
+            newVel = maxLinearVel*sign(newVel);
+          }
         }
-
         targetLinearVelocity = newVel;
       }
 
