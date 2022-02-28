@@ -40,8 +40,8 @@ const int armIntakeActivationThreshold = 400;
 //linGains, rotGains
 
 //PID Values used in move down state
-const PIDGains linGain = {1.87,8,0}; //I is treated like a constant
-const PIDGains rotGain = {32,0,0};
+const PIDGains linGain = {7,2,0}; //I is treated like a constant
+const PIDGains rotGain = {40,0.5,0};
 
 //PID values moved in move up state
 const PIDGains linGainReverse = {5,8,0}; //I is constant
@@ -168,8 +168,6 @@ int trakerFunction(){
 bool updateMotors(double overide=0, bool overideLinear=true){
   double linearSpeed = robot.getLinearSpeedTarget();
   double angularSpeed = robot.getRotationalSpeedTarget();
-
-  std::cout << linearSpeed << ", " << angularSpeed << std::endl;
   
   //linearSpeed = (linearSpeed/UnitsPerRev)*60; //Units/Sec to RPM
   //angularSpeed = angularSpeed * (RobotRadius/UnitsPerRev) * 60 * 0.5; //Converts Rad/S to RPM and splits in half because there are 2 drive sides

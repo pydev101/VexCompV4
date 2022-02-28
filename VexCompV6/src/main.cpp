@@ -96,8 +96,13 @@ int main() {
     
     */
 
-  turnTo(180);
-  
+  //move(-20, 0, false);
+  //turnTo(270);
+  move(36*21, 0);
+  move(-36*21, 0, false);
+  move(36*21, 0, false);
+  move(-36*21, 0);
+
   while(true){
     wait(200, msec);
   }

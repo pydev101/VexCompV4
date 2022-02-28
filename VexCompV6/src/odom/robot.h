@@ -61,7 +61,7 @@ class Robot{
         Vector reverseError = Vector(lastStopPosition, location.getPos());
         double newVel = 0;
 
-        if(baseError > linearThreshold){
+        if(abs(baseError) > linearThreshold){
           if(abs(baseError) > reverseError.getMagnitude()){
             //Follow Reverse
             newVel = reverseError.getMagnitude()*linearGainsReverse.p + linearGainsReverse.i;
@@ -81,7 +81,11 @@ class Robot{
       if(usingRotPIDControls){
         double eTheta = getThetaError();
         rotPID = PID(eTheta, deltaT, rotGains, rotPID);
-        double newOmega = rotPID.output;
+        double newOmega = 0;
+
+        if(abs(eTheta) > rotationalThreshold){
+          newOmega = rotPID.output + sign(rotPID.output)*rotGains.i;
+        }
 
         if(abs(newOmega) > maxAngularVel){
           newOmega = maxAngularVel*sign(newOmega);
