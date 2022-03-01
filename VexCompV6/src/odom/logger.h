@@ -11,31 +11,29 @@ Custom logging libary written for use with my python graphing program. Maps vect
 
 */
 
-class Log : public std::ostream{
+class Log : public std::ostringstream{
 protected:
   const char* fileName;
-  std::stringbuf contents;
-public:
 
+public:
   Log(const char* logName){
     fileName = logName;
-    rdbuf(&contents);
-    contents.str("");
+    str("");
   }
 
   void clear(){
-    contents.str("");
+    str("");
   }
 
   void print(){
-    std::cout << contents.str() << std::flush;
+    std::cout << str() << std::flush;
   }
 
   void save(){
     std::ofstream file(fileName);
     if(file.is_open()){
       file.clear();
-      file << contents.str() << std::flush;
+      file << str() << std::flush;
       file.close();
     }
   }
@@ -43,7 +41,7 @@ public:
   void append(bool clearBuf=true){
     std::ofstream file(fileName, std::ios_base::app);
     if(file.is_open()){
-      file << contents.str() << std::flush;
+      file <<str() << std::flush;
       file.close();
 
       if(clearBuf){
@@ -53,22 +51,27 @@ public:
   }
 };
 
-class PythonProgramLogger : protected Log{
-  PythonProgramLogger(const char* logName) : Log(logName){
+class PythonProgramLogger{
+  protected:
+  Log logger;
+
+  public:
+  PythonProgramLogger(const char* logName){
+    logger = Log(logName);
     save();
   }
 
   void markEnd(){
-    contents << "END:END" << std::endl;
+    this << "HELLO";
   }
 
-  PythonProgramLogger operator << (Point &p){
+  //PythonProgramLogger operator << (Point &p){
       
-  }
+  //}
 
-  PythonProgramLogger operator << (Vector &p){
+  //PythonProgramLogger operator << (Vector &p){
       
-  }
+  //}
 };
 
 typedef struct {

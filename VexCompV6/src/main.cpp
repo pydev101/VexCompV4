@@ -98,10 +98,16 @@ int main() {
 
   //move(-20, 0, false);
   //turnTo(270);
-  move(36*21, 0);
-  move(-36*21, 0, false);
-  move(36*21, 0, false);
-  move(-36*21, 0);
+  //move(36*21, 0);
+  //move(-36*21, 0, false);
+  //move(36*21, 0, false);
+  //move(-36*21, 0);
+
+  PythonProgramLogger apple("Apples");
+  apple << "Hello Bob" << std::endl;
+  apple.markEnd();
+  apple << "peanuts" << std::endl;
+  apple.print();
 
   while(true){
     wait(200, msec);
