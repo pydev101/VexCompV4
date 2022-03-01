@@ -104,9 +104,12 @@ int main() {
   //move(-36*21, 0);
 
   PythonProgramLogger apple("Apples");
-  apple << "Hello Bob" << std::endl;
-  apple.markEnd();
-  apple << "peanuts" << std::endl;
+  Point p(0,0);
+  Vector v(5,2);
+  
+  apple.addPoint(p, "blue");
+  apple.addVector(p, v, "green");
+  apple.graph();
   apple.print();
 
   while(true){

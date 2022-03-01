@@ -12,10 +12,9 @@ Custom logging libary written for use with my python graphing program. Maps vect
 */
 
 class Log : public std::ostringstream{
-protected:
+public:
   const char* fileName;
 
-public:
   Log(const char* logName){
     fileName = logName;
     str("");
@@ -25,16 +24,22 @@ public:
     str("");
   }
 
-  void print(){
+  void print(bool clearBuf=true){
     std::cout << str() << std::flush;
+    if(clearBuf){
+      clear();
+    }
   }
 
-  void save(){
+  void save(bool clearBuf=true){
     std::ofstream file(fileName);
     if(file.is_open()){
       file.clear();
       file << str() << std::flush;
       file.close();
+    }
+    if(clearBuf){
+      clear();
     }
   }
 
@@ -53,37 +58,39 @@ public:
 
 class PythonProgramLogger{
   protected:
+  const char* graphName;
   Log logger;
 
   public:
-  PythonProgramLogger(const char* logName){
-    logger = Log(logName);
-    save();
+  PythonProgramLogger(const char* logName) : logger(logName) {
+    graphName = logName;
   }
 
-  void markEnd(){
-    this << "HELLO";
+  void graph(){
+    logger << "END:END" << std::endl;
   }
 
-  //PythonProgramLogger operator << (Point &p){
-      
-  //}
+  void addPoint(Point p, const char* color){
+    logger << "P:" << p.x << "," << p.y << "," << color << std::endl;
+  }
 
-  //PythonProgramLogger operator << (Vector &p){
-      
-  //}
+  void addVector(Point p, Vector v, const char* color){
+    logger << "V:" << p.x << "," << p.y << "," << v.getX() << "," << v.getY() << "," << color << std::endl;
+  }
+
+  void save(bool clearBuffer=true){
+    logger.save(clearBuffer);
+  }
+
+  void append(bool clearBuffer=true){
+    logger.append(clearBuffer);
+  }
+
+  void print(bool clearBuffer=true){
+    logger.print(clearBuffer);
+  }
 };
 
-typedef struct {
-    Point p;
-    const char* color;
-} PointPair;
-
-typedef struct{
-    Point p;
-    Vector v;
-    const char* color;
-} VectorPair;
 
 typedef struct{
   double error;
@@ -94,10 +101,6 @@ typedef struct{
 
 class Graph{
 public:
-    PointPair* points = (PointPair*)malloc(0);
-    int numOfPoints = 0;
-    VectorPair* vectorlist = (VectorPair*)malloc(0);
-    int numOfVectors = 0;
     PIDData* linearPIDData = (PIDData*)malloc(0);
     int numOfLinPIDData = 0;
     PIDData* rotPIDData = (PIDData*)malloc(0);
@@ -109,22 +112,12 @@ public:
     }
 
     ~Graph() {
-        free(points);
-        free(vectorlist);
         free(linearPIDData);
         free(rotPIDData);
         file.close();
     }
 
     void clear() {
-        free(points);
-        points = (PointPair*)malloc(0);
-        numOfPoints = 0;
-
-        free(vectorlist);
-        vectorlist = (VectorPair*)malloc(0);
-        numOfVectors = 0;
-
         free(linearPIDData);
         linearPIDData = (PIDData*)malloc(0);
         numOfLinPIDData = 0;
@@ -132,18 +125,6 @@ public:
         free(rotPIDData);
         rotPIDData = (PIDData*)malloc(0);
         numOfRotPIDData = 0;
-    }
-
-    void addVector(VectorPair x) {
-        numOfVectors++;
-        vectorlist = (VectorPair*)realloc(vectorlist, sizeof(VectorPair) * numOfVectors);
-        vectorlist[numOfVectors - 1] = x;
-    }
-
-    void addPoint(PointPair x) {
-        numOfPoints++;
-        points = (PointPair*)realloc(points, sizeof(PointPair) * numOfPoints);
-        points[numOfPoints - 1] = x;
     }
 
     void addPID(PIDData data, bool linearPID) {
@@ -160,14 +141,6 @@ public:
 
     std::string getString() {
         std::ostringstream strs;
-        for (int i = 0; i < numOfVectors; i++) {
-            VectorPair v = vectorlist[i];
-            strs << "V:" << v.p.x << "," << v.p.y << "," << v.v.getX() << "," << v.v.getY() << "," << v.color << std::endl;
-        }
-        for (int i = 0; i < numOfPoints; i++) {
-            PointPair p = points[i];
-            strs << "P:" << p.p.x << "," << p.p.y << "," << p.color << std::endl;
-        }
         for (int i = 0; i < numOfLinPIDData; i++) {
             PIDData d = linearPIDData[i];
             strs << "LPID:" << d.error << "," << d.pidOutput.output << "," << d.pidOutput.reset << "," << d.realTargetVel << "," << d.realVel << std::endl;
