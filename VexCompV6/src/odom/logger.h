@@ -12,7 +12,7 @@ Custom logging libary written for use with my python graphing program. Maps vect
 */
 
 class Log : public std::ostream{
-private:
+protected:
   const char* fileName;
   std::stringbuf contents;
 public:
@@ -20,6 +20,7 @@ public:
   Log(const char* logName){
     fileName = logName;
     rdbuf(&contents);
+    contents.str("");
   }
 
   void clear(){
@@ -49,6 +50,24 @@ public:
         clear();
       }
     }
+  }
+};
+
+class PythonProgramLogger : protected Log{
+  PythonProgramLogger(const char* logName) : Log(logName){
+    save();
+  }
+
+  void markEnd(){
+    contents << "END:END" << std::endl;
+  }
+
+  PythonProgramLogger operator << (Point &p){
+      
+  }
+
+  PythonProgramLogger operator << (Vector &p){
+      
   }
 };
 
