@@ -96,10 +96,17 @@ int main() {
     
     */
 
+  //move(30, 0);
+  //move(-30, 0, false);
+
   //move(-20, 0, false);
-  //turnTo(270);
-  move(36*21, 0);
-  move(-36*21, 0, false);
+
+  turnTo(180);
+  turnTo(0);
+  turnTo(270);
+  turnTo(90);
+  turnTo(135);
+  
   //move(36*21, 0, false);
   //move(-36*21, 0);
 

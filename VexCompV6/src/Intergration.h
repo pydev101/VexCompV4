@@ -41,7 +41,7 @@ const int armIntakeActivationThreshold = 400;
 
 //PID Values used in move down state
 const PIDGains linGain = {7,2,0}; //I is treated like a constant
-const PIDGains rotGain = {40,0.5,0};
+const PIDGains rotGain = {46,0,0};
 
 //PID values moved in move up state
 const PIDGains linGainReverse = {5,8,0}; //I is constant
@@ -139,24 +139,25 @@ int trakerFunction(){
 
     //std::cout << robot.location.getCurrHead() << ", " << robot.location.getTargetHead() << std::endl;
 
-    if(frame >= 10){
+    if(frame >= 100){
       #if 1
-        Vector tVec = robot.location.getTargetVector();
-        pythonLog.addPoint(robot.location.pos, "green");
-        pythonLog.addPoint(robot.location.targetPos, "blue");
-        pythonLog.addVector(robot.location.pos, tVec, "teal");
-        pythonLog.addVector(robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(10), "yellow");
-        pythonLog.addVector(robot.location.pos, robot.location.getRobotBasisVector().scale(10), "red");
-        pythonLog.addVector(robot.location.pos, Vector(robot.lastStopPosition, robot.location.getPos()).project(robot.location.getTargetVector().getUnitVector()), "blue");
-        pythonLog.graph();
-        
-        pythonLog.print(false);
+        //pythonLog.print(false);
         pythonLog.append();
 
         //graph.addPID({robot.getLinearErrorForPID(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
         //graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
       #endif
       frame = 0;
+    }else if(frame%10 == 0){
+      Vector tVec = robot.location.getTargetVector();
+      pythonLog.addPoint(robot.location.pos, "green");
+      pythonLog.addPoint(robot.location.targetPos, "blue");
+      pythonLog.addVector(robot.location.pos, tVec, "teal");
+      pythonLog.addVector(robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(10), "yellow");
+      pythonLog.addVector(robot.location.pos, robot.location.getRobotBasisVector().scale(10), "red");
+      //pythonLog.addVector(robot.location.pos, Vector(robot.lastStopPosition, robot.location.getPos()).project(robot.location.getTargetVector().getUnitVector()), "blue");
+      pythonLog.graph();
+      frame = frame + 1;
     }else{
       frame = frame + 1;
     }

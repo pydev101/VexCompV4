@@ -64,10 +64,11 @@ class PythonProgramLogger{
   public:
   PythonProgramLogger(const char* logName) : logger(logName) {
     graphName = logName;
+    save();
   }
 
   void graph(){
-    logger << "END:END" << std::endl;
+    logger << "END:END";
   }
 
   void addPoint(Point p, const char* color){
@@ -83,6 +84,7 @@ class PythonProgramLogger{
   }
 
   void append(bool clearBuffer=true){
+    logger << std::endl;
     logger.append(clearBuffer);
   }
 

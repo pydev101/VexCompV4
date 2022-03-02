@@ -35,7 +35,8 @@ def readData(fileName):
             raise e
 
 
-readData("data.csv")
+readData("E:/Hello.txt")
+#readData("data.csv")
 
 fig2, PIDPlots = plt.subplots(3, 1, figsize=(5, 7))
 fig2.suptitle("Linear PID")
