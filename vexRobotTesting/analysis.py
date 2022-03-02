@@ -91,7 +91,7 @@ for i in range(0, len(graphs)):
             Y.append(p[1])
     axes.plot(X, Y, "gray")
     axes.set_xlim(-60, 25)
-    axes.set_ylim(-10, 100)
+    axes.set_ylim(-10, 1000)
     axes.grid(which="major", color='black', linestyle='-', linewidth=0.5)
     axes.grid(which="minor", color='black', linestyle=':', linewidth=0.5)
     axes.minorticks_on()

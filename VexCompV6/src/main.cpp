@@ -98,19 +98,10 @@ int main() {
 
   //move(-20, 0, false);
   //turnTo(270);
-  //move(36*21, 0);
-  //move(-36*21, 0, false);
+  move(36*21, 0);
+  move(-36*21, 0, false);
   //move(36*21, 0, false);
   //move(-36*21, 0);
-
-  PythonProgramLogger apple("Apples");
-  Point p(0,0);
-  Vector v(5,2);
-  
-  apple.addPoint(p, "blue");
-  apple.addVector(p, v, "green");
-  apple.graph();
-  apple.print();
 
   while(true){
     wait(200, msec);

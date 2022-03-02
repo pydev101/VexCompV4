@@ -150,7 +150,8 @@ int trakerFunction(){
         pythonLog.addVector(robot.location.pos, Vector(robot.lastStopPosition, robot.location.getPos()).project(robot.location.getTargetVector().getUnitVector()), "blue");
         pythonLog.graph();
         
-        pythonLog.print();
+        pythonLog.print(false);
+        pythonLog.append();
 
         //graph.addPID({robot.getLinearErrorForPID(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
         //graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
