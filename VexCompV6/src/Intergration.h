@@ -41,7 +41,7 @@ const int armIntakeActivationThreshold = 400;
 
 //PID Values used in move down state
 const PIDGains linGain = {7,2,0}; //I is treated like a constant
-const PIDGains rotGain = {46,0,0};
+const PIDGains rotGain = {53,0,0}; //46
 
 //PID values moved in move up state
 const PIDGains linGainReverse = {5,8,0}; //I is constant
@@ -140,7 +140,7 @@ int trakerFunction(){
     //std::cout << robot.location.getCurrHead() << ", " << robot.location.getTargetHead() << std::endl;
 
     if(frame >= 100){
-      #if 1
+      #if 0
         //pythonLog.print(false);
         pythonLog.append();
 
@@ -186,9 +186,6 @@ bool updateMotors(double overide=0, bool overideLinear=true){
     right = right - (abs(left) - maxVelocity)*sign(left);
     left = maxVelocity*sign(left);
   }
-
-  
-  std::cout << getHeadingCCW() << ", " << left << ", " << right << std::endl;
 
   setLeft(left, velocityUnits::pct);
   setRight(right, velocityUnits::pct);

@@ -30,7 +30,7 @@
 #include "driver.h"
 #include "programs.h"
 
-#define COMPETITION 0
+#define COMPETITION 1
 
 // A global instance of competition
 #if COMPETITION
@@ -101,10 +101,10 @@ int main() {
 
   //move(-20, 0, false);
   
-  move(36*21, 0);
-  move(-36*21, 0, false);
-  move(36*21, 0, false);
-  move(-36*21, 0, false);
+  //move(36*2, 0);
+  //move(0, 36);
+  //moveAbs(0, 0);
+  //turnTo(90);
 
   while(true){
     wait(200, msec);
