@@ -32,7 +32,7 @@ const double maxVelocity = 100;
 const double maxAngularVelocity = 100;
 
 const double updateTargetHeadingMinThreashold = 5;
-const double maxThetaErrorForMotion = 15; //deg
+const double maxThetaErrorForMotion = 90; //15; //deg
 bool maxThetaErrorForMotionGivenInDegrees = true;
 
 const int armIntakeActivationThreshold = 400;
@@ -186,6 +186,9 @@ bool updateMotors(double overide=0, bool overideLinear=true){
     right = right - (abs(left) - maxVelocity)*sign(left);
     left = maxVelocity*sign(left);
   }
+
+  
+  std::cout << getHeadingCCW() << ", " << left << ", " << right << std::endl;
 
   setLeft(left, velocityUnits::pct);
   setRight(right, velocityUnits::pct);
