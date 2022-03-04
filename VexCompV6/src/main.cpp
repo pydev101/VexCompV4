@@ -93,6 +93,10 @@ int main() {
     Move sensor away from floor and torward the edge of the robot to minimize small shifts that occur in the center
 
     Change units of length from inches to tiles
+
+    Test CV functions
+
+    Work on Beizer curve functions
     
     */
 

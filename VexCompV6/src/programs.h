@@ -9,11 +9,7 @@ Implements the use function in intergation into robot programs that will run dur
 
 
 //Programs
-/*
 void blueLeft(int mod){
-  robot.setLinPID({2.3,0,0});
-  robot.setRotPID({8.3,0,0.06});
-
   moveAbs(13, 63);
   frontPne.set(true);
   moveAbs(12, 40, false);
@@ -35,11 +31,10 @@ void blueLeft(int mod){
   backPne.set(false);
   moveAbs(3, 6);
   moveCV(4, 5, 20);
-}*/
+}
 
 void blueRight(int mod){
-  //moveCV(50, 0, 267); //27,0,130
-  move(50, 0);
+  moveCV(50, 0, 100);
   frontPne.set(true);
   wait(250, msec);
   moveAbs(-11, 26, false);
@@ -72,7 +67,7 @@ void blueRight(int mod){
   }
   backPne.set(true);
 }
-/*
+
 void OneMinute(int mod){
   //Grab front
   moveCV(30, 0, 130);
@@ -169,7 +164,6 @@ void OneMinute(int mod){
   moveTime(-80, 400);
   moveAbs(20, 5, false);
 }
-*/
 
 //Storage of program functions for use in the GUI
 typedef struct {
@@ -178,16 +172,12 @@ typedef struct {
   int mod;
 } autoEntry;
 
-
-void blueLeft(int mod){} //ONLY FOR TESTING----------------------------------!!!!
-
 //Use of a table allows programs to be easily added or removed
 autoEntry entries[] = {
-  {"Blue Left", blueLeft},
-  /*{"Blue Right", blueRight},
+  {"Blue Right", blueRight},
   {"Red Right", blueRight},
   {"Red Left", blueLeft},
-  {"One Minute", OneMinute},*/
+  {"One Minute", OneMinute},
 };
 int indexAuto = 0;
 

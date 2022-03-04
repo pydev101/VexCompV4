@@ -139,28 +139,28 @@ int trakerFunction(){
 
     //std::cout << robot.location.getCurrHead() << ", " << robot.location.getTargetHead() << std::endl;
 
-    if(frame >= 100){
-      #if 0
+    #if 0
+      if(frame >= 100){
         //pythonLog.print(false);
         pythonLog.append();
 
         //graph.addPID({robot.getLinearErrorForPID(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
         //graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
-      #endif
-      frame = 0;
-    }else if(frame%10 == 0){
-      Vector tVec = robot.location.getTargetVector();
-      pythonLog.addPoint(robot.location.pos, "green");
-      pythonLog.addPoint(robot.location.targetPos, "blue");
-      pythonLog.addVector(robot.location.pos, tVec, "teal");
-      pythonLog.addVector(robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(10), "yellow");
-      pythonLog.addVector(robot.location.pos, robot.location.getRobotBasisVector().scale(10), "red");
-      //pythonLog.addVector(robot.location.pos, Vector(robot.lastStopPosition, robot.location.getPos()).project(robot.location.getTargetVector().getUnitVector()), "blue");
-      pythonLog.graph();
-      frame = frame + 1;
-    }else{
-      frame = frame + 1;
-    }
+        frame = 0;
+      }else if(frame%10 == 0){
+        Vector tVec = robot.location.getTargetVector();
+        pythonLog.addPoint(robot.location.pos, "green");
+        pythonLog.addPoint(robot.location.targetPos, "blue");
+        pythonLog.addVector(robot.location.pos, tVec, "teal");
+        pythonLog.addVector(robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(10), "yellow");
+        pythonLog.addVector(robot.location.pos, robot.location.getRobotBasisVector().scale(10), "red");
+        //pythonLog.addVector(robot.location.pos, Vector(robot.lastStopPosition, robot.location.getPos()).project(robot.location.getTargetVector().getUnitVector()), "blue");
+        pythonLog.graph();
+        frame = frame + 1;
+      }else{
+        frame = frame + 1;
+      }
+    #endif
 
     wait(updateTime, msec);
   }
@@ -168,12 +168,12 @@ int trakerFunction(){
 
 
 //Update motor outputs based on robot class output
-bool updateMotors(double overide=0, bool overideLinear=true){
+bool updateMotors(double overide=0){
   double linearSpeed = robot.getLinearSpeedTarget();
+  if(overide != 0){
+    linearSpeed = overide;
+  }
   double angularSpeed = robot.getRotationalSpeedTarget();
-  
-  //linearSpeed = (linearSpeed/UnitsPerRev)*60; //Units/Sec to RPM
-  //angularSpeed = angularSpeed * (RobotRadius/UnitsPerRev) * 60 * 0.5; //Converts Rad/S to RPM and splits in half because there are 2 drive sides
   
   double left = linearSpeed - angularSpeed;
   double right = linearSpeed + angularSpeed;
@@ -263,7 +263,6 @@ void move(double mag, double theta, bool inDeg, bool dir, bool blocking=true){
   move(Vector(mag, theta, inDeg), dir, blocking);
 }
 
-/*
 //Moves to target location with constant linear velocity
 void moveCV(double fwd, double hor, double linearSpeedTarget){
   bool dir = true;
@@ -272,7 +271,7 @@ void moveCV(double fwd, double hor, double linearSpeedTarget){
     dir = false;
     d = PI;
   }
-
+  
   turnTo(Vector(1, 0).getAngle(Vector(hor, fwd)) + d, false);
   robot.setLineMode(dir, false);
   robot.usePIDControls(false, true);
@@ -280,12 +279,7 @@ void moveCV(double fwd, double hor, double linearSpeedTarget){
   wait(updateTime+1, msec);
   
   while(abs(robot.getLinearErrorForPID()) > robot.linearThreshold){
-    double angularSpeed = robot.getRotationalSpeedTarget();
-    double linearSpeed = (linearSpeedTarget/UnitsPerRev)*60; //Units/Sec to RPM
-    angularSpeed = angularSpeed * (RobotRadius/UnitsPerRev) * 60 * 0.5; //Converts Rad/S to RPM and splits in half because there are 2 drive sides
-
-    setLeft(linearSpeed - angularSpeed, velocityUnits::rpm);
-    setRight(linearSpeed + angularSpeed, velocityUnits::rpm);
+    updateMotors(linearSpeedTarget);
     wait(motionDelay, timeUnits::msec);
   }
 
@@ -324,6 +318,7 @@ Vector getErrorFromCamera(vex::vision *cam, vex::vision::signature &sig, CameraS
   return Vector(x, y); //Return a new vector object
 }
 
+/*
 //Sets motor values directly proporional to the value of error determined by the camera; Lines robot up with object while moving torward it
 //Example: trackWithCam(&BackCam, -1, backCameraSettings, 0, BackCam__YELLOWGOAL);
 void trackWithCam(vex::vision *camera, int d, CameraSettings settings, const int gainsIndex, vex::vision::signature &sig){
