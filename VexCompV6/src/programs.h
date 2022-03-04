@@ -35,10 +35,11 @@ void blueLeft(int mod){
   backPne.set(false);
   moveAbs(3, 6);
   moveCV(4, 5, 20);
-}
+}*/
 
 void blueRight(int mod){
-  moveCV(50, 0, 267); //27,0,130
+  //moveCV(50, 0, 267); //27,0,130
+  move(50, 0);
   frontPne.set(true);
   wait(250, msec);
   moveAbs(-11, 26, false);
@@ -71,7 +72,7 @@ void blueRight(int mod){
   }
   backPne.set(true);
 }
-
+/*
 void OneMinute(int mod){
   //Grab front
   moveCV(30, 0, 130);
