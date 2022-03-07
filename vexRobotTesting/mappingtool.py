@@ -34,8 +34,8 @@ class Point:
         return False
 
 
-def midpoint(xa, ya, xb, yb):
-    return (xa + xb) / 2, (ya + yb) / 2
+def midpoint(a, b):
+    return (a.x + b.x) / 2, (a.y + b.y) / 2
 
 
 def quadraticCurve(Start, End, Control, steps=10):
@@ -56,14 +56,14 @@ class Movement:
         self.endHeading = None
         self.constantVelocity = 0
         self.controlpoints = []
-        self.resultpoints = []
+        self.resultpoints = []  # Does not include start/stop points
 
         self.guimode = 0
         self.selectedpoint = None
-        self.drawpoints = []
         self.t = 0
 
     def handleEvent(self, event):
+        mx, my = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 if (self.startPoint is None) or (self.endPoint is None):
@@ -80,15 +80,72 @@ class Movement:
                                 break
                         if self.selectedpoint is None:
                             self.t = time.time()
+            elif event.button == 3:
+                if selectedPoint is None:
+                    if self.startPoint is not None:
+                        if self.startPoint.collision(mx, my):
+                            self.startPoint = None
+                            self.controlpoints = []
+                            self.calculate()
+                    if self.endPoint is not None:
+                        if self.endPoint.collision(mx, my):
+                            self.endPoint = None
+                            self.controlpoints = []
+                            self.calculate()
+                    for i in range(0, len(self.controlpoints)):
+                        if self.controlpoints[i].collision(mx, my):
+                            del self.controlpoints[i]
+                            self.calculate()
+                            break
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if self.selectedpoint is None:
+                if time.time() - self.t < 0.5:
+                    if self.startPoint is None:
+                        self.startPoint = Point(mx, my)
+                    elif self.endPoint is None:
+                        self.endPoint = Point(mx, my)
+                    else:
+                        self.controlpoints.append(Point(mx, my))
+                        self.calculate()
+            else:
+                self.selectedpoint = None
+        elif event.type == pygame.MOUSEMOTION:
+            if self.selectedpoint is not None:
+                self.selectedpoint.x = mx
+                self.selectedpoint.y = my
+                self.calculate()
 
+    def calculate(self):
+        if (self.startPoint is not None) and (self.endPoint is not None) and (len(self.controlpoints) > 0):
+            if len(self.controlpoints) == 1:
+                self.resultpoints = quadraticCurve(self.startPoint, self.endPoint, self.controlpoints[0])[1:-1]
+            else:
+                size = len(self.controlpoints)
+                midpoints = []
+                for i in range(0, size - 1):
+                    midpoints.append(midpoint(self.controlpoints[i], self.controlpoints[i+1]))
+                # Results extend start to first midpoint, all the midpoints inbetween, then last midpoint to end
+                #TODO
+        else:
+            self.resultpoints = []
 
-
-
+    def draw(self):
+        if (self.startPoint is not None) and (self.endPoint is not None):
+            for p in self.resultpoints:
+                p.draw(screen, "black")
+            for p in self.controlpoints:
+                p.draw(screen, "blue")
+        if self.endPoint is not None:
+            self.endPoint.draw(screen, "red")
+        if self.startPoint is not None:
+            self.startPoint.draw(screen, "green")
 
 
 running = True
 selectedPoint = None
 t = 0
+
+motion = Movement()
 while running:
     mx, my = pygame.mouse.get_pos()
     for event in pygame.event.get():
@@ -96,54 +153,17 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             pass
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                for p in points:
-                    if p.collision(mx, my):
-                        selectedPoint = p
-                        break
-                if selectedPoint is None:
-                    t = time.time()
-            elif event.button == 3:
-                if selectedPoint is None:
-                    for i in range(0, len(points)):
-                        if points[i].collision(mx, my):
-                            if points[i].type == 0:
-                                if i == 0:
-                                    if len(points) > 1:
-                                        del points[0]
-                                        del points[0]
-                                    else:
-                                        del points[0]
-                                else:
-                                    del points[i - 1]
-                                    del points[i - 1]
-                                break
-        elif event.type == pygame.MOUSEBUTTONUP:
-            if selectedPoint is None:
-                if time.time() - t < 0.5:
-                    if len(points) > 0:
-                        a, b = midpoint(points[-1].x, points[-1].y, mx, my)
-                        Point(a, b, 1)
-                    Point(mx, my, 0)
-            else:
-                selectedPoint = None
-        elif event.type == pygame.MOUSEMOTION:
-            if selectedPoint is not None:
-                selectedPoint.x = mx
-                selectedPoint.y = my
+        motion.handleEvent(event)
 
     screen.fill("black")
     screen.blit(field_img, (0, 0))
+
+    motion.draw()
 
     if len(points) > 1:
         results = [points[0]]
         for i in range(1, len(points), 2):
             results.extend(quadraticCurve(points[i - 1], points[i + 1], points[i])[1:])
-        for p in results:
-            p.draw(screen)
-    for p in points:
-        p.draw(screen)
 
     # update the dispalay
     pygame.display.flip()
