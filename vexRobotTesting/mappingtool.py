@@ -14,10 +14,14 @@ FIELD_WIDTH, FIELD_HEIGHT = 600, 600
 field_img = pygame.transform.scale(surface=field_img, size=(FIELD_WIDTH, FIELD_HEIGHT))
 
 clock = pygame.time.Clock()
+pygame.display.set_caption("VEX Robotics Programming")
+pygame.display.set_icon(field_img)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 screen.set_alpha(None)
 
-points = []
+
+def drawArrow(screen, Start, End, color=(0, 0, 0)):
+    pygame.draw.line(screen, color, (Start.x, Start.y), (End.x, End.y), int(DOT_RADIUS / 2))
 
 
 class Point:
@@ -35,7 +39,7 @@ class Point:
 
 
 def midpoint(a, b):
-    return (a.x + b.x) / 2, (a.y + b.y) / 2
+    return Point((a.x + b.x) / 2, (a.y + b.y) / 2)
 
 
 def quadraticCurve(Start, End, Control, steps=10):
@@ -53,14 +57,15 @@ class Movement:
     def __init__(self):
         self.startPoint = None
         self.endPoint = None
-        self.endHeading = None
-        self.constantVelocity = 0
+
         self.controlpoints = []
         self.resultpoints = []  # Does not include start/stop points
 
-        self.guimode = 0
         self.selectedpoint = None
         self.t = 0
+
+        self.endHeading = None
+        self.constantVelocity = 0
 
     def handleEvent(self, event):
         mx, my = pygame.mouse.get_pos()
@@ -81,7 +86,7 @@ class Movement:
                         if self.selectedpoint is None:
                             self.t = time.time()
             elif event.button == 3:
-                if selectedPoint is None:
+                if self.selectedpoint is None:
                     if self.startPoint is not None:
                         if self.startPoint.collision(mx, my):
                             self.startPoint = None
@@ -116,23 +121,31 @@ class Movement:
                 self.calculate()
 
     def calculate(self):
+        self.resultpoints = []
         if (self.startPoint is not None) and (self.endPoint is not None) and (len(self.controlpoints) > 0):
             if len(self.controlpoints) == 1:
                 self.resultpoints = quadraticCurve(self.startPoint, self.endPoint, self.controlpoints[0])[1:-1]
             else:
                 size = len(self.controlpoints)
                 midpoints = []
+
                 for i in range(0, size - 1):
-                    midpoints.append(midpoint(self.controlpoints[i], self.controlpoints[i+1]))
+                    midpoints.append(midpoint(self.controlpoints[i], self.controlpoints[i + 1]))
                 # Results extend start to first midpoint, all the midpoints inbetween, then last midpoint to end
-                #TODO
-        else:
-            self.resultpoints = []
+                self.resultpoints.extend(quadraticCurve(self.startPoint, midpoints[0], self.controlpoints[0])[1:])
+                for i in range(0, size - 2):
+                    self.resultpoints.extend(
+                        quadraticCurve(midpoints[i], midpoints[i + 1], self.controlpoints[i + 1])[1:])
+                self.resultpoints.extend(quadraticCurve(midpoints[-1], self.endPoint, self.controlpoints[-1])[1:-1])
 
     def draw(self):
         if (self.startPoint is not None) and (self.endPoint is not None):
+            lp = self.startPoint
             for p in self.resultpoints:
+                drawArrow(screen, lp, p)
                 p.draw(screen, "black")
+                lp = p
+            drawArrow(screen, lp, self.endPoint)
             for p in self.controlpoints:
                 p.draw(screen, "blue")
         if self.endPoint is not None:
@@ -141,11 +154,15 @@ class Movement:
             self.startPoint.draw(screen, "green")
 
 
-running = True
-selectedPoint = None
-t = 0
+class MotionProfile:
+    def __init__(self):
+        self.motion = Movement()
 
-motion = Movement()
+
+motionProfiles = [MotionProfile()]
+currentMotion = motionProfiles[0].motion
+
+running = True
 while running:
     mx, my = pygame.mouse.get_pos()
     for event in pygame.event.get():
@@ -153,17 +170,12 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             pass
-        motion.handleEvent(event)
+        currentMotion.handleEvent(event)
 
-    screen.fill("black")
+    screen.fill("gray")
     screen.blit(field_img, (0, 0))
 
-    motion.draw()
-
-    if len(points) > 1:
-        results = [points[0]]
-        for i in range(1, len(points), 2):
-            results.extend(quadraticCurve(points[i - 1], points[i + 1], points[i])[1:])
+    currentMotion.draw()
 
     # update the dispalay
     pygame.display.flip()
