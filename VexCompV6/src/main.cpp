@@ -77,38 +77,24 @@ int main() {
     Competition.drivercontrol(usercontrol);
   #endif
 
-  blueRight(0);
-  /*moveAbs(0, 20);
-  moveAbs(-20, 20);
-  moveAbs(-20, 0, false);
-  moveAbs(0, 20);
-  turnTo(90, true);
-  moveAbs(0, 0, false);*/
-  //moveAbs(0, 60*12, 1);
+  smartPointPointer path = generatePath(Point(0, 0), Point(0, 60), Point(20, 20), Point(-20, 40));
+  tracePath(path);
 
   //TODO
     /*
     Change units of length from inches to tiles
     --Tune PI after
 
-    Test CV functions
-
     Work on Beizer curve functions
     
     Changes grid from based on starting location to absolute location
 
     Move sensor away from floor and torward the edge of the robot to minimize small shifts that occur in the center
+
+    Have PID rotation while in linear motion if greator then X degrees to avoid thew wiggles
     */
 
-  //move(30, 0);
-  //move(-30, 0, false);
 
-  //move(-20, 0, false);
-  
-  //move(36*2, 0);
-  //move(0, 36);
-  //moveAbs(0, 0);
-  //turnTo(90);
 
   while(true){
     wait(200, msec);

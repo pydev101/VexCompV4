@@ -98,8 +98,11 @@ class Robot{
     //Intenral function that sets target position of class based on current location, speed, and given path
     void updateTrace(double deltaT){
       if(traceModeOn){
-        if(abs(location.getRobotBasisVector().dot(Vector(location.getPos(), pathToTrace[pathTraceIndex]))) < linearThreshold){
-          pathTraceIndex++;
+        Vector e = Vector(location.getPos(), pathToTrace[pathTraceIndex]);
+        if(e.getMagnitude() < 7){
+          if(abs(location.getRobotBasisVector().dot(e)) < 6){
+            pathTraceIndex++;
+          }
         }
 
         Point p = pathToTrace[pathTraceIndex];

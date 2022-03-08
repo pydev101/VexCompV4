@@ -11,6 +11,7 @@ DOT_RADIUS = 5
 
 field_img = pygame.image.load("assets/Field.png")
 FIELD_WIDTH, FIELD_HEIGHT = 600, 600
+SCALING_FACTOR_W, SCALING_FACTOR_H = 142.75/FIELD_WIDTH, 142.75/FIELD_HEIGHT
 field_img = pygame.transform.scale(surface=field_img, size=(FIELD_WIDTH, FIELD_HEIGHT))
 
 clock = pygame.time.Clock()
@@ -37,6 +38,9 @@ class Point:
             return True
         return False
 
+    def export(self):
+        return "Point({}, {})".format(self.x*SCALING_FACTOR_W, self.y*SCALING_FACTOR_H)
+
 
 def midpoint(a, b):
     return Point((a.x + b.x) / 2, (a.y + b.y) / 2)
@@ -52,6 +56,8 @@ def quadraticCurve(Start, End, Control, steps=10):
         pathGenerated.append(Point(x, y))
     return pathGenerated
 
+def calVector(Start, End):
+    return "Vector({}, {})".format((End.x - Start.x)*SCALING_FACTOR_W, (End.y - Start.y)*SCALING_FACTOR_H)
 
 class Movement:
     def __init__(self):
@@ -153,6 +159,12 @@ class Movement:
         if self.startPoint is not None:
             self.startPoint.draw(screen, "green")
 
+    def export(self, realitiveToStart=True):
+        results = ""
+        if (self.startPoint is not None) and (self.endPoint is not None):
+            self.calculate()
+            if realitiveToStart:
+                pass# Expot start point, everything is in vectors after that; the last vector is from start to end
 
 class MotionProfile:
     def __init__(self):
