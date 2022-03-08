@@ -88,8 +88,6 @@ int main() {
 
   //TODO
     /*
-    Move sensor away from floor and torward the edge of the robot to minimize small shifts that occur in the center
-
     Change units of length from inches to tiles
     --Tune PI after
 
@@ -97,6 +95,9 @@ int main() {
 
     Work on Beizer curve functions
     
+    Changes grid from based on starting location to absolute location
+
+    Move sensor away from floor and torward the edge of the robot to minimize small shifts that occur in the center
     */
 
   //move(30, 0);
