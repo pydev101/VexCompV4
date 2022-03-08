@@ -88,11 +88,10 @@ int main() {
 
   //TODO
     /*
-    Tune PI for PCT
-
     Move sensor away from floor and torward the edge of the robot to minimize small shifts that occur in the center
 
     Change units of length from inches to tiles
+    --Tune PI after
 
     Test CV functions
 
