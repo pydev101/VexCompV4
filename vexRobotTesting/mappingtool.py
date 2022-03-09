@@ -41,7 +41,7 @@ class Point:
         return False
 
     def export(self):
-        return "Point({0:0.7g}, {0:0.7g})".format(self.x*SCALING_FACTOR_W, self.y*SCALING_FACTOR_H)
+        return "Point({}, {})".format(self.x*SCALING_FACTOR_W, (FIELD_HEIGHT-self.y)*SCALING_FACTOR_H)
 
 
 def midpoint(a, b):
@@ -59,7 +59,7 @@ def quadraticCurve(Start, End, Control, steps=10):
     return pathGenerated
 
 def calVector(Start, End):
-    return "Vector({}, {})".format((End.x - Start.x)*SCALING_FACTOR_W, (End.y - Start.y)*SCALING_FACTOR_H)
+    return "Vector({}, {})".format((End.x - Start.x)*SCALING_FACTOR_W, -1*(End.y - Start.y)*SCALING_FACTOR_H)
 
 class Movement:
     def __init__(self):
