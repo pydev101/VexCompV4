@@ -7,11 +7,13 @@ pygame.init()
 
 WIDTH = 900
 HEIGHT = 700
-DOT_RADIUS = 5
 
 field_img = pygame.image.load("assets/Field.png")
 FIELD_WIDTH, FIELD_HEIGHT = 600, 600
 SCALING_FACTOR_W, SCALING_FACTOR_H = 142.75/FIELD_WIDTH, 142.75/FIELD_HEIGHT
+
+DOT_RADIUS = 5
+
 field_img = pygame.transform.scale(surface=field_img, size=(FIELD_WIDTH, FIELD_HEIGHT))
 
 clock = pygame.time.Clock()
@@ -39,7 +41,7 @@ class Point:
         return False
 
     def export(self):
-        return "Point({}, {})".format(self.x*SCALING_FACTOR_W, self.y*SCALING_FACTOR_H)
+        return "Point({0:0.7g}, {0:0.7g})".format(self.x*SCALING_FACTOR_W, self.y*SCALING_FACTOR_H)
 
 
 def midpoint(a, b):
@@ -57,7 +59,7 @@ def quadraticCurve(Start, End, Control, steps=10):
     return pathGenerated
 
 def calVector(Start, End):
-    return "Vector({}, {})".format((End.x - Start.x)*SCALING_FACTOR_W, (End.y - Start.y)*SCALING_FACTOR_H)
+    return "Vector({0:0.7g}, {0:0.7g})".format((End.x - Start.x)*SCALING_FACTOR_W, (End.y - Start.y)*SCALING_FACTOR_H)
 
 class Movement:
     def __init__(self):
@@ -164,7 +166,16 @@ class Movement:
         if (self.startPoint is not None) and (self.endPoint is not None):
             self.calculate()
             if realitiveToStart:
-                pass# Expot start point, everything is in vectors after that; the last vector is from start to end
+                results = "Point start = robot.location.getPos();\nsmartPointPointer result;\nresult.append(start);\nVector shifts[] = {"
+            else:
+                results = "Point start = %s;\nsmartPointPointer result;\nresult.append(start);\nVector shifts[] = {" % self.startPoint.export()
+
+            for p in self.resultpoints:
+                results += "{}, ".format(calVector(self.startPoint, p))
+
+            results += "%s};\n" % calVector(self.startPoint, self.endPoint)
+            results += "for(int i=0; i<%d; i++){\n     result.append(shifts[i] + start);\n}\ntracePath(result);" %(len(self.resultpoints)+1)
+        return results
 
 class MotionProfile:
     def __init__(self):
@@ -179,6 +190,7 @@ while running:
     mx, my = pygame.mouse.get_pos()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            print(currentMotion.export())
             running = False
         elif event.type == pygame.KEYDOWN:
             pass

@@ -94,7 +94,14 @@ int main() {
     Have PID rotation while in linear motion if greator then X degrees to avoid thew wiggles
     */
 
-
+Point start = robot.location.getPos();
+smartPointPointer result;
+result.append(start);
+Vector shifts[] = {Vector(6.511779, 6.511779), Vector(12.72378, 12.72378), Vector(18.63601, 18.63601), Vector(24.24847, 24.24847), Vector(29.56115, 29.56115), Vector(34.57405, 34.57405), Vector(39.28718, 39.28718), Vector(43.70053, 43.70053), Vector(47.81411, 47.81411), Vector(51.62792, 51.62792), Vector(55.28945, 55.28945), Vector(58.94623, 58.94623), Vector(62.59825, 62.59825), Vector(66.24552, 66.24552), Vector(69.88802, 69.88802), Vector(73.52577, 73.52577), Vector(77.15875, 77.15875), Vector(80.78698, 80.78698), Vector(84.41045, 84.41045), Vector(88.02917, 88.02917), Vector(91.80253, 91.80253), Vector(95.88993, 95.88993), Vector(100.2914, 100.2914), Vector(105.0069, 105.0069), Vector(110.0365, 110.0365), Vector(115.3801, 115.3801), Vector(121.0377, 121.0377), Vector(127.0094, 127.0094), Vector(133.2952, 133.2952), Vector(139.895, 139.895)};
+for(int i=0; i<30; i++){
+     result.append(shifts[i] + start);
+}
+tracePath(result);
 
   while(true){
     wait(200, msec);
