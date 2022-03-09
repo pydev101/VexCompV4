@@ -59,7 +59,7 @@ def quadraticCurve(Start, End, Control, steps=10):
     return pathGenerated
 
 def calVector(Start, End):
-    return "Vector({0:0.7g}, {0:0.7g})".format((End.x - Start.x)*SCALING_FACTOR_W, (End.y - Start.y)*SCALING_FACTOR_H)
+    return "Vector({}, {})".format((End.x - Start.x)*SCALING_FACTOR_W, (End.y - Start.y)*SCALING_FACTOR_H)
 
 class Movement:
     def __init__(self):

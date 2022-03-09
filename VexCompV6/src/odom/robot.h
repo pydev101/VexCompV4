@@ -99,10 +99,8 @@ class Robot{
     void updateTrace(double deltaT){
       if(traceModeOn){
         Vector e = Vector(location.getPos(), pathToTrace[pathTraceIndex]);
-        if(e.getMagnitude() < 7){
-          if(abs(location.getRobotBasisVector().dot(e)) < 6){
-            pathTraceIndex++;
-          }
+        while((e.getMagnitude() < 12) && (abs(location.getRobotBasisVector().dot(e)) < 10) && (pathTraceIndex < (pathToTrace.size - 2))){
+          pathTraceIndex++;
         }
 
         Point p = pathToTrace[pathTraceIndex];

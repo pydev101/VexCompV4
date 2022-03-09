@@ -77,8 +77,8 @@ int main() {
     Competition.drivercontrol(usercontrol);
   #endif
 
-  smartPointPointer path = generatePath(Point(0, 0), Point(0, 60), Point(20, 20), Point(-20, 40));
-  tracePath(path);
+  //smartPointPointer path = generatePath(Point(0, 0), Point(0, 60), Point(20, 20), Point(-20, 40));
+  //tracePath(path);
 
   //TODO
     /*
@@ -97,11 +97,11 @@ int main() {
 Point start = robot.location.getPos();
 smartPointPointer result;
 result.append(start);
-Vector shifts[] = {Vector(6.511779, 6.511779), Vector(12.72378, 12.72378), Vector(18.63601, 18.63601), Vector(24.24847, 24.24847), Vector(29.56115, 29.56115), Vector(34.57405, 34.57405), Vector(39.28718, 39.28718), Vector(43.70053, 43.70053), Vector(47.81411, 47.81411), Vector(51.62792, 51.62792), Vector(55.28945, 55.28945), Vector(58.94623, 58.94623), Vector(62.59825, 62.59825), Vector(66.24552, 66.24552), Vector(69.88802, 69.88802), Vector(73.52577, 73.52577), Vector(77.15875, 77.15875), Vector(80.78698, 80.78698), Vector(84.41045, 84.41045), Vector(88.02917, 88.02917), Vector(91.80253, 91.80253), Vector(95.88993, 95.88993), Vector(100.2914, 100.2914), Vector(105.0069, 105.0069), Vector(110.0365, 110.0365), Vector(115.3801, 115.3801), Vector(121.0377, 121.0377), Vector(127.0094, 127.0094), Vector(133.2952, 133.2952), Vector(139.895, 139.895)};
-for(int i=0; i<30; i++){
+Vector shifts[] = {Vector(14.30592916666668, 14.275000000000004), Vector(25.43805000000002, 28.45483333333334), Vector(33.3963625, 42.53950000000001), Vector(38.18086666666666, 56.529), Vector(39.7915625, 70.42333333333333), Vector(38.22844999999999, 84.22250000000001), Vector(33.49152916666666, 97.9265), Vector(25.580799999999996, 111.53533333333336), Vector(14.496262500000002, 125.049), Vector(0.23791666666666667, 138.4675)};
+for(int i=0; i<10; i++){
      result.append(shifts[i] + start);
 }
-tracePath(result);
+tracePath(result, 90);
 
   while(true){
     wait(200, msec);
