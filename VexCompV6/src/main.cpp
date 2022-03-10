@@ -93,6 +93,13 @@ int main() {
   Test and tune reverse rot PID; P for rotation should be about 16 and it should use an I of about 15; 
 */
 
+turnTo(0);
+turnTo(180);
+turnTo(365-45);
+turnTo(30);
+
+
+/*
 Point start = robot.location.getPos();
 smartPointPointer result;
 result.append(start);
@@ -102,7 +109,7 @@ for(int i=0; i<10; i++){
      result.append(shifts[i] + start);
 }
 tracePath(result, 90);
-
+*/
   while(true){
     wait(200, msec);
   }
