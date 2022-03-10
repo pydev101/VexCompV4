@@ -90,7 +90,7 @@ int main() {
 
   Have PID rotation while in linear motion if greator then X degrees to avoid thew wiggles
 
-  Add reverse PID for rotation; P for rotation should be about 16 and it should use an I of about 15; 
+  Test and tune reverse rot PID; P for rotation should be about 16 and it should use an I of about 15; 
 */
 
 Point start = robot.location.getPos();
