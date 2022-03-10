@@ -166,7 +166,7 @@ class Movement:
         if (self.startPoint is not None) and (self.endPoint is not None):
             self.calculate()
             if realitiveToStart:
-                results = "Point start = robot.location.getPos();\nsmartPointPointer result;\nresult.append(start);\nVector shifts[] = {"
+                results = "\nPoint start = robot.location.getPos();\nsmartPointPointer result;\nresult.append(start);\nVector shifts[] = {"
             else:
                 results = "Point start = %s;\nsmartPointPointer result;\nresult.append(start);\nVector shifts[] = {" % self.startPoint.export()
 
@@ -174,7 +174,8 @@ class Movement:
                 results += "{}, ".format(calVector(self.startPoint, p))
 
             results += "%s};\n" % calVector(self.startPoint, self.endPoint)
-            results += "for(int i=0; i<%d; i++){\n     result.append(shifts[i] + start);\n}\ntracePath(result);" %(len(self.resultpoints)+1)
+            results += "moveAbs(start);\n"
+            results += "for(int i=0; i<%d; i++){\n     result.append(shifts[i] + start);\n}\ntracePath(result);\n" %(len(self.resultpoints)+1)
         return results
 
 class MotionProfile:

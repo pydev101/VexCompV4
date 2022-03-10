@@ -77,27 +77,27 @@ int main() {
     Competition.drivercontrol(usercontrol);
   #endif
 
-  //smartPointPointer path = generatePath(Point(0, 0), Point(0, 60), Point(20, 20), Point(-20, 40));
-  //tracePath(path);
-
-  //TODO
-    /*
-    Change units of length from inches to tiles
+//-------TODO
+/*
+  Change units of length from inches to tiles
     --Tune PI after
 
-    Work on Beizer curve functions
+  Work on Beizer curve functions
     
-    Changes grid from based on starting location to absolute location
+  Changes grid from based on starting location to absolute location
 
-    Move sensor away from floor and torward the edge of the robot to minimize small shifts that occur in the center
+  Move sensor away from floor and torward the edge of the robot to minimize small shifts that occur in the center
 
-    Have PID rotation while in linear motion if greator then X degrees to avoid thew wiggles
-    */
+  Have PID rotation while in linear motion if greator then X degrees to avoid thew wiggles
+
+  Add reverse PID for rotation; P for rotation should be about 16 and it should use an I of about 15; 
+*/
 
 Point start = robot.location.getPos();
 smartPointPointer result;
 result.append(start);
 Vector shifts[] = {Vector(14.30592916666668, 14.275000000000004), Vector(25.43805000000002, 28.45483333333334), Vector(33.3963625, 42.53950000000001), Vector(38.18086666666666, 56.529), Vector(39.7915625, 70.42333333333333), Vector(38.22844999999999, 84.22250000000001), Vector(33.49152916666666, 97.9265), Vector(25.580799999999996, 111.53533333333336), Vector(14.496262500000002, 125.049), Vector(0.23791666666666667, 138.4675)};
+moveAbs(start);
 for(int i=0; i<10; i++){
      result.append(shifts[i] + start);
 }
@@ -107,23 +107,3 @@ tracePath(result, 90);
     wait(200, msec);
   }
 }
-
-
-
-/*moveAbs(0, 20);
-moveAbs(-20, 20);
-moveAbs(-20, 0, false);
-moveAbs(0, 20);
-turnTo(90, true);
-moveAbs(0, 0, false);*/
-//smartPointPointer path = generatePath(Point(0,0), Point(0,24.8), Point(-35.4,3.85), Point(31.53, 12.35), 25);
-//tracePath(path);
-//std::cout << "Complete" << std::endl;
-
-/*
-TODO
-
--implement a path tracer which follows a path without worrying about slowing down to a stop each time
--Look at vex::serial_link as part of logger
---Cameras need to be done once above is done; Set the target poisition to the goal
-*/

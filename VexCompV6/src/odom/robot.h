@@ -20,10 +20,11 @@ class Robot{
     //PID varibles
     PIDGains linearGains;
     PIDGains rotGains;
-    PIDGains linearGainsReverse; 
+    PIDGains linearGainsReverse;
+    PIDGains reverseRotGains; 
 
     Point lastStopPosition = Point(0,0);
-    PIDOutput rotPID = initPID(0);
+    double lastStopHeading = 0;
 
     //Varibles related to if the robot is currently stopped
     double linearThreshold; //How close the robot should be from target before it is allowed to quit
@@ -80,11 +81,23 @@ class Robot{
 
       if(usingRotPIDControls){
         double eTheta = getThetaError();
-        rotPID = PID(eTheta, deltaT, rotGains, rotPID);
+        double normalizedCurrHead = normalizeAngle(location.getCurrHead());
+        double rError = normalizedCurrHead - lastStopHeading;
+        rError = abs(rError);
+        if(rError > PI){
+          rError = 2*PI - rError;
+        }
         double newOmega = 0;
 
         if(abs(eTheta) > rotationalThreshold){
-          newOmega = rotPID.output + sign(rotPID.output)*rotGains.i;
+          if(abs(eTheta) > rError){
+            //Follow Reverse
+            newOmega = rError*reverseRotGains.p + reverseRotGains.i;
+            newOmega = newOmega * sign(eTheta);
+          }else{
+            //Follow Standard
+            newOmega = rotGains.p*eTheta + sign(eTheta)*rotGains.i;
+          }
         }
 
         if(abs(newOmega) > maxAngularVel){
@@ -99,8 +112,9 @@ class Robot{
     void updateTrace(double deltaT){
       if(traceModeOn){
         Vector e = Vector(location.getPos(), pathToTrace[pathTraceIndex]);
-        while((e.getMagnitude() < 12) && (abs(location.getRobotBasisVector().dot(e)) < 10) && (pathTraceIndex < (pathToTrace.size - 2))){
+        while((e.getMagnitude() < 10) && (abs(location.getRobotBasisVector().dot(e)) < 10) && (pathTraceIndex < (pathToTrace.size - 2))){
           pathTraceIndex++;
+          e = Vector(location.getPos(), pathToTrace[pathTraceIndex]);
         }
 
         Point p = pathToTrace[pathTraceIndex];
@@ -122,16 +136,18 @@ class Robot{
     //Constructor to save all required user defined varibles in safe manner
     Robot(Point Pos, double CurrentHeading, bool headingGivenInDegrees, 
           PIDGains linPID, PIDGains rotPID,
-          PIDGains linPIDR,
+          PIDGains linPIDR, PIDGains RotGainsR,
           double linearThres, double rotationalThresInRadians, double maxLinearVelocity, double maxAngularVelocity,
           double updateTargetHeadingMinThreasholdX, double maxThetaErrorForMotionX, bool lastArgInDeg){
       location = OdomGrid(Pos, CurrentHeading, headingGivenInDegrees);
 
       lastStopPosition = Pos;
+      lastStopHeading = normalizeAngle(CurrentHeading, headingGivenInDegrees);
 
       linearGains = linPID;
       rotGains = rotPID;
       linearGainsReverse = linPIDR;
+      reverseRotGains = RotGainsR;
 
       rotationalThreshold = rotationalThresInRadians;
       linearThreshold = linearThres;
@@ -200,6 +216,7 @@ class Robot{
       updateTargetHeadingWhileInMotion = false;
       blockLinearMotionIfThetaErrorTooHigh = false;
     }
+
     //Setup robot output to follow a path at contant velocity
     void traceMode(smartPointPointer &path, double vel){
       if(path.size >= 2){
@@ -258,6 +275,7 @@ class Robot{
       roatationStopTimer = roatationStopTimer + deltaT;
       if(roatationStopTimer > 0.05){
         stoppedRotating = true;
+        lastStopHeading = normalizeAngle(location.getCurrHead());
       }
     }else{
       roatationStopTimer = 0;

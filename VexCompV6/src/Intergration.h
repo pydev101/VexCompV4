@@ -45,6 +45,7 @@ const PIDGains rotGain = {53,0,0}; //53
 
 //PID values moved in move up state
 const PIDGains linGainReverse = {5,8,0}; //I is constant
+const PIDGains rotGainReverse = {53,0,0}; //I is constant
 
 
 /*
@@ -73,7 +74,7 @@ PythonProgramLogger pythonLog(fileName);
 ///Robot Instantation
 Robot robot = Robot(startingPoint, startingHead, true, 
                     linGain, rotGain,
-                    linGainReverse,
+                    linGainReverse, rotGainReverse,
                     linThreashold, angularThreashold, 
                     maxVelocity, maxAngularVelocity, 
                     updateTargetHeadingMinThreashold, maxThetaErrorForMotion, maxThetaErrorForMotionGivenInDegrees);
