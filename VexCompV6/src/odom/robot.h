@@ -112,22 +112,22 @@ class Robot{
     void updateTrace(double deltaT){
       if(traceModeOn){
         Vector e = Vector(location.getPos(), pathToTrace[pathTraceIndex]);
-        while((e.getMagnitude() < 10) && (abs(location.getRobotBasisVector().dot(e)) < 10) && (pathTraceIndex < (pathToTrace.size - 2))){
-          pathTraceIndex++;
-          e = Vector(location.getPos(), pathToTrace[pathTraceIndex]);
-        }
+        Vector otherE = Vector(location.getPos(), pathToTrace[pathToTrace.size-1]);
 
-        Point p = pathToTrace[pathTraceIndex];
-        setAbsTarget(p);
-        Vector t = Vector(location.getPos(), p).getUnitVector();
-        Vector v = location.getRobotBasisVector().scale(traceVelocity);
-
-        if(pathTraceIndex == (pathToTrace.size - 1)){
-          setAbsTarget(pathToTrace[pathToTrace.size - 1]);
+        if(otherE.getMagnitude() <= 12){
           setLineMode(true);
         }else{
+          while((e.getMagnitude() < 10) && (abs(location.getRobotBasisVector().dot(e)) < 10) && (pathTraceIndex < (pathToTrace.size - 2))){
+            pathTraceIndex++;
+            e = Vector(location.getPos(), pathToTrace[pathTraceIndex]);
+          }
+
+          Point p = pathToTrace[pathTraceIndex];
+          Vector t = Vector(location.getPos(), p);
+          Vector v = location.getRobotBasisVector().scale(traceVelocity);
+
           setHeadTargetAbs(Vector(1 ,0).getAngle(t), false);
-          targetLinearVelocity = v.dot(t);
+          targetLinearVelocity = v.dot(t.getUnitVector());
         }
       }
     }
@@ -282,6 +282,7 @@ class Robot{
       stoppedRotating = false;
     }
 
+    //TODO (Maybe) Make last stopped position be based on velocity not linear threshold; maybe if the difference between this position and last position is less than threshold for x time; same for rot
     if(abs(getLinearErrorForPID()) < linearThreshold){
       motionStopTimer = motionStopTimer + deltaT;
       if(motionStopTimer > 0.05){
