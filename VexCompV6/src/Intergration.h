@@ -140,24 +140,17 @@ int trakerFunction(){
 
     //std::cout << robot.location.getCurrHead() << ", " << robot.location.getTargetHead() << std::endl;
 
-    #if 0
-      if(frame >= 100){
-        //pythonLog.print(false);
-        pythonLog.append();
-
-        //graph.addPID({robot.getLinearErrorForPID(), robot.linearPid, robot.getLinearSpeedTarget(), robot.location.getVel().dot(robot.location.getRobotBasisVector())}, true);
-        //graph.addPID({robot.getThetaError(), robot.rotationalPid, robot.getRotationalSpeedTarget(), robot.location.getAngularVel()}, false);
-        frame = 0;
-      }else if(frame%10 == 0){
+    #if 1
+      if(frame >= 10){
         Vector tVec = robot.location.getTargetVector();
         pythonLog.addPoint(robot.location.pos, "green");
         pythonLog.addPoint(robot.location.targetPos, "blue");
         pythonLog.addVector(robot.location.pos, tVec, "teal");
         pythonLog.addVector(robot.location.pos, Vector(1, robot.location.getTargetHead(), false).scale(10), "yellow");
         pythonLog.addVector(robot.location.pos, robot.location.getRobotBasisVector().scale(10), "red");
-        //pythonLog.addVector(robot.location.pos, Vector(robot.lastStopPosition, robot.location.getPos()).project(robot.location.getTargetVector().getUnitVector()), "blue");
         pythonLog.graph();
-        frame = frame + 1;
+        pythonLog.print();
+        frame = 0;
       }else{
         frame = frame + 1;
       }
@@ -294,8 +287,12 @@ void moveCV(Vector v, double linearSpeedTarget){
 
 //Follow a generated path
 void tracePath(smartPointPointer &points, double vel=20){
-  robot.traceMode(points, vel);
-  executeMove();
+  if(points.size >= 2){
+    moveAbs(points[0]);
+    turnTo(Vector(1, 0).getAngle(Vector(robot.location.getPos(), points[1])), false);
+    robot.traceMode(points, vel);
+    executeMove();
+  }
 }
 
 //Camera functions

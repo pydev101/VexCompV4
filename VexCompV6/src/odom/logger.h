@@ -89,6 +89,7 @@ class PythonProgramLogger{
   }
 
   void print(bool clearBuffer=true){
+    logger << std::endl;
     logger.print(clearBuffer);
   }
 };

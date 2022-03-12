@@ -117,7 +117,8 @@ class Robot{
         if(otherE.getMagnitude() <= 12){
           setLineMode(true);
         }else{
-          while((e.getMagnitude() < 10) && (abs(location.getRobotBasisVector().dot(e)) < 10) && (pathTraceIndex < (pathToTrace.size - 2))){
+          //TODO Make stop timer values and these distance values be passed from intergration file, also make logger be able to output path to program; also allow for save/load of motion profiles and add settings menu
+          while((e.getMagnitude() < 12) && (abs(location.getRobotBasisVector().dot(e)) < 12) && (pathTraceIndex < (pathToTrace.size - 1))){
             pathTraceIndex++;
             e = Vector(location.getPos(), pathToTrace[pathTraceIndex]);
           }
@@ -224,10 +225,12 @@ class Robot{
         forward = true;
         updateTargetHeadingWhileInMotion = false;
         blockLinearMotionIfThetaErrorTooHigh = false;
+        
         traceVelocity = vel;
         setAbsTarget(path[path.size - 1]);
         pathToTrace = path;
         pathTraceIndex = 0;
+
         traceModeOn = true;
       }
     }
