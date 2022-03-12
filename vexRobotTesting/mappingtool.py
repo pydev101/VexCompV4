@@ -205,3 +205,9 @@ while running:
     # update the dispalay
     pygame.display.flip()
     clock.tick(60)
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    clock.tick(60)
