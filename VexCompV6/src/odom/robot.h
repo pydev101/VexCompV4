@@ -90,7 +90,7 @@ class Robot{
         double newOmega = 0;
 
         if(abs(eTheta) > rotationalThreshold){
-          if(abs(eTheta) > rError){
+          if((abs(eTheta) > rError) && (abs(eTheta) > degToRad(5))){
             //Follow Reverse
             newOmega = rError*reverseRotGains.p + reverseRotGains.i;
             newOmega = newOmega * sign(eTheta);

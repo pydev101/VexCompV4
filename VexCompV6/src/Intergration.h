@@ -41,11 +41,11 @@ const int armIntakeActivationThreshold = 400;
 
 //PID Values used in move down state
 const PIDGains linGain = {7,2,0}; //I is treated like a constant
-const PIDGains rotGain = {30,0,0}; //53
+const PIDGains rotGain = {20,7,0};
 
 //PID values moved in move up state
 const PIDGains linGainReverse = {5,8,0}; //I is constant
-const PIDGains rotGainReverse = {40,5,0}; //I is constant
+const PIDGains rotGainReverse = {40,15,0}; //I is constant
 
 
 /*
@@ -140,7 +140,7 @@ int trakerFunction(){
 
     //std::cout << robot.location.getCurrHead() << ", " << robot.location.getTargetHead() << std::endl;
 
-    #if 1
+    #if 0
       if(frame >= 10){
         Vector tVec = robot.location.getTargetVector();
         pythonLog.addPoint(robot.location.pos, "green");
