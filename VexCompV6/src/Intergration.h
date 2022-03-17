@@ -41,12 +41,11 @@ const int armIntakeActivationThreshold = 400;
 
 //PID Values used in move down state
 const PIDGains linGain = {7,2,0}; //I is treated like a constant
-const PIDGains rotGain = {20,7,0};
+const PIDGains rotGain = {22,2,0};
 
 //PID values moved in move up state
 const PIDGains linGainReverse = {5,8,0}; //I is constant
-const PIDGains rotGainReverse = {40,15,0}; //I is constant
-
+const PIDGains rotGainReverse = {44,2,0}; //I is constant
 
 /*
 const PIDGains cameraGains[2][2] = {
