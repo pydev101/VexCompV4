@@ -10,160 +10,95 @@ Implements the use function in intergation into robot programs that will run dur
 
 //Programs
 void blueLeft(int mod){
-  moveAbs(13, 63);
+  moveCV(10, 0, 100);
+  moveCV(40, 10, 92);
   frontPne.set(true);
-  moveAbs(12, 40, false);
-  moveCV(0, 40, -40);
-  moveAbs(51, 40, true);
-  turnTo(270);
-  robot.usePIDControls(false);
-  double t = Brain.timer(timeUnits::msec);
-  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
-    setLeft(-40);
-    setRight(-40);
-    wait(motionDelay, msec);
-  }
+  wait(300, msec);
+
+  moveCV(-8, 0, -50);
+
+  backPne.set(false);
+  moveCV(16, 33, -80);
+
   backPne.set(true);
-  setLeft(0);
-  setRight(0);
-  moveAbs(10, 30);
+  wait(250, msec);
+  moveCV(-30, -30, 80);
+
   moveAbs(0, 3, false);
   backPne.set(false);
   moveAbs(3, 6);
   moveCV(4, 5, 20);
 }
 
+void specialLeft(int mod){
+  moveCV(10, 0, 100);
+  moveCV(40, 10, 100);
+  frontPne.set(true);
+  wait(350, msec);
+
+  moveCV(-25, -7, -80);
+  backPne.set(false);
+  turnTo(135);
+  robot.usePIDControls(false);
+  double t = Brain.timer(timeUnits::msec);
+  while(((Brain.timer(timeUnits::msec) - t) <= 800) && (!LimitBack.pressing())){
+    setLeft(-60);
+    setRight(-60);
+    wait(motionDelay, msec);
+  }
+  backPne.set(true);
+  setLeft(0);
+  setRight(0);
+
+  moveTime(60, 800);
+  arm.rotateTo(700, rotationUnits::deg, 90, velocityUnits::pct);
+  setIntake(-80);
+}
+
 void blueRight(int mod){
   moveCV(50, 0, 100);
   frontPne.set(true);
   wait(250, msec);
-  moveAbs(-11, 26, false);
+  moveCV(-15, -11, -40);
+  backPne.set(false);
 
-  moveAbs(-36, 52, false);
-  robot.usePIDControls(false);
-  double t = Brain.timer(timeUnits::msec);
-  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
-    setLeft(-40);
-    setRight(-40);
-    wait(motionDelay, msec);
-  }
+  moveCV(20, -23, -100);
   backPne.set(true);
-  setLeft(0);
-  setRight(0);
+  wait(250, msec);
 
-  moveAbs(0.5*(-34+13), 0.5*(52+0));
 
-  moveAbs(13, 0, false);
-  
+  moveCV(-38, 33, 90);
+  moveCV(-9, 9, -90);
+
   backPne.set(false);
   moveAbs(4, 18, true);
   turnTo(180);
   robot.usePIDControls(false);
-  t = Brain.timer(timeUnits::msec);
-  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
+  double t = Brain.timer(timeUnits::msec);
+  while(((Brain.timer(timeUnits::msec) - t) <= 800) && (!LimitBack.pressing())){
     setLeft(-40);
     setRight(-40);
     wait(motionDelay, msec);
   }
   backPne.set(true);
+  setLeft(0);
+  setRight(0);
 }
 
-void OneMinute(int mod){
-  //Grab front
-  moveCV(30, 0, 130);
-  wait(700, msec);
+void rightSpecial(int mod){
+  moveCV(50, 0, 100);
   frontPne.set(true);
   wait(250, msec);
-  moveAbs(-7, 26, false);
-  
-  //Grab middle
-  moveAbs(-36, 52, false);
-  robot.usePIDControls(false);
-  double t = Brain.timer(timeUnits::msec);
-  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
-    setLeft(-40);
-    setRight(-40);
-    wait(motionDelay, msec);
-  }
-  backPne.set(true);
-  setLeft(0);
-  setRight(0);
-
-  //Score bridge
-  moveAbs(-35, 30);
-  turnTo(270);
-  arm.rotateTo(1520, rotationUnits::deg, 90, velocityUnits::pct);
-  moveAbs(-35, 15);
-  frontPne.set(false);
-  wait(500, timeUnits::msec);
-
-  //Drop off middle
-  turnTo(180);
-  arm.startRotateTo(0, rotationUnits::deg, 90, velocityUnits::pct);
-  setIntake(0);
-  moveAbs(0, 17, false);
-  moveCV(-16, 2, -70);
+  moveCV(-22, 0, -70);
   backPne.set(false);
-  wait(400, msec);
-  moveAbs(0, 10);
-  turnTo(180);
-  
-  //Grab red
-  robot.usePIDControls(false);
-  t = Brain.timer(timeUnits::msec);
-  while(((Brain.timer(timeUnits::msec) - t) <= 1000) && (!LimitBack.pressing())){
-    setLeft(-80);
-    setRight(-80);
-    wait(motionDelay, msec);
-  }
+  moveCV(0, 20, -80);
   backPne.set(true);
-  setLeft(0);
-  setRight(0);
-  
-  //Grab next red
-  moveAbs(-86, 15);
-  moveCV(Vector(10, 303, true), 40);
-  wait(400, timeUnits::msec);
-  frontPne.set(true);
-  wait(100, timeUnits::msec);
-  
-  //Move accross field
-  move(Vector(-2, 303, true), false);
-  moveCV(Vector(84, 83, true), -80);
-
-  //Drop
-  backPne.set(false);
-  wait(100, timeUnits::msec);
-  moveAbs(-80, 80);
-  turnTo(320);
-
-  //Grab
-  robot.usePIDControls(false);
-  t = Brain.timer(timeUnits::msec);
-  while(((Brain.timer(timeUnits::msec) - t) <= 700) && (!LimitBack.pressing())){
-    setLeft(-70);
-    setRight(-70);
-    wait(motionDelay, msec);
-  }
-  backPne.set(true);
-  setLeft(0);
-  setRight(0);
-
-  //Move and drop
-  moveAbs(-45, 70);
-  moveAbs(20, 84);
-  frontPne.set(false);
-
-  //Grab
-  turnTo(105);
-  moveTime(80, 800);
-  frontPne.set(true);
-  wait(100, timeUnits::msec);
-
-  //Retreat
-  moveTime(-80, 400);
-  moveAbs(20, 5, false);
+  wait(250, msec);
+  arm.rotateTo(700, rotationUnits::deg, 90, velocityUnits::pct);
+  setIntake(-80);
+  moveCV(0, -10, 70);
 }
+
 
 //Storage of program functions for use in the GUI
 typedef struct {
@@ -174,10 +109,10 @@ typedef struct {
 
 //Use of a table allows programs to be easily added or removed
 autoEntry entries[] = {
-  {"Blue Right", blueRight},
-  {"Red Right", blueRight},
-  {"Red Left", blueLeft},
-  {"One Minute", OneMinute},
+  {"Right", blueRight},
+  {"Right Special", rightSpecial},
+  {"Left", blueLeft},
+  {"Left Special", specialLeft},
 };
 int indexAuto = 0;
 

@@ -7,7 +7,7 @@ Written By: Carson Easterling
 Defines driver program and function
 */
 
-#define specialSkillsMode 1
+#define specialSkillsMode 0 //If activated allows the one click full lift mode or hold for small adjustments
 #define armUpSpeed 100
 #define armDownSpeed -100
 #define fullUp 1520
@@ -114,7 +114,7 @@ void usercontrol(void) {
           setIntake(0);
         }else{
           intakeMode = 1;
-          setIntake(50);
+          setIntake(80);
         }
       }
     }else if(Controller1.ButtonA.pressing()){
@@ -125,7 +125,7 @@ void usercontrol(void) {
           setIntake(0);
         }else{
           intakeMode = -1;
-          setIntake(-50);
+          setIntake(-80);
         }
       }
     }else{

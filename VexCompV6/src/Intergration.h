@@ -18,7 +18,7 @@ const Point startingPoint = Point(0, 0);
 const double startingHead = 90; //Degrees (CCW +)
 
 const double UnitsPerRev = 18.3207546*1.0167034; //Inches per revolution
-const double RobotDiameter = 15; //Inches (Same Units as above)
+const double RobotDiameter = 14.6; //Inches (Same Units as above)
 const double RobotRadius = 0.5*RobotDiameter;
 
 const double updateTime = 10; //msec
@@ -40,12 +40,12 @@ const int armIntakeActivationThreshold = 400;
 //linGains, rotGains
 
 //PID Values used in move down state
-const PIDGains linGain = {7,2,0}; //I is treated like a constant
-const PIDGains rotGain = {22,2,0};
+const PIDGains linGain = {4,2,0}; //I is treated like a constant
+const PIDGains rotGain = {44,2,0};
 
 //PID values moved in move up state
-const PIDGains linGainReverse = {5,8,0}; //I is constant
-const PIDGains rotGainReverse = {44,2,0}; //I is constant
+const PIDGains linGainReverse = {7,8,0}; //I is constant
+const PIDGains rotGainReverse = {88,2,0}; //I is constant
 
 /*
 const PIDGains cameraGains[2][2] = {
@@ -224,12 +224,12 @@ void turnTo(double theta, bool inDeg=true, bool blocking=true){
 
 //Moves to absolute coordnate location
 void moveAbs(double x, double y, bool fwd=true, bool blocking=true){
-  //Point p = robot.location.getPos();
+  Point p = robot.location.getPos();
   double d = 0;
   if(!fwd){
     d = PI;
   }
-  //turnTo(Vector(1, 0).getAngle(Vector(x-p.x, y-p.y)) + d, false);
+  turnTo(Vector(1, 0).getAngle(Vector(x-p.x, y-p.y)) + d, false);
 
   robot.setLineMode(fwd);
   robot.setAbsTarget(x, y);
