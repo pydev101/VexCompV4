@@ -8,7 +8,7 @@ pygame.init()
 WIDTH = 900
 HEIGHT = 700
 
-field_img = pygame.image.load("assets/Field.png")
+field_img = pygame.image.load("assets/Field2022.png")
 FIELD_WIDTH, FIELD_HEIGHT = 600, 600
 SCALING_FACTOR_W, SCALING_FACTOR_H = 142.75/FIELD_WIDTH, 142.75/FIELD_HEIGHT
 
