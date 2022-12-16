@@ -166,16 +166,16 @@ class Movement:
         if (self.startPoint is not None) and (self.endPoint is not None):
             self.calculate()
             if realitiveToStart:
-                results = "\nPoint start = robot.location.getPos();\nsmartPointPointer result;\nresult.append(start);\nVector shifts[] = {"
+                results = "\nPoint start = robot.getCurrPos().p;\nstd::vector<positionSet> result;\nresult.push_back({start,0});\nVector shifts[] = {"
             else:
-                results = "Point start = %s;\nsmartPointPointer result;\nresult.append(start);\nVector shifts[] = {" % self.startPoint.export()
+                results = "Point start = %s;\nsmartPointPointer result;\nresult.append({start,0});\nVector shifts[] = {" % self.startPoint.export()
 
             for p in self.resultpoints:
                 results += "{}, ".format(calVector(self.startPoint, p))
 
             results += "%s};\n" % calVector(self.startPoint, self.endPoint)
-            results += "moveAbs(start);\n"
-            results += "for(int i=0; i<%d; i++){\n     result.append(shifts[i] + start);\n}\ntracePath(result);\n" %(len(self.resultpoints)+1)
+            results += "robot.setAbsTarget(start);\n"
+            results += "for(int i=0; i<%d; i++){\n     result.push_back({shifts[i] + start,0});\n}\nrobot.setMultiPointPath(result);\nexecuteMove();\n" %(len(self.resultpoints)+1)
         return results
 
 class MotionProfile:
